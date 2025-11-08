@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Skill, buildSkillsFromStorage } from "@/utils/skillGraph";
 import { Navigation } from "@/components/Navigation";
 import { CosmicLogo } from "@/components/CosmicLogo";
 import { ShootingStars } from "@/components/ShootingStars";
-import { CheckCircle2, Lock, Unlock } from "lucide-react";
+import { CheckCircle2, Lock, Unlock, Gamepad2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 const Skills = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -68,26 +70,37 @@ const Skills = () => {
                 </CardDescription>
               </CardHeader>
               
-              {skill.unlocks && skill.unlocks.length > 0 && (
-                <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-sm font-semibold text-secondary uppercase tracking-wider">
-                      Unlocks:
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {skill.unlocks.map((unlock) => (
-                        <Badge
-                          key={unlock}
-                          variant="outline"
-                          className="text-xs border-secondary/30 text-secondary"
-                        >
-                          {unlock}
-                        </Badge>
-                      ))}
+              <CardContent>
+                <div className="space-y-4">
+                  {skill.unlocks && skill.unlocks.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-semibold text-secondary uppercase tracking-wider">
+                        Unlocks:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {skill.unlocks.map((unlock) => (
+                          <Badge
+                            key={unlock}
+                            variant="outline"
+                            className="text-xs border-secondary/30 text-secondary"
+                          >
+                            {unlock}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              )}
+                  )}
+                  
+                  {skill.unlocked && (
+                    <Link to={`/learn?skill=${skill.id}`}>
+                      <Button variant="outline" className="w-full" size="sm">
+                        <Gamepad2 className="w-4 h-4 mr-2" />
+                        Start Learning
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </CardContent>
             </Card>
           ))}
         </div>

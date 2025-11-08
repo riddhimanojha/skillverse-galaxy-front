@@ -82,19 +82,21 @@ export const addXP = (currentProgress: UserProgress, amount: number): UserProgre
 };
 
 /**
- * Award XP for completing a skill
+ * Award XP for completing a skill or challenge
  */
-export const completeSkill = (skillId: string): UserProgress => {
+export const completeSkill = (skillId: string, customXP?: number): UserProgress => {
   let progress = getProgress();
   
   // Update streak
   progress = updateStreak(progress);
   
-  // Add XP
-  progress = addXP(progress, XP_PER_SKILL);
+  // Add XP (use custom amount for challenges or default for skills)
+  progress = addXP(progress, customXP || XP_PER_SKILL);
   
-  // Increment total skills
-  progress.totalSkillsCompleted += 1;
+  // Increment total skills only if no custom XP (means it's a skill completion)
+  if (!customXP) {
+    progress.totalSkillsCompleted += 1;
+  }
   
   // Check for achievements
   progress = checkAchievements(progress);
