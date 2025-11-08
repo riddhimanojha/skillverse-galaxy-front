@@ -8,61 +8,52 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Deep Space Background */
-    --background: 250 70% 3%;
+    /* Cosmic galaxy theme */
+    --background: 250 60% 5%;
     --foreground: 240 10% 98%;
 
-    /* Glassmorphism cards with depth */
-    --card: 250 40% 8%;
+    /* Glassmorphism cards */
+    --card: 250 40% 10%;
     --card-foreground: 240 10% 98%;
 
-    --popover: 250 40% 10%;
+    --popover: 250 40% 12%;
     --popover-foreground: 240 10% 98%;
 
-    /* Neon Electric Purple - Primary */
-    --primary: 280 100% 65%;
+    /* Neon cosmic accents */
+    --primary: 280 100% 70%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 280 100% 75%;
 
-    /* Cyan Neon - Secondary */
-    --secondary: 185 95% 55%;
+    /* Cyan for unlocked skills */
+    --secondary: 190 100% 60%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-glow: 185 95% 65%;
 
     /* Muted cosmic elements */
-    --muted: 250 35% 12%;
-    --muted-foreground: 240 15% 60%;
+    --muted: 250 30% 15%;
+    --muted-foreground: 240 20% 65%;
 
-    /* Electric accent colors */
-    --accent: 270 100% 60%;
+    /* Accent - electric purple */
+    --accent: 270 100% 65%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 270 100% 70%;
 
-    /* Danger red with glow */
-    --destructive: 0 85% 55%;
+    --destructive: 0 80% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders with subtle glow */
-    --border: 260 50% 20%;
-    --input: 250 45% 12%;
-    --ring: 280 100% 65%;
+    /* Borders with cosmic glow */
+    --border: 260 40% 25%;
+    --input: 250 40% 15%;
+    --ring: 280 100% 70%;
 
-    --radius: 1.25rem;
+    --radius: 1rem;
 
-    /* Multi-layer glow effects */
-    --glow-completed: 280 100% 65%;
-    --glow-unlocked: 185 95% 55%;
-    --glow-locked: 240 25% 35%;
+    /* Glow effects */
+    --glow-completed: 280 100% 70%;
+    --glow-unlocked: 190 100% 60%;
+    --glow-locked: 240 20% 40%;
     
-    /* Deep nebula gradients */
-    --nebula-start: 250 70% 5%;
-    --nebula-mid: 270 60% 8%;
-    --nebula-end: 280 50% 6%;
-    
-    /* Accent gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(280 100% 65%), hsl(270 100% 60%));
-    --gradient-secondary: linear-gradient(135deg, hsl(185 95% 55%), hsl(195 90% 60%));
-    --gradient-cosmic: linear-gradient(135deg, hsl(280 100% 65%), hsl(185 95% 55%));
+    /* Nebula gradient */
+    --nebula-start: 250 60% 8%;
+    --nebula-mid: 270 50% 12%;
+    --nebula-end: 280 40% 10%;
   }
 
   * {
@@ -75,132 +66,46 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
-  /* Cosmic glow text effect */
   .cosmic-glow {
     text-shadow: 0 0 20px hsl(var(--primary)), 
-                 0 0 40px hsl(var(--primary) / 0.6),
-                 0 0 60px hsl(var(--primary) / 0.4),
-                 0 0 80px hsl(var(--primary) / 0.2);
+                 0 0 40px hsl(var(--primary) / 0.5),
+                 0 0 60px hsl(var(--primary) / 0.3);
     animation: glow-pulse 3s ease-in-out infinite;
-  }
-  
-  .cosmic-glow-secondary {
-    text-shadow: 0 0 20px hsl(var(--secondary)), 
-                 0 0 40px hsl(var(--secondary) / 0.6),
-                 0 0 60px hsl(var(--secondary) / 0.4);
-    animation: glow-pulse-secondary 3s ease-in-out infinite;
   }
   
   @keyframes glow-pulse {
     0%, 100% {
       text-shadow: 0 0 20px hsl(var(--primary)), 
-                   0 0 40px hsl(var(--primary) / 0.6),
-                   0 0 60px hsl(var(--primary) / 0.4);
+                   0 0 40px hsl(var(--primary) / 0.5),
+                   0 0 60px hsl(var(--primary) / 0.3);
     }
     50% {
       text-shadow: 0 0 30px hsl(var(--primary)), 
-                   0 0 60px hsl(var(--primary) / 0.8),
-                   0 0 90px hsl(var(--primary) / 0.6),
-                   0 0 120px hsl(var(--primary) / 0.3);
+                   0 0 60px hsl(var(--primary) / 0.7),
+                   0 0 90px hsl(var(--primary) / 0.5);
     }
   }
   
-  @keyframes glow-pulse-secondary {
-    0%, 100% {
-      text-shadow: 0 0 20px hsl(var(--secondary)), 
-                   0 0 40px hsl(var(--secondary) / 0.6);
-    }
-    50% {
-      text-shadow: 0 0 30px hsl(var(--secondary)), 
-                   0 0 60px hsl(var(--secondary) / 0.8);
-    }
-  }
-  
-  /* Enhanced glass panel with depth */
   .glass-panel {
-    background: linear-gradient(135deg, 
-      hsl(var(--card) / 0.9) 0%, 
-      hsl(var(--card) / 0.7) 50%,
-      hsl(var(--card) / 0.8) 100%);
-    backdrop-filter: blur(32px) saturate(200%);
-    -webkit-backdrop-filter: blur(32px) saturate(200%);
-    border: 1px solid hsl(var(--border) / 0.5);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6),
-                inset 0 1px 2px 0 hsl(var(--primary) / 0.15),
-                0 0 0 1px hsl(var(--primary) / 0.05);
+    background: linear-gradient(135deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.6));
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid hsl(var(--border) / 0.4);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 0 hsl(var(--primary) / 0.1);
   }
   
-  /* Planet/skill card with 3D effect */
-  .planet-card {
-    background: linear-gradient(135deg, 
-      hsl(var(--card) / 0.95), 
-      hsl(var(--card) / 0.85));
-    backdrop-filter: blur(20px);
-    border: 1px solid hsl(var(--border) / 0.6);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 hsl(var(--primary) / 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .planet-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7),
-                0 0 40px hsl(var(--primary) / 0.3),
-                inset 0 1px 0 hsl(var(--primary) / 0.2);
-    border-color: hsl(var(--primary) / 0.6);
-  }
-  
-  /* Skill glow effects with layers */
   .skill-glow-completed {
     filter: drop-shadow(0 0 20px hsl(var(--glow-completed))) 
-            drop-shadow(0 0 40px hsl(var(--glow-completed) / 0.7))
-            drop-shadow(0 0 60px hsl(var(--glow-completed) / 0.4));
+            drop-shadow(0 0 40px hsl(var(--glow-completed) / 0.6));
   }
   
   .skill-glow-unlocked {
     filter: drop-shadow(0 0 15px hsl(var(--glow-unlocked))) 
-            drop-shadow(0 0 30px hsl(var(--glow-unlocked) / 0.6))
-            drop-shadow(0 0 45px hsl(var(--glow-unlocked) / 0.3));
+            drop-shadow(0 0 30px hsl(var(--glow-unlocked) / 0.5));
   }
   
   .skill-glow-locked {
-    filter: drop-shadow(0 0 8px hsl(var(--glow-locked)))
-            drop-shadow(0 0 16px hsl(var(--glow-locked) / 0.4));
-  }
-  
-  /* Floating animation */
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-  
-  .float-animation {
-    animation: float 6s ease-in-out infinite;
-  }
-  
-  /* Rotate glow animation */
-  @keyframes rotate-glow {
-    0% {
-      filter: hue-rotate(0deg);
-    }
-    100% {
-      filter: hue-rotate(360deg);
-    }
-  }
-  
-  .rotate-glow {
-    animation: rotate-glow 10s linear infinite;
-  }
-  
-  /* Gradient text */
-  .gradient-text {
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    filter: drop-shadow(0 0 8px hsl(var(--glow-locked)));
   }
 }
