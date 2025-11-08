@@ -6,6 +6,7 @@ import { CosmicLogo } from "@/components/CosmicLogo";
 import { Navigation } from "@/components/Navigation";
 import { ConstellationLines } from "@/components/ConstellationLines";
 import { ShootingStars } from "@/components/ShootingStars";
+import { SearchLearningPath } from "@/components/SearchLearningPath";
 import { toast } from "sonner";
 import { Skill, buildSkillsFromStorage, saveProgress } from "@/utils/skillGraph";
 import { completeSkill, getProgress } from "@/utils/progressSystem";
@@ -100,6 +101,11 @@ const Index = () => {
       
       {/* Navigation */}
       <Navigation />
+
+      {/* Search Box */}
+      <div className="fixed top-32 left-1/2 -translate-x-1/2 z-40 w-full px-8 animate-fade-in">
+        <SearchLearningPath />
+      </div>
 
       {/* Stats Panel - Glassmorphism */}
       <div className="fixed bottom-8 left-8 z-50 glass-panel rounded-2xl p-6 min-w-[220px] animate-fade-in border border-primary/20">
