@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Bug, CheckCircle2, Timer } from "lucide-react";
+import { Bug, CheckCircle2, Timer, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 import { GameChallenge, completeChallenge } from "@/utils/challengeSystem";
 import { completeSkill } from "@/utils/progressSystem";
@@ -16,17 +16,20 @@ const buggyCodeSamples = [
   {
     broken: "function greet(name) {\n  console.log('Hello ' + nam);\n}",
     fixed: "function greet(name) {\n  console.log('Hello ' + name);\n}",
-    bug: "Variable name typo: 'nam' should be 'name'"
+    bug: "Variable name typo: 'nam' should be 'name'",
+    hint: "Check the variable names - is 'nam' the correct variable?"
   },
   {
     broken: "const numbers = [1, 2, 3];\nfor (let i = 0; i <= numbers.length; i++) {\n  console.log(numbers[i]);\n}",
     fixed: "const numbers = [1, 2, 3];\nfor (let i = 0; i < numbers.length; i++) {\n  console.log(numbers[i]);\n}",
-    bug: "Array index out of bounds: should be i < length, not i <= length"
+    bug: "Array index out of bounds: should be i < length, not i <= length",
+    hint: "Arrays are zero-indexed. What happens when i equals the array length?"
   },
   {
     broken: "const obj = { name: 'Bob' }\nconsole.log(obj.age);",
     fixed: "const obj = { name: 'Bob', age: 30 }\nconsole.log(obj.age);",
-    bug: "Missing property: obj.age is undefined"
+    bug: "Missing property: obj.age is undefined",
+    hint: "The object is missing a property that's being accessed. What property is missing?"
   }
 ];
 
@@ -36,6 +39,7 @@ export const PlanetDebugger = ({ challenge, onComplete }: PlanetDebuggerProps) =
   const [timeLeft, setTimeLeft] = useState(60);
   const [score, setScore] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
     if (!isPlaying || timeLeft <= 0) return;
@@ -60,6 +64,7 @@ export const PlanetDebugger = ({ challenge, onComplete }: PlanetDebuggerProps) =
     setScore(0);
     setTimeLeft(60);
     setCode(buggyCodeSamples[0].broken);
+    setShowHint(false);
   };
 
   const checkFix = () => {
@@ -78,6 +83,7 @@ export const PlanetDebugger = ({ challenge, onComplete }: PlanetDebuggerProps) =
         setCurrentLevel(prev => prev + 1);
         setCode(buggyCodeSamples[currentLevel + 1].broken);
         setTimeLeft(prev => prev + 20); // Bonus time
+        setShowHint(false); // Reset hint for new level
       } else {
         setIsPlaying(false);
         handleGameEnd(true);
@@ -175,10 +181,28 @@ export const PlanetDebugger = ({ challenge, onComplete }: PlanetDebuggerProps) =
               spellCheck={false}
             />
 
-            <Button onClick={checkFix} className="w-full">
-              <CheckCircle2 className="w-4 h-4 mr-2" />
-              Check Fix
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => setShowHint(!showHint)} 
+                variant="outline"
+                className="flex-1"
+              >
+                <Lightbulb className="w-4 h-4 mr-2" />
+                {showHint ? "Hide Hint" : "Show Hint"}
+              </Button>
+              <Button onClick={checkFix} className="flex-1">
+                <CheckCircle2 className="w-4 h-4 mr-2" />
+                Check Fix
+              </Button>
+            </div>
+
+            {showHint && (
+              <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
+                <p className="text-sm text-foreground/90">
+                  💡 <strong>Hint:</strong> {buggyCodeSamples[currentLevel].hint}
+                </p>
+              </div>
+            )}
           </>
         )}
       </CardContent>
