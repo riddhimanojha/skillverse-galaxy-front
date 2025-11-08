@@ -6,6 +6,7 @@ import { CosmicLogo } from "@/components/CosmicLogo";
 import { Navigation } from "@/components/Navigation";
 import { ConstellationLines } from "@/components/ConstellationLines";
 import { ShootingStars } from "@/components/ShootingStars";
+import { AIChatPanel } from "@/components/AIChatPanel";
 import { toast } from "sonner";
 import { Skill, buildSkillsFromStorage, saveProgress } from "@/utils/skillGraph";
 import { completeSkill, getProgress } from "@/utils/progressSystem";
@@ -138,6 +139,9 @@ const Index = () => {
         onComplete={handleComplete}
         onSkip={handleSkip}
       />
+      
+      {/* AI Chat Panel */}
+      <AIChatPanel />
     </div>
   );
 };
