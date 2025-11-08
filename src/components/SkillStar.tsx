@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 interface Skill {
   id: string;
   name: string;
-  learned: boolean;
+  completed: boolean;
+  unlocked: boolean;
   x: number;
   y: number;
 }
@@ -11,62 +12,90 @@ interface Skill {
 interface SkillStarProps {
   skill: Skill;
   onClick: () => void;
-  isHighlighted?: boolean;
 }
 
-export const SkillStar = ({ skill, onClick, isHighlighted }: SkillStarProps) => {
-  const [pulse, setPulse] = useState(false);
+export const SkillStar = ({ skill, onClick }: SkillStarProps) => {
+  const [ripple, setRipple] = useState(false);
 
   useEffect(() => {
-    if (skill.learned) {
-      setPulse(true);
-      const timer = setTimeout(() => setPulse(false), 1000);
+    if (skill.completed) {
+      setRipple(true);
+      const timer = setTimeout(() => setRipple(false), 1500);
       return () => clearTimeout(timer);
     }
-  }, [skill.learned]);
+  }, [skill.completed]);
+
+  const getGlowClass = () => {
+    if (skill.completed) return "skill-glow-completed";
+    if (skill.unlocked) return "skill-glow-unlocked";
+    return "skill-glow-locked";
+  };
+
+  const getPulseAnimation = () => {
+    if (skill.completed) return "animate-pulse";
+    if (skill.unlocked) return "animate-pulse";
+    return "";
+  };
 
   return (
     <div
-      className="absolute cursor-pointer group transition-transform duration-200 hover:scale-125"
+      className={`absolute cursor-pointer group transition-all duration-300 ${
+        skill.unlocked ? "hover:scale-150" : "opacity-50 cursor-not-allowed"
+      }`}
       style={{
         left: `${skill.x}%`,
         top: `${skill.y}%`,
         transform: "translate(-50%, -50%)",
       }}
-      onClick={onClick}
+      onClick={() => skill.unlocked && onClick()}
     >
-      {/* Glow effect */}
+      {/* Ripple effect for completed */}
+      {ripple && (
+        <div className="absolute inset-0 rounded-full animate-ping bg-primary opacity-75" style={{ width: "30px", height: "30px", margin: "-10px" }} />
+      )}
+      
+      {/* Glow aura */}
       <div
-        className={`absolute inset-0 rounded-full blur-md transition-all duration-500 ${
-          skill.learned
-            ? "bg-primary opacity-60"
-            : "bg-secondary opacity-30"
-        } ${pulse ? "animate-ping" : ""} ${
-          isHighlighted ? "scale-150 opacity-80" : ""
-        }`}
+        className={`absolute inset-0 rounded-full blur-xl transition-all duration-700 ${getPulseAnimation()}`}
         style={{
-          width: "20px",
-          height: "20px",
-          margin: "-5px",
+          width: "40px",
+          height: "40px",
+          margin: "-15px",
+          backgroundColor: skill.completed
+            ? "hsl(var(--glow-completed))"
+            : skill.unlocked
+            ? "hsl(var(--glow-unlocked))"
+            : "hsl(var(--glow-locked))",
+          opacity: skill.completed ? 0.8 : skill.unlocked ? 0.6 : 0.3,
         }}
       />
       
-      {/* Star shape */}
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        className={`relative transition-all duration-300 ${
-          skill.learned ? "fill-primary" : "fill-secondary"
-        } ${isHighlighted ? "scale-125" : ""}`}
-      >
-        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
-      </svg>
+      {/* Star/Planet shape */}
+      <div
+        className={`relative w-6 h-6 rounded-full transition-all duration-300 ${getGlowClass()} ${getPulseAnimation()}`}
+        style={{
+          backgroundColor: skill.completed
+            ? "hsl(var(--glow-completed))"
+            : skill.unlocked
+            ? "hsl(var(--glow-unlocked))"
+            : "hsl(var(--glow-locked))",
+          boxShadow: skill.completed
+            ? "0 0 20px hsl(var(--glow-completed)), inset 0 0 10px rgba(255,255,255,0.5)"
+            : skill.unlocked
+            ? "0 0 15px hsl(var(--glow-unlocked))"
+            : "0 0 5px hsl(var(--glow-locked))",
+        }}
+      />
 
       {/* Tooltip on hover */}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-card border border-border rounded text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-        {skill.name}
-      </div>
+      {skill.unlocked && (
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-2 glass-panel rounded-lg text-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+          <div className="font-semibold text-foreground">{skill.name}</div>
+          <div className="text-xs text-muted-foreground">
+            {skill.completed ? "✓ Completed" : "Click to view"}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

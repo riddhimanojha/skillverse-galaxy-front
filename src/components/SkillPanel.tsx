@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
 import { useState, useEffect } from "react";
 
@@ -6,17 +6,19 @@ interface Skill {
   id: string;
   name: string;
   description: string;
-  learned: boolean;
-  connectors?: string[];
+  completed: boolean;
+  unlocked: boolean;
+  unlocks?: string[];
 }
 
 interface SkillPanelProps {
   skill: Skill | null;
   onClose: () => void;
-  onMarkLearned: (skillId: string) => void;
+  onComplete: (skillId: string) => void;
+  onSkip: (skillId: string) => void;
 }
 
-export const SkillPanel = ({ skill, onClose, onMarkLearned }: SkillPanelProps) => {
+export const SkillPanel = ({ skill, onClose, onComplete, onSkip }: SkillPanelProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -33,67 +35,72 @@ export const SkillPanel = ({ skill, onClose, onMarkLearned }: SkillPanelProps) =
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 z-40 ${
+        className={`fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-500 z-40 ${
           isVisible ? "opacity-100" : "opacity-0"
         }`}
         onClick={onClose}
       />
 
-      {/* Panel */}
+      {/* Glassmorphism Panel */}
       <div
-        className={`fixed right-0 top-0 h-full w-full md:w-96 bg-card border-l border-border shadow-2xl z-50 transition-transform duration-300 ${
+        className={`fixed right-0 top-0 h-full w-full md:w-[480px] glass-panel z-50 transition-all duration-500 ${
           isVisible ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex flex-col h-full p-6">
+        <div className="flex flex-col h-full p-8">
           {/* Header */}
-          <div className="flex items-start justify-between mb-6">
+          <div className="flex items-start justify-between mb-8">
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-foreground mb-1">{skill.name}</h2>
+              <h2 className="text-3xl font-bold text-foreground mb-3 cosmic-glow">
+                {skill.name}
+              </h2>
               <div className="flex items-center gap-2">
-                <span
-                  className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                    skill.learned
-                      ? "bg-primary/20 text-primary"
-                      : "bg-secondary/20 text-secondary"
-                  }`}
-                >
-                  {skill.learned ? "✓ Learned" : "Not Learned"}
-                </span>
+                {skill.completed ? (
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-primary/20 text-primary border border-primary/30">
+                    <Sparkles className="w-3 h-3 mr-1.5" />
+                    Completed
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-secondary/20 text-secondary border border-secondary/30">
+                    Ready to Learn
+                  </span>
+                )}
               </div>
             </div>
             <Button
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground hover:bg-white/10"
             >
               <X className="h-5 w-5" />
             </Button>
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto space-y-6">
+          <div className="flex-1 overflow-y-auto space-y-8">
             <div>
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                Description
+              <h3 className="text-sm font-bold text-primary uppercase tracking-wider mb-3">
+                About This Skill
               </h3>
-              <p className="text-foreground leading-relaxed">{skill.description}</p>
+              <p className="text-foreground/90 leading-relaxed text-base">
+                {skill.description}
+              </p>
             </div>
 
-            {skill.connectors && skill.connectors.length > 0 && (
+            {skill.unlocks && skill.unlocks.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-                  Suggested Connections
+                <h3 className="text-sm font-bold text-secondary uppercase tracking-wider mb-3">
+                  This Unlocks
                 </h3>
                 <div className="space-y-2">
-                  {skill.connectors.map((connector, index) => (
+                  {skill.unlocks.map((unlock, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg border border-border/50"
+                      className="flex items-center gap-3 p-4 bg-gradient-to-r from-secondary/10 to-transparent rounded-xl border border-secondary/20"
                     >
-                      <div className="flex-shrink-0 w-2 h-2 rounded-full bg-accent" />
-                      <span className="text-sm text-foreground">{connector}</span>
+                      <div className="flex-shrink-0 w-2 h-2 rounded-full bg-secondary animate-pulse" />
+                      <span className="text-sm text-foreground font-medium">{unlock}</span>
                     </div>
                   ))}
                 </div>
@@ -101,21 +108,34 @@ export const SkillPanel = ({ skill, onClose, onMarkLearned }: SkillPanelProps) =
             )}
           </div>
 
-          {/* Footer */}
-          <div className="pt-6 border-t border-border">
-            {!skill.learned ? (
-              <Button
-                onClick={() => onMarkLearned(skill.id)}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
-              >
-                Mark as Learned
-              </Button>
+          {/* Footer Actions */}
+          <div className="pt-8 border-t border-border/30 space-y-3">
+            {!skill.completed ? (
+              <>
+                <Button
+                  onClick={() => onComplete(skill.id)}
+                  className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold py-6 text-base shadow-lg shadow-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/50"
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Mark as Completed
+                </Button>
+                <Button
+                  onClick={() => onSkip(skill.id)}
+                  variant="outline"
+                  className="w-full border-secondary/30 text-secondary hover:bg-secondary/10 hover:border-secondary/50 py-6 text-base"
+                >
+                  Skip (I already know this)
+                </Button>
+              </>
             ) : (
-              <div className="text-center text-muted-foreground text-sm">
-                <span className="inline-flex items-center gap-2">
-                  <span className="text-2xl">🎉</span>
-                  You've mastered this skill!
-                </span>
+              <div className="text-center py-6">
+                <div className="text-4xl mb-3 animate-bounce">🎉</div>
+                <p className="text-lg font-semibold text-primary cosmic-glow">
+                  Mastered!
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  You've completed this skill
+                </p>
               </div>
             )}
           </div>

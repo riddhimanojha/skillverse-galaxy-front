@@ -8,50 +8,52 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Deep space theme - dark backgrounds */
-    --background: 240 20% 5%;
-    --foreground: 210 40% 98%;
+    /* Cosmic galaxy theme */
+    --background: 250 60% 5%;
+    --foreground: 240 10% 98%;
 
-    /* Cards and popovers with subtle transparency */
-    --card: 240 15% 8%;
-    --card-foreground: 210 40% 98%;
+    /* Glassmorphism cards */
+    --card: 250 40% 10%;
+    --card-foreground: 240 10% 98%;
 
-    --popover: 240 15% 10%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 250 40% 12%;
+    --popover-foreground: 240 10% 98%;
 
-    /* Golden accent for learned skills */
-    --primary: 45 100% 60%;
-    --primary-foreground: 240 20% 10%;
+    /* Neon cosmic accents */
+    --primary: 280 100% 70%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Subtle blue for unlearned */
-    --secondary: 220 60% 50%;
-    --secondary-foreground: 210 40% 98%;
+    /* Cyan for unlocked skills */
+    --secondary: 190 100% 60%;
+    --secondary-foreground: 0 0% 100%;
 
-    /* Muted elements */
-    --muted: 240 10% 15%;
-    --muted-foreground: 215 20% 65%;
+    /* Muted cosmic elements */
+    --muted: 250 30% 15%;
+    --muted-foreground: 240 20% 65%;
 
-    /* Accent colors - cosmic purple */
-    --accent: 270 60% 50%;
-    --accent-foreground: 210 40% 98%;
+    /* Accent - electric purple */
+    --accent: 270 100% 65%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 80% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    /* Borders and inputs - subtle */
-    --border: 240 10% 20%;
-    --input: 240 10% 15%;
-    --ring: 45 100% 60%;
+    /* Borders with cosmic glow */
+    --border: 260 40% 25%;
+    --input: 250 40% 15%;
+    --ring: 280 100% 70%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    /* Glow effects for stars */
-    --glow-learned: 45 100% 60%;
-    --glow-unlearned: 220 60% 50%;
+    /* Glow effects */
+    --glow-completed: 280 100% 70%;
+    --glow-unlocked: 190 100% 60%;
+    --glow-locked: 240 20% 40%;
     
-    /* Gradient for space background */
-    --space-gradient-start: 240 30% 3%;
-    --space-gradient-end: 270 25% 8%;
+    /* Nebula gradient */
+    --nebula-start: 250 60% 8%;
+    --nebula-mid: 270 50% 12%;
+    --nebula-end: 280 40% 10%;
   }
 
   * {
@@ -59,6 +61,33 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-hidden;
+  }
+}
+
+@layer utilities {
+  .cosmic-glow {
+    text-shadow: 0 0 20px hsl(var(--primary)), 0 0 40px hsl(var(--primary) / 0.5);
+  }
+  
+  .glass-panel {
+    background: linear-gradient(135deg, hsl(var(--card) / 0.7), hsl(var(--card) / 0.5));
+    backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--border) / 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  }
+  
+  .skill-glow-completed {
+    filter: drop-shadow(0 0 15px hsl(var(--glow-completed))) 
+            drop-shadow(0 0 30px hsl(var(--glow-completed) / 0.5));
+  }
+  
+  .skill-glow-unlocked {
+    filter: drop-shadow(0 0 10px hsl(var(--glow-unlocked))) 
+            drop-shadow(0 0 20px hsl(var(--glow-unlocked) / 0.5));
+  }
+  
+  .skill-glow-locked {
+    filter: drop-shadow(0 0 5px hsl(var(--glow-locked)));
   }
 }

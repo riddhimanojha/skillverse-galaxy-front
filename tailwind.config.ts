@@ -47,11 +47,19 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        "glow-learned": "hsl(var(--glow-learned))",
-        "glow-unlearned": "hsl(var(--glow-unlearned))",
+        nebula: {
+          start: "hsl(var(--nebula-start))",
+          mid: "hsl(var(--nebula-mid))",
+          end: "hsl(var(--nebula-end))",
+        },
+        glow: {
+          completed: "hsl(var(--glow-completed))",
+          unlocked: "hsl(var(--glow-unlocked))",
+          locked: "hsl(var(--glow-locked))",
+        },
       },
       backgroundImage: {
-        "space-gradient": "linear-gradient(to bottom, hsl(var(--space-gradient-start)), hsl(var(--space-gradient-end)))",
+        "nebula-gradient": "linear-gradient(to bottom, hsl(var(--nebula-start)), hsl(var(--nebula-mid)), hsl(var(--nebula-end)))",
       },
       borderRadius: {
         lg: "var(--radius)",
