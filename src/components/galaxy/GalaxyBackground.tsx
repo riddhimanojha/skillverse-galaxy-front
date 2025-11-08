@@ -17,12 +17,15 @@ export const GalaxyBackground = ({
   mousePosition, 
   starCount = 8000 
 }: GalaxyBackgroundProps) => {
-  const nebulaRef = useRef<any>(null);
+  const nebulaRef = useRef<NebulaMaterial>(null);
   const starsRef = useRef<THREE.Points>(null);
   const galaxyGroupRef = useRef<THREE.Group>(null);
 
   // Smooth mouse tracking
   const smoothMouse = useRef({ x: 0, y: 0 });
+
+  // Create nebula material instance
+  const nebulaMaterial = useMemo(() => new NebulaMaterial(), []);
 
   // Create star geometry with colors (memoized)
   const { starGeometry, starMaterial } = useMemo(() => {
@@ -82,7 +85,7 @@ export const GalaxyBackground = ({
   useFrame((state, delta) => {
     // Update nebula shader time
     if (nebulaRef.current) {
-      nebulaRef.current.time += delta * 0.3;
+      nebulaRef.current.uniforms.time.value += delta * 0.3;
     }
 
     // Smooth mouse interpolation (lerp)
@@ -109,12 +112,7 @@ export const GalaxyBackground = ({
       {/* Nebula sphere with custom shader */}
       <mesh>
         <sphereGeometry args={[40, 32, 32]} />
-        <nebulaMaterial 
-          ref={nebulaRef} 
-          transparent 
-          side={THREE.BackSide}
-          depthWrite={false}
-        />
+        <primitive ref={nebulaRef} object={nebulaMaterial} attach="material" />
       </mesh>
 
       {/* Star field */}
