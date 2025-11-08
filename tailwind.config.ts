@@ -47,16 +47,11 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
-        },
+        "glow-learned": "hsl(var(--glow-learned))",
+        "glow-unlearned": "hsl(var(--glow-unlearned))",
+      },
+      backgroundImage: {
+        "space-gradient": "linear-gradient(to bottom, hsl(var(--space-gradient-start)), hsl(var(--space-gradient-end)))",
       },
       borderRadius: {
         lg: "var(--radius)",
