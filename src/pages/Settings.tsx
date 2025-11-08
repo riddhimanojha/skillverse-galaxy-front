@@ -4,21 +4,34 @@ import { CosmicLogo } from "@/components/CosmicLogo";
 import { ShootingStars } from "@/components/ShootingStars";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Palette, Sparkles, Trash2, Download } from "lucide-react";
+import { Palette, Sparkles, Trash2, Download, User } from "lucide-react";
+import { getUsername, setUsername } from "@/utils/leaderboardSystem";
 
 const Settings = () => {
   const [galaxyDensity, setGalaxyDensity] = useState(50);
   const [showShootingStars, setShowShootingStars] = useState(true);
   const [enableAnimations, setEnableAnimations] = useState(true);
+  const [username, setUsernameState] = useState(getUsername());
+  
+  const handleUsernameChange = () => {
+    if (username.trim().length < 3) {
+      toast.error("Username must be at least 3 characters");
+      return;
+    }
+    setUsername(username);
+    toast.success("Username updated successfully");
+  };
   
   const handleResetProgress = () => {
     if (confirm("Are you sure you want to reset all progress? This cannot be undone.")) {
       localStorage.removeItem("skillverse_completed");
       localStorage.removeItem("skillverse_progress");
+      localStorage.removeItem("skillverse_leaderboard");
       toast.success("Progress reset successfully");
       setTimeout(() => window.location.reload(), 1000);
     }
@@ -59,6 +72,40 @@ const Settings = () => {
             Customize your Skillverse experience
           </p>
         </div>
+        
+        {/* Profile Settings */}
+        <Card className="glass-panel border-border/40 mb-6 animate-fade-in">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <User className="w-5 h-5 text-primary" />
+              <CardTitle>Profile</CardTitle>
+            </div>
+            <CardDescription>Customize your leaderboard identity</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username" className="text-sm font-medium">
+                Username
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsernameState(e.target.value)}
+                  placeholder="Enter your username"
+                  className="flex-1"
+                  maxLength={20}
+                />
+                <Button onClick={handleUsernameChange} variant="secondary">
+                  Save
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                This name will appear on the leaderboard
+              </p>
+            </div>
+          </CardContent>
+        </Card>
         
         {/* Visual Settings */}
         <Card className="glass-panel border-border/40 mb-6 animate-fade-in">

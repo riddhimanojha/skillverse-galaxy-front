@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Skills from "./pages/Skills";
 import Learn from "./pages/Learn";
 import Progress from "./pages/Progress";
+import Leaderboard from "./pages/Leaderboard";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/skills" element={<Skills />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/progress" element={<Progress />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

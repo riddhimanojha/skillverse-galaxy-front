@@ -1,6 +1,8 @@
-import { X, Sparkles } from "lucide-react";
+import { X, Sparkles, RotateCcw } from "lucide-react";
 import { Button } from "./ui/button";
 import { useState, useEffect } from "react";
+import { toast } from "@/hooks/use-toast";
+import { unmasterSkill } from "@/utils/progressSystem";
 
 interface Skill {
   id: string;
@@ -16,9 +18,10 @@ interface SkillPanelProps {
   onClose: () => void;
   onComplete: (skillId: string) => void;
   onSkip: (skillId: string) => void;
+  onUnmaster?: (skillId: string) => void;
 }
 
-export const SkillPanel = ({ skill, onClose, onComplete, onSkip }: SkillPanelProps) => {
+export const SkillPanel = ({ skill, onClose, onComplete, onSkip, onUnmaster }: SkillPanelProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -28,6 +31,18 @@ export const SkillPanel = ({ skill, onClose, onComplete, onSkip }: SkillPanelPro
       setIsVisible(false);
     }
   }, [skill]);
+
+  const handleUnmaster = () => {
+    if (skill && onUnmaster) {
+      unmasterSkill(skill.id);
+      onUnmaster(skill.id);
+      toast({
+        title: "Skill Unmastered",
+        description: `${skill.name} has been reset. You can now practice it again!`,
+      });
+      onClose();
+    }
+  };
 
   if (!skill) return null;
 
@@ -128,14 +143,24 @@ export const SkillPanel = ({ skill, onClose, onComplete, onSkip }: SkillPanelPro
                 </Button>
               </>
             ) : (
-              <div className="text-center py-6">
-                <div className="text-4xl mb-3 animate-bounce">🎉</div>
-                <p className="text-lg font-semibold text-primary cosmic-glow">
-                  Mastered!
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  You've completed this skill
-                </p>
+              <div className="space-y-3">
+                <div className="text-center py-6">
+                  <div className="text-4xl mb-3 animate-bounce">🎉</div>
+                  <p className="text-lg font-semibold text-primary cosmic-glow">
+                    Mastered!
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    You've completed this skill
+                  </p>
+                </div>
+                <Button
+                  onClick={handleUnmaster}
+                  variant="outline"
+                  className="w-full border-destructive/30 text-destructive hover:bg-destructive/10 hover:border-destructive/50 py-4"
+                >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Unmaster & Practice Again
+                </Button>
               </div>
             )}
           </div>

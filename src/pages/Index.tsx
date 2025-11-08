@@ -64,6 +64,17 @@ const Index = () => {
     });
   };
 
+  // Handle skill unmaster
+  const handleUnmaster = (skillId: string) => {
+    const completedIds = new Set(skills.filter((s) => s.completed).map((s) => s.id));
+    completedIds.delete(skillId);
+    saveProgress(completedIds);
+    
+    const updatedSkills = buildSkillsFromStorage();
+    setSkills(updatedSkills);
+    setSelectedSkill(null);
+  };
+
   // Keyboard accessibility
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -137,6 +148,7 @@ const Index = () => {
         onClose={() => setSelectedSkill(null)}
         onComplete={handleComplete}
         onSkip={handleSkip}
+        onUnmaster={handleUnmaster}
       />
     </div>
   );

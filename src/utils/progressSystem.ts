@@ -98,11 +98,18 @@ export const completeSkill = (skillId: string, customXP?: number): UserProgress 
     progress.totalSkillsCompleted += 1;
   }
   
+  // Mark skill as completed
+  markSkillCompleted(skillId);
+  
   // Check for achievements
   progress = checkAchievements(progress);
   
   // Save to localStorage
   saveProgress(progress);
+  
+  // Update leaderboard
+  const { updateLeaderboard } = require('./leaderboardSystem');
+  updateLeaderboard(progress);
   
   return progress;
 };
@@ -150,6 +157,41 @@ export const getXPForNextLevel = (currentXP: number): number => {
   const currentLevel = Math.floor(currentXP / XP_PER_LEVEL) + 1;
   const nextLevelXP = currentLevel * XP_PER_LEVEL;
   return nextLevelXP - currentXP;
+};
+
+/**
+ * Unmaster a skill - reset individual skill progress but keep XP
+ */
+export const unmasterSkill = (skillId: string): UserProgress => {
+  const progress = getProgress();
+  
+  // Remove skill from completed list if it exists
+  const completedSkills = JSON.parse(localStorage.getItem('completed_skills') || '[]');
+  const updatedSkills = completedSkills.filter((id: string) => id !== skillId);
+  localStorage.setItem('completed_skills', JSON.stringify(updatedSkills));
+  
+  // Save updated progress
+  saveProgress(progress);
+  
+  return progress;
+};
+
+/**
+ * Get all completed skills
+ */
+export const getCompletedSkills = (): string[] => {
+  return JSON.parse(localStorage.getItem('completed_skills') || '[]');
+};
+
+/**
+ * Mark skill as completed
+ */
+export const markSkillCompleted = (skillId: string): void => {
+  const completedSkills = getCompletedSkills();
+  if (!completedSkills.includes(skillId)) {
+    completedSkills.push(skillId);
+    localStorage.setItem('completed_skills', JSON.stringify(completedSkills));
+  }
 };
 
 /**
