@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { CosmicLogo } from "@/components/CosmicLogo";
 import { ShootingStars } from "@/components/ShootingStars";
@@ -25,6 +25,7 @@ import { buildSkillsFromStorage } from "@/utils/skillGraph";
 
 const Learn = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const skillId = searchParams.get('skill');
   const [challenges, setChallenges] = useState<(CodeChallengeType | QuizChallengeType | GameChallengeType)[]>([]);
   const [selectedChallenge, setSelectedChallenge] = useState<CodeChallengeType | QuizChallengeType | GameChallengeType | null>(null);
@@ -48,7 +49,29 @@ const Learn = () => {
   };
 
   const handleSkipChallenge = () => {
-    setSelectedChallenge(null);
+    if (skillId) {
+      // Find next unlocked skill
+      const skills = buildSkillsFromStorage();
+      const currentIndex = skills.findIndex(s => s.id === skillId);
+      
+      // Look for next unlocked skill
+      let nextSkill = null;
+      for (let i = currentIndex + 1; i < skills.length; i++) {
+        if (skills[i].unlocked && !skills[i].completed) {
+          nextSkill = skills[i];
+          break;
+        }
+      }
+      
+      if (nextSkill) {
+        navigate(`/learn?skill=${nextSkill.id}`);
+      } else {
+        // No more skills, go back to main menu
+        navigate('/');
+      }
+    } else {
+      setSelectedChallenge(null);
+    }
   };
 
   const filterChallenges = (type: string) => {

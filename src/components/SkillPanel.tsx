@@ -1,6 +1,7 @@
-import { X, Sparkles, RotateCcw } from "lucide-react";
+import { X, Sparkles, RotateCcw, GraduationCap } from "lucide-react";
 import { Button } from "./ui/button";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { unmasterSkill } from "@/utils/progressSystem";
 
@@ -23,6 +24,7 @@ interface SkillPanelProps {
 
 export const SkillPanel = ({ skill, onClose, onComplete, onSkip, onUnmaster }: SkillPanelProps) => {
   const [isVisible, setIsVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (skill) {
@@ -128,8 +130,16 @@ export const SkillPanel = ({ skill, onClose, onComplete, onSkip, onUnmaster }: S
             {!skill.completed ? (
               <>
                 <Button
-                  onClick={() => onComplete(skill.id)}
+                  onClick={() => navigate(`/learn?skill=${skill.id}`)}
                   className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold py-6 text-base shadow-lg shadow-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/50"
+                >
+                  <GraduationCap className="w-4 h-4 mr-2" />
+                  Start Learning
+                </Button>
+                <Button
+                  onClick={() => onComplete(skill.id)}
+                  variant="outline"
+                  className="w-full border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50 py-4 text-sm"
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
                   Mark as Completed
@@ -137,7 +147,7 @@ export const SkillPanel = ({ skill, onClose, onComplete, onSkip, onUnmaster }: S
                 <Button
                   onClick={() => onSkip(skill.id)}
                   variant="outline"
-                  className="w-full border-secondary/30 text-secondary hover:bg-secondary/10 hover:border-secondary/50 py-6 text-base"
+                  className="w-full border-secondary/30 text-secondary hover:bg-secondary/10 hover:border-secondary/50 py-4 text-sm"
                 >
                   Skip (I already know this)
                 </Button>
