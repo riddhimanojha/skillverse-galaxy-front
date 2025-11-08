@@ -30,6 +30,7 @@ export interface QuizChallenge extends Challenge {
     options?: string[];
     correctAnswer: number | string;
     explanation: string;
+    hint?: string;
   }[];
 }
 
@@ -206,27 +207,31 @@ export const challengeData: (CodeChallenge | QuizChallenge | GameChallenge)[] = 
           'Hyperlinks and Text Markup Language'
         ],
         correctAnswer: 0,
-        explanation: 'HTML stands for Hyper Text Markup Language - it\'s the standard markup language for web pages.'
+        explanation: 'HTML stands for Hyper Text Markup Language - it\'s the standard markup language for web pages.',
+        hint: 'Think about the key words: links between text (Hyper), the type of content (Text), and how it structures content (Markup).'
       },
       {
         question: 'Which tag is used for the largest heading?',
         type: 'multiple-choice',
         options: ['<heading>', '<h6>', '<head>', '<h1>'],
         correctAnswer: 3,
-        explanation: '<h1> creates the largest heading, while <h6> creates the smallest.'
+        explanation: '<h1> creates the largest heading, while <h6> creates the smallest.',
+        hint: 'Heading tags use numbers - the smaller the number, the larger the heading size.'
       },
       {
         question: 'HTML tags are case-sensitive.',
         type: 'true-false',
         options: ['True', 'False'],
         correctAnswer: 1,
-        explanation: 'HTML tags are NOT case-sensitive. <div>, <DIV>, and <DiV> all work the same way, but lowercase is the standard convention.'
+        explanation: 'HTML tags are NOT case-sensitive. <div>, <DIV>, and <DiV> all work the same way, but lowercase is the standard convention.',
+        hint: 'HTML is designed to be forgiving and flexible. Consider whether <DIV> and <div> would work differently.'
       },
       {
         question: 'The _____ tag is used to define an unordered list.',
         type: 'fill-in-blank',
         correctAnswer: 'ul',
-        explanation: 'The <ul> tag creates an unordered (bulleted) list, while <ol> creates an ordered (numbered) list.'
+        explanation: 'The <ul> tag creates an unordered (bulleted) list, while <ol> creates an ordered (numbered) list.',
+        hint: 'The tag name is an abbreviation for "unordered list".'
       }
     ]
   },

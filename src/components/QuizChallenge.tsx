@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CheckCircle2, XCircle, Zap } from "lucide-react";
+import { CheckCircle2, XCircle, Zap, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 import { QuizChallenge as QuizChallengeType, completeChallenge } from "@/utils/challengeSystem";
 import { completeSkill } from "@/utils/progressSystem";
@@ -19,6 +19,7 @@ export const QuizChallenge = ({ challenge, onComplete, onSkip }: QuizChallengePr
   const [fillInAnswer, setFillInAnswer] = useState("");
   const [showExplanation, setShowExplanation] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [showHint, setShowHint] = useState(false);
 
   const question = challenge.questions[currentQuestion];
   const isLastQuestion = currentQuestion === challenge.questions.length - 1;
@@ -71,6 +72,7 @@ export const QuizChallenge = ({ challenge, onComplete, onSkip }: QuizChallengePr
       setSelectedAnswer(null);
       setFillInAnswer("");
       setShowExplanation(false);
+      setShowHint(false);
     }
   };
 
@@ -151,6 +153,15 @@ export const QuizChallenge = ({ challenge, onComplete, onSkip }: QuizChallengePr
               </div>
             </div>
           )}
+
+          {!showExplanation && showHint && question.hint && (
+            <div className="p-4 bg-secondary/10 border border-secondary/20 rounded-lg animate-fade-in">
+              <div className="flex items-start gap-2">
+                <Lightbulb className="w-5 h-5 text-secondary mt-0.5 flex-shrink-0" />
+                <p className="text-sm text-foreground/90">💡 {question.hint}</p>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex gap-3">
@@ -163,6 +174,15 @@ export const QuizChallenge = ({ challenge, onComplete, onSkip }: QuizChallengePr
               >
                 Submit Answer
               </Button>
+              {question.hint && (
+                <Button 
+                  onClick={() => setShowHint(!showHint)} 
+                  variant="outline"
+                >
+                  <Lightbulb className="w-4 h-4 mr-2" />
+                  {showHint ? "Hide Hint" : "Hint"}
+                </Button>
+              )}
               {onSkip && (
                 <Button onClick={onSkip} variant="outline">
                   Skip
