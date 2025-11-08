@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { CheckCircle2, XCircle, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { QuizChallenge as QuizChallengeType, completeChallenge } from "@/utils/challengeSystem";
@@ -9,11 +10,13 @@ import { completeSkill } from "@/utils/progressSystem";
 interface QuizChallengeProps {
   challenge: QuizChallengeType;
   onComplete: () => void;
+  onSkip?: () => void;
 }
 
-export const QuizChallenge = ({ challenge, onComplete }: QuizChallengeProps) => {
+export const QuizChallenge = ({ challenge, onComplete, onSkip }: QuizChallengeProps) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [fillInAnswer, setFillInAnswer] = useState("");
   const [showExplanation, setShowExplanation] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
 
@@ -21,9 +24,15 @@ export const QuizChallenge = ({ challenge, onComplete }: QuizChallengeProps) => 
   const isLastQuestion = currentQuestion === challenge.questions.length - 1;
 
   const handleSubmit = () => {
-    if (selectedAnswer === null) return;
+    let isCorrect = false;
 
-    const isCorrect = selectedAnswer === question.correctAnswer;
+    if (question.type === 'fill-in-blank') {
+      if (!fillInAnswer.trim()) return;
+      isCorrect = fillInAnswer.trim().toLowerCase() === String(question.correctAnswer).toLowerCase();
+    } else {
+      if (selectedAnswer === null) return;
+      isCorrect = selectedAnswer === question.correctAnswer;
+    }
     
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
@@ -54,11 +63,13 @@ export const QuizChallenge = ({ challenge, onComplete }: QuizChallengeProps) => 
         setCurrentQuestion(0);
         setCorrectAnswers(0);
         setSelectedAnswer(null);
+        setFillInAnswer("");
         setShowExplanation(false);
       }
     } else {
       setCurrentQuestion(prev => prev + 1);
       setSelectedAnswer(null);
+      setFillInAnswer("");
       setShowExplanation(false);
     }
   };
@@ -89,38 +100,48 @@ export const QuizChallenge = ({ challenge, onComplete }: QuizChallengeProps) => 
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">{question.question}</h3>
           
-          <div className="space-y-3">
-            {question.options.map((option, index) => {
-              const isSelected = selectedAnswer === index;
-              const isCorrect = index === question.correctAnswer;
-              const showResult = showExplanation;
+          {question.type === 'fill-in-blank' ? (
+            <Input
+              placeholder="Type your answer here..."
+              value={fillInAnswer}
+              onChange={(e) => setFillInAnswer(e.target.value)}
+              disabled={showExplanation}
+              className="text-lg py-6"
+            />
+          ) : (
+            <div className="space-y-3">
+              {question.options?.map((option, index) => {
+                const isSelected = selectedAnswer === index;
+                const isCorrect = index === question.correctAnswer;
+                const showResult = showExplanation;
 
-              let buttonClass = "justify-start h-auto py-4 px-6 text-left";
-              if (showResult) {
-                if (isCorrect) {
-                  buttonClass += " bg-primary/20 border-primary/40 text-primary";
+                let buttonClass = "justify-start h-auto py-4 px-6 text-left";
+                if (showResult) {
+                  if (isCorrect) {
+                    buttonClass += " bg-primary/20 border-primary/40 text-primary";
+                  } else if (isSelected) {
+                    buttonClass += " bg-destructive/20 border-destructive/40 text-destructive";
+                  }
                 } else if (isSelected) {
-                  buttonClass += " bg-destructive/20 border-destructive/40 text-destructive";
+                  buttonClass += " bg-primary/20 border-primary/40";
                 }
-              } else if (isSelected) {
-                buttonClass += " bg-primary/20 border-primary/40";
-              }
 
-              return (
-                <Button
-                  key={index}
-                  variant="outline"
-                  className={buttonClass}
-                  onClick={() => !showExplanation && setSelectedAnswer(index)}
-                  disabled={showExplanation}
-                >
-                  <span className="flex-1">{option}</span>
-                  {showResult && isCorrect && <CheckCircle2 className="w-5 h-5 ml-2" />}
-                  {showResult && isSelected && !isCorrect && <XCircle className="w-5 h-5 ml-2" />}
-                </Button>
-              );
-            })}
-          </div>
+                return (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    className={buttonClass}
+                    onClick={() => !showExplanation && setSelectedAnswer(index)}
+                    disabled={showExplanation}
+                  >
+                    <span className="flex-1">{option}</span>
+                    {showResult && isCorrect && <CheckCircle2 className="w-5 h-5 ml-2" />}
+                    {showResult && isSelected && !isCorrect && <XCircle className="w-5 h-5 ml-2" />}
+                  </Button>
+                );
+              })}
+            </div>
+          )}
 
           {showExplanation && (
             <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg animate-fade-in">
@@ -134,9 +155,20 @@ export const QuizChallenge = ({ challenge, onComplete }: QuizChallengeProps) => 
 
         <div className="flex gap-3">
           {!showExplanation ? (
-            <Button onClick={handleSubmit} disabled={selectedAnswer === null} className="flex-1">
-              Submit Answer
-            </Button>
+            <>
+              <Button 
+                onClick={handleSubmit} 
+                disabled={question.type === 'fill-in-blank' ? !fillInAnswer.trim() : selectedAnswer === null} 
+                className="flex-1"
+              >
+                Submit Answer
+              </Button>
+              {onSkip && (
+                <Button onClick={onSkip} variant="outline">
+                  Skip
+                </Button>
+              )}
+            </>
           ) : (
             <Button onClick={handleNext} className="flex-1">
               {isLastQuestion ? "Finish Quiz" : "Next Question"}

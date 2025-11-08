@@ -5,18 +5,21 @@ import { CosmicLogo } from "@/components/CosmicLogo";
 import { ShootingStars } from "@/components/ShootingStars";
 import { CodeEditor } from "@/components/CodeEditor";
 import { QuizChallenge } from "@/components/QuizChallenge";
+import { CheatSheet } from "@/components/CheatSheet";
 import { PlanetDebugger } from "@/components/games/PlanetDebugger";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Code, Gamepad2, BookOpen, Trophy, Zap } from "lucide-react";
+import { Code, Gamepad2, BookOpen, Trophy, Zap, Book } from "lucide-react";
 import { 
   getAllChallenges, 
   getChallengesForSkill, 
   getChallengeStats,
   CodeChallenge as CodeChallengeType,
   QuizChallenge as QuizChallengeType,
-  GameChallenge as GameChallengeType
+  GameChallenge as GameChallengeType,
+  cheatSheets
 } from "@/utils/challengeSystem";
 import { buildSkillsFromStorage } from "@/utils/skillGraph";
 
@@ -25,6 +28,7 @@ const Learn = () => {
   const skillId = searchParams.get('skill');
   const [challenges, setChallenges] = useState<(CodeChallengeType | QuizChallengeType | GameChallengeType)[]>([]);
   const [selectedChallenge, setSelectedChallenge] = useState<CodeChallengeType | QuizChallengeType | GameChallengeType | null>(null);
+  const [showCheatSheet, setShowCheatSheet] = useState(false);
   const [stats, setStats] = useState(getChallengeStats());
   const [activeTab, setActiveTab] = useState("all");
 
@@ -40,6 +44,10 @@ const Learn = () => {
 
   const handleChallengeComplete = () => {
     loadChallenges();
+    setSelectedChallenge(null);
+  };
+
+  const handleSkipChallenge = () => {
     setSelectedChallenge(null);
   };
 
@@ -71,6 +79,28 @@ const Learn = () => {
     }
   };
 
+  if (showCheatSheet && skillId && cheatSheets[skillId]) {
+    return (
+      <div className="min-h-screen bg-background relative overflow-y-auto">
+        <div className="fixed inset-0 bg-nebula-gradient -z-10" />
+        <ShootingStars />
+        <CosmicLogo />
+        <Navigation />
+
+        <div className="container mx-auto px-4 pt-32 pb-16 max-w-4xl">
+          <Button 
+            onClick={() => setShowCheatSheet(false)} 
+            variant="outline" 
+            className="mb-6"
+          >
+            ← Back to Challenges
+          </Button>
+          <CheatSheet data={cheatSheets[skillId]} />
+        </div>
+      </div>
+    );
+  }
+
   if (selectedChallenge) {
     return (
       <div className="min-h-screen bg-background relative overflow-y-auto">
@@ -97,6 +127,7 @@ const Learn = () => {
             <QuizChallenge 
               challenge={selectedChallenge as QuizChallengeType} 
               onComplete={handleChallengeComplete}
+              onSkip={handleSkipChallenge}
             />
           )}
           {selectedChallenge.type === 'game' && (
@@ -122,9 +153,19 @@ const Learn = () => {
           <h1 className="text-5xl font-bold mb-4">
             <span className="cosmic-glow">Learn & Practice</span>
           </h1>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-lg mb-4">
             {skillId ? `Master ${getSkillName(skillId)} with hands-on challenges` : 'Interactive challenges, quizzes, and games'}
           </p>
+          {skillId && cheatSheets[skillId] && (
+            <Button 
+              onClick={() => setShowCheatSheet(true)} 
+              variant="outline"
+              className="mt-2"
+            >
+              <Book className="mr-2 h-4 w-4" />
+              View {getSkillName(skillId)} Cheat Sheet
+            </Button>
+          )}
         </div>
 
         {/* Stats Overview */}
