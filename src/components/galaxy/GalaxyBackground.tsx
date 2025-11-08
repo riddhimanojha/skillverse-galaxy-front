@@ -4,8 +4,7 @@
  */
 
 import { useRef, useMemo } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
-import { Points, PointMaterial } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { NebulaMaterial } from "./NebulaShader";
 
@@ -21,14 +20,15 @@ export const GalaxyBackground = ({
   const nebulaRef = useRef<any>(null);
   const starsRef = useRef<THREE.Points>(null);
   const galaxyGroupRef = useRef<THREE.Group>(null);
-  const { viewport } = useThree();
 
   // Smooth mouse tracking
   const smoothMouse = useRef({ x: 0, y: 0 });
 
-  // Generate star positions (optimized)
-  const starPositions = useMemo(() => {
+  // Create star geometry with colors (memoized)
+  const { starGeometry, starMaterial } = useMemo(() => {
+    const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(starCount * 3);
+    const colors = new Float32Array(starCount * 3);
     
     for (let i = 0; i < starCount; i++) {
       const i3 = i * 3;
@@ -41,19 +41,9 @@ export const GalaxyBackground = ({
       positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
       positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
       positions[i3 + 2] = radius * Math.cos(phi) - 25;
-    }
-    
-    return positions;
-  }, [starCount]);
-
-  // Generate star colors (purple/cyan/white mix)
-  const starColors = useMemo(() => {
-    const colors = new Float32Array(starCount * 3);
-    
-    for (let i = 0; i < starCount; i++) {
-      const i3 = i * 3;
-      const choice = Math.random();
       
+      // Color mix: purple/cyan/white
+      const choice = Math.random();
       if (choice < 0.5) {
         // Purple stars
         colors[i3] = 0.7 + Math.random() * 0.3;
@@ -72,7 +62,20 @@ export const GalaxyBackground = ({
       }
     }
     
-    return colors;
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    
+    const material = new THREE.PointsMaterial({
+      size: 0.03,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      sizeAttenuation: true,
+    });
+    
+    return { starGeometry: geometry, starMaterial: material };
   }, [starCount]);
 
   // Animation loop
@@ -115,25 +118,7 @@ export const GalaxyBackground = ({
       </mesh>
 
       {/* Star field */}
-      <Points
-        ref={starsRef}
-        positions={starPositions}
-        stride={3}
-      >
-        <PointMaterial
-          transparent
-          vertexColors
-          size={0.03}
-          sizeAttenuation={true}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-          opacity={0.8}
-        />
-        <bufferAttribute
-          attach="attributes-color"
-          args={[starColors, 3]}
-        />
-      </Points>
+      <points ref={starsRef} geometry={starGeometry} material={starMaterial} />
 
       {/* Ambient cosmic lighting */}
       <ambientLight intensity={0.3} color="#6b46c1" />
