@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ThreeGalaxy } from "@/components/ThreeGalaxy";
+import { ThreeGalaxyCanvas } from "@/components/galaxy/ThreeGalaxyCanvas";
 import { SkillStar } from "@/components/SkillStar";
 import { SkillPanel } from "@/components/SkillPanel";
 import { CosmicLogo } from "@/components/CosmicLogo";
@@ -71,31 +71,37 @@ const Index = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Three.js Galaxy Background */}
-      <ThreeGalaxy mousePosition={mousePosition} />
+      {/* React Three Fiber Galaxy Background */}
+      <ThreeGalaxyCanvas mousePosition={mousePosition} />
 
       {/* Cosmic Logo */}
       <CosmicLogo />
 
-      {/* Stats Panel */}
-      <div className="fixed bottom-8 left-8 z-50 glass-panel rounded-2xl p-6 min-w-[200px]">
-        <div className="space-y-3">
+      {/* Stats Panel - Glassmorphism */}
+      <div className="fixed bottom-8 left-8 z-50 glass-panel rounded-2xl p-6 min-w-[220px] animate-fade-in border border-primary/20">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Completed</span>
-            <span className="font-bold text-2xl text-primary cosmic-glow">
-              {skills.filter((s) => s.completed).length}
-            </span>
+            <span className="text-sm text-muted-foreground uppercase tracking-wider">Mastered</span>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+              <span className="font-bold text-3xl text-primary cosmic-glow">
+                {skills.filter((s) => s.completed).length}
+              </span>
+            </div>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Unlocked</span>
-            <span className="font-bold text-xl text-secondary">
-              {skills.filter((s) => s.unlocked).length}
-            </span>
+            <span className="text-sm text-muted-foreground uppercase tracking-wider">Unlocked</span>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-secondary" />
+              <span className="font-bold text-2xl text-secondary">
+                {skills.filter((s) => s.unlocked).length}
+              </span>
+            </div>
           </div>
-          <div className="h-px bg-border/50" />
+          <div className="h-px bg-gradient-to-r from-primary via-accent to-transparent opacity-30" />
           <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground">Total</span>
-            <span className="font-bold text-foreground">{skills.length}</span>
+            <span className="text-sm text-muted-foreground uppercase tracking-wider">Total Skills</span>
+            <span className="font-bold text-xl text-foreground">{skills.length}</span>
           </div>
         </div>
       </div>
