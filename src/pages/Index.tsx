@@ -3,8 +3,12 @@ import { ThreeGalaxyCanvas } from "@/components/galaxy/ThreeGalaxyCanvas";
 import { SkillStar } from "@/components/SkillStar";
 import { SkillPanel } from "@/components/SkillPanel";
 import { CosmicLogo } from "@/components/CosmicLogo";
+import { Navigation } from "@/components/Navigation";
+import { ConstellationLines } from "@/components/ConstellationLines";
+import { ShootingStars } from "@/components/ShootingStars";
 import { toast } from "sonner";
 import { Skill, buildSkillsFromStorage, saveProgress } from "@/utils/skillGraph";
+import { completeSkill, getProgress } from "@/utils/progressSystem";
 
 const Index = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -36,6 +40,9 @@ const Index = () => {
     completedIds.add(skillId);
     saveProgress(completedIds);
     
+    // Update progress system (XP, streak, etc.)
+    const newProgress = completeSkill(skillId);
+    
     const updatedSkills = buildSkillsFromStorage();
     setSkills(updatedSkills);
     
@@ -44,8 +51,8 @@ const Index = () => {
       setSelectedSkill(updatedSkill);
     }
     
-    toast.success("Skill completed! 🎉", {
-      description: "New skills may have been unlocked!",
+    toast.success(`Skill completed! +100 XP 🎉`, {
+      description: `Level ${newProgress.level} • ${newProgress.streak} day streak 🔥`,
     });
   };
 
@@ -73,9 +80,15 @@ const Index = () => {
     <div className="relative min-h-screen overflow-hidden">
       {/* React Three Fiber Galaxy Background */}
       <ThreeGalaxyCanvas mousePosition={mousePosition} />
+      
+      {/* Shooting Stars Effect */}
+      <ShootingStars />
 
       {/* Cosmic Logo */}
       <CosmicLogo />
+      
+      {/* Navigation */}
+      <Navigation />
 
       {/* Stats Panel - Glassmorphism */}
       <div className="fixed bottom-8 left-8 z-50 glass-panel rounded-2xl p-6 min-w-[220px] animate-fade-in border border-primary/20">
@@ -106,8 +119,9 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Skill Stars/Nodes */}
+      {/* Skill Stars/Nodes with Constellation Lines */}
       <div className="relative w-full h-screen">
+        <ConstellationLines skills={skills} />
         {skills.map((skill) => (
           <SkillStar
             key={skill.id}
