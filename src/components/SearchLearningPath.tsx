@@ -49,7 +49,11 @@ const pathDescriptions: Record<string, string> = {
   'responsive design': 'Create mobile-friendly websites',
 };
 
-export const SearchLearningPath = () => {
+interface SearchLearningPathProps {
+  onSubmit?: (skillIds: string[]) => void;
+}
+
+export const SearchLearningPath = ({ onSubmit }: SearchLearningPathProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -76,8 +80,13 @@ export const SearchLearningPath = () => {
     const coursePath = learningPaths[key];
     
     if (coursePath && coursePath.length > 0) {
-      // Navigate to the first course in the learning path
-      navigate(`/learn?skill=${coursePath[0]}`);
+      if (onSubmit) {
+        // If onSubmit callback provided, use it (for welcome screen)
+        onSubmit(coursePath);
+      } else {
+        // Otherwise navigate to the first course
+        navigate(`/learn?skill=${coursePath[0]}`);
+      }
       setSearchQuery("");
       setShowSuggestions(false);
     }

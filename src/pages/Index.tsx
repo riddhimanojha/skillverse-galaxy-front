@@ -15,12 +15,32 @@ const Index = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 });
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [filteredSkillIds, setFilteredSkillIds] = useState<string[] | null>(null);
 
   // Load skills from localStorage on mount
   useEffect(() => {
     const loadedSkills = buildSkillsFromStorage();
     setSkills(loadedSkills);
+    
+    // Check if user has seen welcome screen before
+    const hasSeenWelcome = localStorage.getItem('skillverse_seen_welcome');
+    if (hasSeenWelcome) {
+      setShowWelcome(false);
+    }
   }, []);
+
+  const handleSearchSubmit = (skillIds: string[]) => {
+    setFilteredSkillIds(skillIds);
+    setShowWelcome(false);
+    localStorage.setItem('skillverse_seen_welcome', 'true');
+  };
+
+  const handleSkipWelcome = () => {
+    setShowWelcome(false);
+    setFilteredSkillIds(null);
+    localStorage.setItem('skillverse_seen_welcome', 'true');
+  };
 
   // Mouse tracking for parallax
   useEffect(() => {
@@ -88,6 +108,10 @@ const Index = () => {
     return () => window.removeEventListener("keydown", handleKeyPress);
   }, [selectedSkill]);
 
+  const displayedSkills = filteredSkillIds 
+    ? skills.filter(s => filteredSkillIds.includes(s.id))
+    : skills;
+
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* React Three Fiber Galaxy Background */}
@@ -96,16 +120,39 @@ const Index = () => {
       {/* Shooting Stars Effect */}
       <ShootingStars />
 
+      {/* Welcome Screen */}
+      {showWelcome && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-xl animate-fade-in">
+          <div className="max-w-3xl w-full px-8 space-y-8">
+            <div className="text-center space-y-4">
+              <h1 className="text-6xl font-bold cosmic-glow">
+                Welcome to Skillverse
+              </h1>
+              <p className="text-2xl text-muted-foreground">
+                Your journey through the cosmos of knowledge begins here
+              </p>
+            </div>
+            
+            <div className="space-y-4">
+              <SearchLearningPath onSubmit={handleSearchSubmit} />
+              <div className="text-center">
+                <button
+                  onClick={handleSkipWelcome}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors underline"
+                >
+                  Skip and explore all skills
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Cosmic Logo */}
       <CosmicLogo />
       
       {/* Navigation */}
       <Navigation />
-
-      {/* Search Box */}
-      <div className="fixed top-32 left-1/2 -translate-x-1/2 z-40 w-full px-8 animate-fade-in">
-        <SearchLearningPath />
-      </div>
 
       {/* Stats Panel - Glassmorphism */}
       <div className="fixed bottom-8 left-8 z-50 glass-panel rounded-2xl p-6 min-w-[220px] animate-fade-in border border-primary/20">
@@ -138,8 +185,8 @@ const Index = () => {
 
       {/* Skill Stars/Nodes with Constellation Lines */}
       <div className="relative w-full h-screen">
-        <ConstellationLines skills={skills} />
-        {skills.map((skill) => (
+        <ConstellationLines skills={displayedSkills} />
+        {displayedSkills.map((skill) => (
           <SkillStar
             key={skill.id}
             skill={skill}

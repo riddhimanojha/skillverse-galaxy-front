@@ -9,7 +9,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Palette, Sparkles, Trash2, Download, User } from "lucide-react";
+import { Palette, Sparkles, Trash2, Download, User, RotateCcw } from "lucide-react";
 import { getUsername, setUsername } from "@/utils/leaderboardSystem";
 
 const Settings = () => {
@@ -34,6 +34,14 @@ const Settings = () => {
       localStorage.removeItem("skillverse_leaderboard");
       toast.success("Progress reset successfully");
       setTimeout(() => window.location.reload(), 1000);
+    }
+  };
+
+  const handleDeveloperReset = () => {
+    if (confirm("This will reset everything including the welcome screen. Continue?")) {
+      localStorage.clear();
+      toast.success("App reset to initial state");
+      setTimeout(() => window.location.href = "/", 1000);
     }
   };
   
@@ -195,6 +203,20 @@ const Settings = () => {
               <Trash2 className="w-4 h-4 mr-2" />
               Reset All Progress
             </Button>
+
+            <div className="pt-4 border-t border-border/30">
+              <p className="text-sm text-muted-foreground mb-3">
+                Developer Options
+              </p>
+              <Button
+                onClick={handleDeveloperReset}
+                variant="outline"
+                className="w-full justify-start border-accent/30 text-accent hover:bg-accent/10"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Full App Reset (Including Welcome Screen)
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
