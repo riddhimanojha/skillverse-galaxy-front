@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AIAssistant } from "@/components/AIAssistant";
 import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
 import Skills from "./pages/Skills";
 import Learn from "./pages/Learn";
 import Progress from "./pages/Progress";
@@ -23,6 +24,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/skills" element={<Skills />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/progress" element={<Progress />} />
