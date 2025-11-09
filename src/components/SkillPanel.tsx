@@ -1,9 +1,10 @@
-import { X, Sparkles, RotateCcw, GraduationCap } from "lucide-react";
+import { X, Sparkles, RotateCcw, GraduationCap, BookOpen } from "lucide-react";
 import { Button } from "./ui/button";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { unmasterSkill } from "@/utils/progressSystem";
+import { getLearningMaterial } from "@/utils/learningMaterial";
 
 interface Skill {
   id: string;
@@ -96,6 +97,60 @@ export const SkillPanel = ({ skill, onClose, onComplete, onSkip, onUnmaster }: S
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto space-y-8">
+            {/* Learning Material Section */}
+            {(() => {
+              const material = getLearningMaterial(skill.id);
+              return material && (
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <BookOpen className="w-4 h-4 text-accent" />
+                      <h3 className="text-sm font-bold text-accent uppercase tracking-wider">
+                        Learning Material
+                      </h3>
+                    </div>
+                    <p className="text-foreground/90 leading-relaxed text-sm mb-4">
+                      {material.introduction}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="text-xs font-bold text-primary uppercase tracking-wider mb-3">
+                      Key Concepts
+                    </h4>
+                    <div className="space-y-3">
+                      {material.concepts.map((concept, index) => (
+                        <div
+                          key={index}
+                          className="p-3 bg-gradient-to-r from-primary/5 to-transparent rounded-lg border border-primary/10"
+                        >
+                          <h5 className="font-semibold text-foreground text-sm mb-1">
+                            {concept.title}
+                          </h5>
+                          <p className="text-xs text-foreground/70 leading-relaxed">
+                            {concept.description}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {material.codeExample && (
+                    <div>
+                      <h4 className="text-xs font-bold text-secondary uppercase tracking-wider mb-3">
+                        {material.codeExample.title}
+                      </h4>
+                      <pre className="bg-background/50 backdrop-blur-sm border border-border/30 rounded-lg p-4 overflow-x-auto text-xs">
+                        <code className="text-foreground/90 font-mono">
+                          {material.codeExample.code}
+                        </code>
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
             <div>
               <h3 className="text-sm font-bold text-primary uppercase tracking-wider mb-3">
                 About This Skill

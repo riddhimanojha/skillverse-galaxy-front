@@ -34,13 +34,19 @@ export const SkillStar = ({ skill, onClick }: SkillStarProps) => {
 
   return (
     <div
-      className={`absolute transition-all duration-500 ${
+      className={`absolute duration-300 ease-out ${
         skill.unlocked ? "cursor-pointer" : "opacity-40 cursor-not-allowed"
-      } ${hover && skill.unlocked ? "scale-150" : "scale-100"}`}
+      }`}
       style={{
         left: `${skill.x}%`,
         top: `${skill.y}%`,
-        transform: "translate(-50%, -50%)",
+        transform: hover && skill.unlocked 
+          ? "translate(-50%, -50%) scale(1.5)" 
+          : "translate(-50%, -50%) scale(1)",
+        filter: hover && skill.unlocked 
+          ? "drop-shadow(0 0 12px rgba(180, 90, 255, 0.9))" 
+          : "none",
+        transition: "all 0.25s ease-out",
       }}
       onClick={() => skill.unlocked && onClick()}
       onMouseEnter={() => setHover(true)}
