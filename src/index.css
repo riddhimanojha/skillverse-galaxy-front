@@ -8,9 +8,9 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Cosmic galaxy theme - Deep purple */
-    --background: 270 50% 8%;
-    --foreground: 280 20% 95%;
+    /* Cosmic galaxy theme */
+    --background: 250 60% 5%;
+    --foreground: 240 10% 98%;
 
     /* Glassmorphism cards */
     --card: 250 40% 10%;
@@ -19,9 +19,9 @@ All colors MUST be HSL.
     --popover: 250 40% 12%;
     --popover-foreground: 240 10% 98%;
 
-    /* Lilac/magenta accents */
-    --primary: 280 85% 65%;
-    --primary-foreground: 280 20% 10%;
+    /* Neon cosmic accents */
+    --primary: 280 100% 70%;
+    --primary-foreground: 0 0% 100%;
 
     /* Cyan for unlocked skills */
     --secondary: 190 100% 60%;
@@ -31,9 +31,9 @@ All colors MUST be HSL.
     --muted: 250 30% 15%;
     --muted-foreground: 240 20% 65%;
 
-    /* Accent - magenta */
-    --accent: 300 85% 70%;
-    --accent-foreground: 300 20% 10%;
+    /* Accent - electric purple */
+    --accent: 270 100% 65%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 80% 60%;
     --destructive-foreground: 0 0% 100%;

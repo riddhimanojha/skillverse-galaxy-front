@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { OptimizedThreeGalaxy } from "@/components/OptimizedThreeGalaxy";
+import { useState, useEffect } from "react";
+import { ThreeGalaxyCanvas } from "@/components/galaxy/ThreeGalaxyCanvas";
 import { SkillStar } from "@/components/SkillStar";
 import { SkillPanel } from "@/components/SkillPanel";
 import { CosmicLogo } from "@/components/CosmicLogo";
@@ -7,25 +7,18 @@ import { Navigation } from "@/components/Navigation";
 import { ConstellationLines } from "@/components/ConstellationLines";
 import { ShootingStars } from "@/components/ShootingStars";
 import { SearchLearningPath } from "@/components/SearchLearningPath";
-import { AIChat, AIChatRef } from "@/components/AIChat";
-import { CompleteModal } from "@/components/CompleteModal";
-import { DevOptions } from "@/components/DevOptions";
 import { toast } from "sonner";
 import { Skill, buildSkillsFromStorage, initialSkills } from "@/utils/skillGraph";
 import { completeSkill, unmasterSkill } from "@/utils/progressSystem";
 import { Button } from "@/components/ui/button";
 import { Zap } from "lucide-react";
-import html2canvas from "html2canvas";
 
 const Index = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 });
   const [showWelcome, setShowWelcome] = useState(true);
   const [filteredSkillIds, setFilteredSkillIds] = useState<string[] | null>(null);
-  const [showCompleteModal, setShowCompleteModal] = useState(false);
-  const [starCount, setStarCount] = useState(400);
-  const [nebulaIntensity, setNebulaIntensity] = useState(1.0);
-  const chatRef = useRef<AIChatRef>(null);
 
   // Load skills from localStorage on mount
   useEffect(() => {
@@ -59,58 +52,18 @@ const Index = () => {
     localStorage.setItem('skillverse_seen_welcome', 'true');
   };
 
-  // Complete All - marks ALL skills as completed instantly
-  const handleCompleteAll = () => {
-    // Complete all skills without reload
-    initialSkills.forEach((skill) => {
-      completeSkill(skill.id);
-    });
-    
-    const updatedSkills = buildSkillsFromStorage();
-    setSkills(updatedSkills);
-    
-    // Dispatch event for other components
-    window.dispatchEvent(new CustomEvent('skillsUpdated'));
-    
-    // Show completion modal
-    setShowCompleteModal(true);
-  };
+  // Mouse tracking for parallax
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: e.clientX / window.innerWidth,
+        y: e.clientY / window.innerHeight,
+      });
+    };
 
-  const handleModalBackToChat = () => {
-    setShowCompleteModal(false);
-    setShowWelcome(true);
-    localStorage.removeItem('skillverse_seen_welcome');
-    chatRef.current?.focus();
-  };
-
-  const handleCaptureScreenshot = async () => {
-    try {
-      const canvas = document.querySelector('canvas');
-      if (canvas) {
-        const dataUrl = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.download = 'skillverse-constellation.png';
-        link.href = dataUrl;
-        link.click();
-        toast.success('Screenshot captured!');
-      } else {
-        const element = document.body;
-        const capturedCanvas = await html2canvas(element, {
-          backgroundColor: 'rgba(0,0,0,0)',
-          scale: 0.5,
-        });
-        const dataUrl = capturedCanvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.download = 'skillverse-constellation.png';
-        link.href = dataUrl;
-        link.click();
-        toast.success('Screenshot captured!');
-      }
-    } catch (error) {
-      console.error('Screenshot failed:', error);
-      toast.error('Failed to capture screenshot');
-    }
-  };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   // Handle skill completion
   const handleComplete = (skillId: string) => {
@@ -146,6 +99,28 @@ const Index = () => {
     setSelectedSkill(null);
   };
 
+  // Complete all skills at once (developer feature)
+  const handleCompleteAll = () => {
+    let completedCount = 0;
+    initialSkills.forEach((skill) => {
+      const currentSkill = skills.find(s => s.id === skill.id);
+      if (currentSkill && !currentSkill.completed) {
+        completeSkill(skill.id);
+        completedCount++;
+      }
+    });
+    
+    const updatedSkills = buildSkillsFromStorage();
+    setSkills(updatedSkills);
+    
+    // Dispatch custom event to update other components
+    window.dispatchEvent(new CustomEvent('skillsUpdated'));
+    
+    toast.success(`Completed all ${completedCount} remaining skills! 🌟`, {
+      description: "All courses are now marked as completed.",
+    });
+  };
+
   // Keyboard accessibility
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -164,11 +139,8 @@ const Index = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Optimized Three.js Galaxy Background */}
-      <OptimizedThreeGalaxy 
-        starCount={starCount} 
-        nebulaIntensity={nebulaIntensity}
-      />
+      {/* React Three Fiber Galaxy Background */}
+      <ThreeGalaxyCanvas mousePosition={mousePosition} />
       
       {/* Shooting Stars Effect */}
       <ShootingStars />
@@ -207,14 +179,9 @@ const Index = () => {
       {/* Navigation */}
       <Navigation />
 
-      {/* Left Sidebar - AI Chat + Dashboard */}
-      <div className="fixed top-24 left-8 z-50 w-96 space-y-4 animate-fade-in">
-        {/* AI Chat */}
-        <AIChat ref={chatRef} />
-
-        {/* Dashboard Stats */}
-        <div className="glass-panel rounded-2xl p-6 border border-primary/20">
-          <div className="space-y-4">
+      {/* Stats Panel - Glassmorphism */}
+      <div className="fixed bottom-8 left-8 z-50 glass-panel rounded-2xl p-6 min-w-[220px] animate-fade-in border border-primary/20">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground uppercase tracking-wider">Mastered</span>
             <div className="flex items-center gap-2">
@@ -239,39 +206,22 @@ const Index = () => {
             <span className="font-bold text-xl text-foreground">{skills.length}</span>
           </div>
           
-          {/* Complete All Button - Always visible */}
-          <div className="h-px bg-gradient-to-r from-primary via-accent to-transparent opacity-30" />
-          <Button
-            onClick={handleCompleteAll}
-            className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold py-2 text-sm shadow-lg shadow-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/50"
-            size="sm"
-            disabled={skills.every(s => s.completed)}
-          >
-            <Zap className="w-4 h-4 mr-2" />
-            Complete All
-          </Button>
-
-          {/* Dev Options */}
-          <div className="h-px bg-gradient-to-r from-primary via-accent to-transparent opacity-30" />
-          <DevOptions
-            starCount={starCount}
-            onStarCountChange={setStarCount}
-            nebulaIntensity={nebulaIntensity}
-            onNebulaIntensityChange={setNebulaIntensity}
-            onCaptureScreenshot={handleCaptureScreenshot}
-          />
-          </div>
+          {/* Developer Complete All Button */}
+          {skills.some(s => !s.completed) && (
+            <>
+              <div className="h-px bg-gradient-to-r from-primary via-accent to-transparent opacity-30" />
+              <Button
+                onClick={handleCompleteAll}
+                className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold py-2 text-sm shadow-lg shadow-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/50"
+                size="sm"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Complete All
+              </Button>
+            </>
+          )}
         </div>
       </div>
-
-      {/* Complete Modal */}
-      <CompleteModal
-        open={showCompleteModal}
-        onClose={() => setShowCompleteModal(false)}
-        onBackToChat={handleModalBackToChat}
-        skills={skills}
-        courseName={filteredSkillIds ? "Selected Course" : "All Courses"}
-      />
 
       {/* Skill Stars/Nodes with Constellation Lines */}
       <div className="relative w-full h-screen">
