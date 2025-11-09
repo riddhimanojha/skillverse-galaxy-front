@@ -8,8 +8,8 @@ import { ConstellationLines } from "@/components/ConstellationLines";
 import { ShootingStars } from "@/components/ShootingStars";
 import { SearchLearningPath } from "@/components/SearchLearningPath";
 import { toast } from "sonner";
-import { Skill, buildSkillsFromStorage, saveProgress } from "@/utils/skillGraph";
-import { completeSkill, getProgress } from "@/utils/progressSystem";
+import { Skill, buildSkillsFromStorage } from "@/utils/skillGraph";
+import { completeSkill, unmasterSkill } from "@/utils/progressSystem";
 
 const Index = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -57,22 +57,12 @@ const Index = () => {
 
   // Handle skill completion
   const handleComplete = (skillId: string) => {
-    console.log('Completing skill:', skillId);
-    
-    // Update progress system first (XP, streak, etc.) - this also marks skill as completed
+    // Update progress system (XP, streak, etc.) - this also marks skill as completed
     const newProgress = completeSkill(skillId);
-    console.log('New progress:', newProgress);
-    
-    // Update the completed skills set for the skill graph
-    const completedIds = new Set(skills.filter((s) => s.completed).map((s) => s.id));
-    completedIds.add(skillId);
-    saveProgress(completedIds);
-    console.log('Completed IDs saved:', Array.from(completedIds));
     
     // Reload all skills with updated completion status
     const updatedSkills = buildSkillsFromStorage();
     setSkills(updatedSkills);
-    console.log('Skills updated:', updatedSkills.find(s => s.id === skillId));
     
     // Close the panel and return to galaxy view
     setSelectedSkill(null);
@@ -92,9 +82,7 @@ const Index = () => {
 
   // Handle skill unmaster
   const handleUnmaster = (skillId: string) => {
-    const completedIds = new Set(skills.filter((s) => s.completed).map((s) => s.id));
-    completedIds.delete(skillId);
-    saveProgress(completedIds);
+    unmasterSkill(skillId);
     
     const updatedSkills = buildSkillsFromStorage();
     setSkills(updatedSkills);

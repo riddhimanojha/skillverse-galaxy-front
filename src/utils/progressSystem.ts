@@ -166,9 +166,9 @@ export const unmasterSkill = (skillId: string): UserProgress => {
   const progress = getProgress();
   
   // Remove skill from completed list if it exists
-  const completedSkills = JSON.parse(localStorage.getItem('completed_skills') || '[]');
+  const completedSkills = JSON.parse(localStorage.getItem('skillverse_completed') || '[]');
   const updatedSkills = completedSkills.filter((id: string) => id !== skillId);
-  localStorage.setItem('completed_skills', JSON.stringify(updatedSkills));
+  localStorage.setItem('skillverse_completed', JSON.stringify(updatedSkills));
   
   // Save updated progress
   saveProgress(progress);
@@ -180,7 +180,7 @@ export const unmasterSkill = (skillId: string): UserProgress => {
  * Get all completed skills
  */
 export const getCompletedSkills = (): string[] => {
-  return JSON.parse(localStorage.getItem('completed_skills') || '[]');
+  return JSON.parse(localStorage.getItem('skillverse_completed') || '[]');
 };
 
 /**
@@ -190,7 +190,7 @@ export const markSkillCompleted = (skillId: string): void => {
   const completedSkills = getCompletedSkills();
   if (!completedSkills.includes(skillId)) {
     completedSkills.push(skillId);
-    localStorage.setItem('completed_skills', JSON.stringify(completedSkills));
+    localStorage.setItem('skillverse_completed', JSON.stringify(completedSkills));
   }
 };
 
