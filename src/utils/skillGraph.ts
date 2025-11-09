@@ -11,24 +11,27 @@ export interface Skill {
 }
 
 export const initialSkills: Omit<Skill, "completed" | "unlocked">[] = [
-  // Foundation (Bottom Layer)
+  // Gemini Constellation - Frontend Skills
+  // Positioned to form the actual Gemini constellation pattern (the Twins)
+  
+  // Pollux (Right Twin) - Main HTML branch
   {
     id: "html",
     name: "HTML",
     description: "Learn the foundation of web development. Master semantic HTML, forms, tables, and document structure.",
-    x: 30,
+    x: 35,
     y: 70,
     requires: [],
     unlocks: ["CSS", "JavaScript", "Git"],
   },
   
-  // Frontend Constellation
+  // CSS Branch (Left side of Pollux)
   {
     id: "css",
     name: "CSS",
     description: "Style your web pages with CSS. Learn selectors, layouts, animations, and responsive design.",
-    x: 20,
-    y: 50,
+    x: 25,
+    y: 55,
     requires: ["html"],
     unlocks: ["Sass", "Tailwind"],
   },
@@ -36,8 +39,8 @@ export const initialSkills: Omit<Skill, "completed" | "unlocked">[] = [
     id: "sass",
     name: "Sass",
     description: "Advanced CSS with variables, nesting, and mixins for scalable stylesheets.",
-    x: 15,
-    y: 35,
+    x: 20,
+    y: 40,
     requires: ["css"],
     unlocks: [],
   },
@@ -45,19 +48,19 @@ export const initialSkills: Omit<Skill, "completed" | "unlocked">[] = [
     id: "tailwind",
     name: "Tailwind",
     description: "Utility-first CSS framework for rapid UI development.",
-    x: 25,
-    y: 30,
+    x: 18,
+    y: 25,
     requires: ["css"],
     unlocks: [],
   },
   
-  // JavaScript Constellation
+  // Castor (Left Twin) - JavaScript branch
   {
     id: "javascript",
     name: "JavaScript",
     description: "Add interactivity to your websites. Learn variables, functions, DOM manipulation, and modern ES6+ features.",
     x: 45,
-    y: 55,
+    y: 60,
     requires: ["html"],
     unlocks: ["TypeScript", "React", "Node.js"],
   },
@@ -65,8 +68,8 @@ export const initialSkills: Omit<Skill, "completed" | "unlocked">[] = [
     id: "typescript",
     name: "TypeScript",
     description: "JavaScript with static typing for safer, more maintainable code.",
-    x: 40,
-    y: 40,
+    x: 42,
+    y: 45,
     requires: ["javascript"],
     unlocks: [],
   },
@@ -74,8 +77,8 @@ export const initialSkills: Omit<Skill, "completed" | "unlocked">[] = [
     id: "react",
     name: "React",
     description: "Build dynamic user interfaces with React components, hooks, and state management.",
-    x: 50,
-    y: 35,
+    x: 48,
+    y: 30,
     requires: ["javascript"],
     unlocks: ["Next.js"],
   },
@@ -83,8 +86,8 @@ export const initialSkills: Omit<Skill, "completed" | "unlocked">[] = [
     id: "next.js",
     name: "Next.js",
     description: "Full-stack React framework with SSR, routing, and API routes.",
-    x: 55,
-    y: 20,
+    x: 50,
+    y: 15,
     requires: ["react"],
     unlocks: [],
   },
