@@ -40,12 +40,11 @@ const Dashboard = () => {
   // Complete all skills at once
   const handleCompleteAll = () => {
     let completedCount = 0;
+    
+    // Complete ALL skills, including locked ones
     initialSkills.forEach((skill) => {
-      const currentSkill = skills.find(s => s.id === skill.id);
-      if (currentSkill && !currentSkill.completed) {
-        completeSkill(skill.id);
-        completedCount++;
-      }
+      completeSkill(skill.id);
+      completedCount++;
     });
     
     // Force immediate state update
@@ -55,9 +54,17 @@ const Dashboard = () => {
     // Dispatch custom event to update other components
     window.dispatchEvent(new CustomEvent('skillsUpdated'));
     
-    toast.success(`Completed all ${completedCount} remaining skills! 🌟`, {
-      description: "All courses are now marked as completed.",
+    // Show congratulations
+    toast.success(`🎉 Congratulations! All ${completedCount} skills completed!`, {
+      description: "You've mastered everything. Ready for a new learning path?",
+      duration: 5000,
     });
+    
+    // Navigate back to main page and show welcome screen
+    setTimeout(() => {
+      localStorage.removeItem('skillverse_seen_welcome');
+      navigate('/');
+    }, 3000);
   };
 
   // Reset all progress
@@ -181,10 +188,9 @@ const Dashboard = () => {
                 <Button
                   onClick={handleCompleteAll}
                   className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold py-6 shadow-lg shadow-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/50"
-                  disabled={completedSkills.length === skills.length}
                 >
                   <Zap className="w-5 h-5 mr-2" />
-                  Complete All Skills ({skills.length - completedSkills.length} left)
+                  Complete All Skills ({initialSkills.length} total)
                 </Button>
 
                 <Button
