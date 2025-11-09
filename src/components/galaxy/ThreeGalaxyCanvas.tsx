@@ -14,18 +14,19 @@ export const ThreeGalaxyCanvas = ({ mousePosition }: ThreeGalaxyCanvasProps) => 
   return (
     <div className="fixed inset-0 -z-10">
       <Canvas
-        camera={{ position: [0, 0, 5], fov: 65 }}
+        camera={{ position: [0, 0, 5], fov: 70 }}
         gl={{
-          antialias: false, // Disabled for performance
+          antialias: true,
           alpha: true,
           powerPreference: "high-performance",
         }}
-        dpr={[1, 1.5]} // Cap pixel ratio for performance
+        dpr={[1, 2]}
+        frameloop="always"
         style={{
-          background: "radial-gradient(ellipse at center, hsl(270, 50%, 8%) 0%, hsl(260, 60%, 3%) 50%, hsl(250, 70%, 2%) 100%)",
+          background: "radial-gradient(ellipse at center, hsl(270, 60%, 6%) 0%, hsl(265, 70%, 4%) 40%, hsl(260, 80%, 2%) 100%)",
         }}
       >
-        <GalaxyBackground mousePosition={mousePosition} starCount={8000} />
+        <GalaxyBackground mousePosition={mousePosition} starCount={12000} />
       </Canvas>
     </div>
   );

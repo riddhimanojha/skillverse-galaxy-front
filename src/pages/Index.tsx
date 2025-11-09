@@ -12,6 +12,7 @@ import { Skill, buildSkillsFromStorage, initialSkills } from "@/utils/skillGraph
 import { completeSkill, unmasterSkill } from "@/utils/progressSystem";
 import { Button } from "@/components/ui/button";
 import { Zap } from "lucide-react";
+import { AILearningGuide } from "@/components/AILearningGuide";
 
 const Index = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -179,49 +180,53 @@ const Index = () => {
       {/* Navigation */}
       <Navigation />
 
-      {/* Stats Panel - Glassmorphism */}
-      <div className="fixed bottom-8 left-8 z-50 glass-panel rounded-2xl p-6 min-w-[220px] animate-fade-in border border-primary/20">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground uppercase tracking-wider">Mastered</span>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
-              <span className="font-bold text-3xl text-primary cosmic-glow">
-                {skills.filter((s) => s.completed).length}
-              </span>
+      {/* Left Side Stack - Bottom to Top */}
+      <div className="fixed bottom-6 left-6 z-50 flex flex-col gap-4 animate-fade-in">
+        {/* AI Learning Guide - Bottom */}
+        <AILearningGuide />
+        
+        {/* Stats Dashboard - Above AI Guide */}
+        <div className="glass-panel rounded-2xl p-5 w-72 border border-primary/20">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">Mastered</span>
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
+                <span className="font-bold text-2xl text-primary cosmic-glow">
+                  {skills.filter((s) => s.completed).length}
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">Unlocked</span>
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-secondary" />
+                <span className="font-bold text-xl text-secondary">
+                  {skills.filter((s) => s.unlocked).length}
+                </span>
+              </div>
+            </div>
+            <div className="h-px bg-gradient-to-r from-primary via-accent to-transparent opacity-30" />
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">Total Skills</span>
+              <span className="font-bold text-lg text-foreground">{skills.length}</span>
             </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground uppercase tracking-wider">Unlocked</span>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-secondary" />
-              <span className="font-bold text-2xl text-secondary">
-                {skills.filter((s) => s.unlocked).length}
-              </span>
-            </div>
-          </div>
-          <div className="h-px bg-gradient-to-r from-primary via-accent to-transparent opacity-30" />
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-muted-foreground uppercase tracking-wider">Total Skills</span>
-            <span className="font-bold text-xl text-foreground">{skills.length}</span>
-          </div>
-          
-          {/* Developer Complete All Button */}
-          {skills.some(s => !s.completed) && (
-            <>
-              <div className="h-px bg-gradient-to-r from-primary via-accent to-transparent opacity-30" />
-              <Button
-                onClick={handleCompleteAll}
-                className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold py-2 text-sm shadow-lg shadow-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/50"
-                size="sm"
-              >
-                <Zap className="w-4 h-4 mr-2" />
-                Complete All
-              </Button>
-            </>
-          )}
         </div>
       </div>
+
+      {/* Complete All Button - Top Right */}
+      {skills.some(s => !s.completed) && (
+        <div className="fixed top-24 right-8 z-50 animate-fade-in">
+          <Button
+            onClick={handleCompleteAll}
+            className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold px-6 py-3 shadow-lg shadow-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/50"
+          >
+            <Zap className="w-5 h-5 mr-2" />
+            Complete All
+          </Button>
+        </div>
+      )}
 
       {/* Skill Stars/Nodes with Constellation Lines */}
       <div className="relative w-full h-screen">

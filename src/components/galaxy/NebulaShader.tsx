@@ -11,9 +11,10 @@ export class NebulaMaterial extends THREE.ShaderMaterial {
     super({
       uniforms: {
         time: { value: 0 },
-        colorA: { value: new THREE.Color(0.25, 0.1, 0.4) }, // Deep purple
-        colorB: { value: new THREE.Color(0.5, 0.2, 0.7) }, // Cosmic violet
-        colorC: { value: new THREE.Color(0.15, 0.05, 0.25) }, // Dark space
+        colorA: { value: new THREE.Color(0.58, 0.2, 0.92) }, // Electric violet
+        colorB: { value: new THREE.Color(0.4, 0.6, 0.95) }, // Cosmic blue
+        colorC: { value: new THREE.Color(0.2, 0.11, 0.35) }, // Dark space purple
+        colorD: { value: new THREE.Color(0.65, 0.3, 0.8) }, // Purple glow
       },
       vertexShader: `
         varying vec2 vUv;
@@ -30,6 +31,7 @@ export class NebulaMaterial extends THREE.ShaderMaterial {
         uniform vec3 colorA;
         uniform vec3 colorB;
         uniform vec3 colorC;
+        uniform vec3 colorD;
         
         varying vec2 vUv;
         varying vec3 vPosition;
@@ -83,13 +85,18 @@ export class NebulaMaterial extends THREE.ShaderMaterial {
           // Combine noise layers
           float nebula = (n1 + n2 * 0.6 + n3 * 0.4) / 2.2;
           
-          // Create smooth color gradients
+          // Create rich color gradients
           vec3 color = mix(colorC, colorA, nebula);
-          color = mix(color, colorB, smoothstep(0.3, 0.7, nebula));
+          color = mix(color, colorB, smoothstep(0.2, 0.8, nebula));
+          color = mix(color, colorD, smoothstep(0.5, 1.0, nebula));
           
-          // Add subtle glow in the center
-          float glow = 1.0 - length(vUv - 0.5) * 0.8;
-          color += colorB * glow * 0.15;
+          // Add glowing center
+          float glow = 1.0 - length(vUv - 0.5) * 0.5;
+          color += colorD * glow * 0.25;
+          
+          // Add depth variation
+          float depthFactor = smoothstep(-1.0, 1.0, vPosition.z / 40.0);
+          color = mix(color * 0.7, color, depthFactor);
           
           // Soft opacity for dreamy effect
           float alpha = nebula * 0.6 + 0.3;

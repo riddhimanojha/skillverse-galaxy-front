@@ -7,6 +7,7 @@ import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { NebulaMaterial } from "./NebulaShader";
+import { PlanetWithRings } from "./PlanetWithRings";
 
 interface GalaxyBackgroundProps {
   mousePosition: { x: number; y: number };
@@ -21,8 +22,10 @@ export const GalaxyBackground = ({
   const starsRef = useRef<THREE.Points>(null);
   const galaxyGroupRef = useRef<THREE.Group>(null);
 
-  // Smooth mouse tracking
+  // Smooth mouse tracking with parallax
   const smoothMouse = useRef({ x: 0, y: 0 });
+  const nebulaLayerRef = useRef<THREE.Group>(null);
+  const starsLayerRef = useRef<THREE.Group>(null);
 
   // Create nebula material instance
   const nebulaMaterial = useMemo(() => new NebulaMaterial(), []);
@@ -45,22 +48,22 @@ export const GalaxyBackground = ({
       positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
       positions[i3 + 2] = radius * Math.cos(phi) - 25;
       
-      // Color mix: purple/cyan/white
+      // Micro-stars: subtle purple/blue/white tones
       const choice = Math.random();
-      if (choice < 0.5) {
-        // Purple stars
-        colors[i3] = 0.7 + Math.random() * 0.3;
-        colors[i3 + 1] = 0.5 + Math.random() * 0.3;
+      if (choice < 0.6) {
+        // Soft purple
+        colors[i3] = 0.8 + Math.random() * 0.2;
+        colors[i3 + 1] = 0.6 + Math.random() * 0.2;
         colors[i3 + 2] = 1;
-      } else if (choice < 0.8) {
-        // Cyan stars
-        colors[i3] = 0.4 + Math.random() * 0.2;
-        colors[i3 + 1] = 0.7 + Math.random() * 0.3;
+      } else if (choice < 0.85) {
+        // Soft blue
+        colors[i3] = 0.5 + Math.random() * 0.2;
+        colors[i3 + 1] = 0.7 + Math.random() * 0.2;
         colors[i3 + 2] = 1;
       } else {
-        // White stars
-        colors[i3] = 1;
-        colors[i3 + 1] = 1;
+        // White
+        colors[i3] = 0.9 + Math.random() * 0.1;
+        colors[i3 + 1] = 0.9 + Math.random() * 0.1;
         colors[i3 + 2] = 1;
       }
     }
@@ -69,10 +72,10 @@ export const GalaxyBackground = ({
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     
     const material = new THREE.PointsMaterial({
-      size: 0.03,
+      size: 0.015, // Smaller micro-stars
       vertexColors: true,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.7,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       sizeAttenuation: true,
@@ -83,45 +86,74 @@ export const GalaxyBackground = ({
 
   // Animation loop
   useFrame((state, delta) => {
-    // Update nebula shader time
+    // Update nebula shader time (slow drift)
     if (nebulaRef.current) {
-      nebulaRef.current.uniforms.time.value += delta * 0.3;
+      nebulaRef.current.uniforms.time.value += delta * 0.2;
     }
 
-    // Smooth mouse interpolation (lerp)
-    smoothMouse.current.x += (mousePosition.x - 0.5 - smoothMouse.current.x) * 0.03;
-    smoothMouse.current.y += (mousePosition.y - 0.5 - smoothMouse.current.y) * 0.03;
+    // Smooth mouse interpolation with throttle
+    smoothMouse.current.x += (mousePosition.x - 0.5 - smoothMouse.current.x) * 0.02;
+    smoothMouse.current.y += (mousePosition.y - 0.5 - smoothMouse.current.y) * 0.02;
 
-    // Gentle parallax effect on entire galaxy
+    // Parallax layers: nebula shifts most, planet medium, stars least
+    if (nebulaLayerRef.current) {
+      nebulaLayerRef.current.position.x = smoothMouse.current.x * 3;
+      nebulaLayerRef.current.position.y = -smoothMouse.current.y * 3;
+      nebulaLayerRef.current.rotation.y += delta * 0.01;
+    }
+
     if (galaxyGroupRef.current) {
-      galaxyGroupRef.current.rotation.y += delta * 0.02; // Slow rotation
-      galaxyGroupRef.current.rotation.x = smoothMouse.current.y * 0.15;
-      galaxyGroupRef.current.position.x = smoothMouse.current.x * 2;
-      galaxyGroupRef.current.position.y = -smoothMouse.current.y * 2;
+      galaxyGroupRef.current.position.x = smoothMouse.current.x * 1.5;
+      galaxyGroupRef.current.position.y = -smoothMouse.current.y * 1.5;
     }
 
-    // Subtle star drift
+    if (starsLayerRef.current) {
+      starsLayerRef.current.position.x = smoothMouse.current.x * 0.5;
+      starsLayerRef.current.position.y = -smoothMouse.current.y * 0.5;
+    }
+
+    // Gentle star twinkle
     if (starsRef.current) {
-      starsRef.current.rotation.y += delta * 0.015;
-      starsRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.1) * 0.05;
+      const material = starsRef.current.material as THREE.PointsMaterial;
+      material.opacity = 0.6 + Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
+      starsRef.current.rotation.y += delta * 0.008;
     }
   });
 
   return (
-    <group ref={galaxyGroupRef}>
-      {/* Nebula sphere with custom shader */}
-      <mesh>
-        <sphereGeometry args={[40, 32, 32]} />
-        <primitive ref={nebulaRef} object={nebulaMaterial} attach="material" />
-      </mesh>
+    <>
+      {/* Nebula layer - moves most with parallax */}
+      <group ref={nebulaLayerRef}>
+        <mesh>
+          <sphereGeometry args={[45, 48, 48]} />
+          <primitive ref={nebulaRef} object={nebulaMaterial} attach="material" />
+        </mesh>
+        <mesh position={[0, 0, 0]}>
+          <sphereGeometry args={[46, 48, 48]} />
+          <meshBasicMaterial
+            color="#7c3aed"
+            transparent
+            opacity={0.1}
+            blending={THREE.AdditiveBlending}
+          />
+        </mesh>
+      </group>
 
-      {/* Star field */}
-      <points ref={starsRef} geometry={starGeometry} material={starMaterial} />
+      {/* Planet and main scene - medium parallax */}
+      <group ref={galaxyGroupRef}>
+        <PlanetWithRings />
+        
+        {/* Ambient cosmic lighting */}
+        <ambientLight intensity={0.4} color="#8b5cf6" />
+        <pointLight position={[20, 15, 10]} intensity={3} color="#a78bfa" distance={60} />
+        <pointLight position={[-15, -10, 5]} intensity={2} color="#6366f1" distance={50} />
+        <pointLight position={[0, 20, -20]} intensity={1.5} color="#c084fc" distance={40} />
+      </group>
 
-      {/* Ambient cosmic lighting */}
-      <ambientLight intensity={0.3} color="#6b46c1" />
-      <pointLight position={[10, 10, 10]} intensity={2} color="#9333ea" distance={50} />
-      <pointLight position={[-10, -10, 5]} intensity={1.5} color="#3b82f6" distance={40} />
-    </group>
+      {/* Star field - minimal parallax */}
+      <group ref={starsLayerRef}>
+        <points ref={starsRef} geometry={starGeometry} material={starMaterial} />
+      </group>
+    </>
   );
 };
