@@ -20,25 +20,20 @@ const Index = () => {
   const [showWelcome, setShowWelcome] = useState(true);
   const [filteredSkillIds, setFilteredSkillIds] = useState<string[] | null>(null);
 
-  // Load skills from localStorage on mount and check welcome screen
+  // Load skills from localStorage on mount
   useEffect(() => {
     const loadedSkills = buildSkillsFromStorage();
     setSkills(loadedSkills);
     
     // Check if user has seen welcome screen before
-    const checkWelcomeScreen = () => {
-      const hasSeenWelcome = localStorage.getItem('skillverse_seen_welcome');
-      if (!hasSeenWelcome) {
-        setShowWelcome(true);
-      }
-    };
-    
-    checkWelcomeScreen();
+    const hasSeenWelcome = localStorage.getItem('skillverse_seen_welcome');
+    if (hasSeenWelcome) {
+      setShowWelcome(false);
+    }
 
     // Listen for skills updates from other components
     const handleSkillsUpdate = () => {
       setSkills(buildSkillsFromStorage());
-      checkWelcomeScreen(); // Also recheck welcome screen
     };
 
     window.addEventListener('skillsUpdated', handleSkillsUpdate);
@@ -107,11 +102,12 @@ const Index = () => {
   // Complete all skills at once (developer feature)
   const handleCompleteAll = () => {
     let completedCount = 0;
-    
-    // Complete ALL skills, including locked ones
     initialSkills.forEach((skill) => {
-      completeSkill(skill.id);
-      completedCount++;
+      const currentSkill = skills.find(s => s.id === skill.id);
+      if (currentSkill && !currentSkill.completed) {
+        completeSkill(skill.id);
+        completedCount++;
+      }
     });
     
     const updatedSkills = buildSkillsFromStorage();
@@ -120,18 +116,9 @@ const Index = () => {
     // Dispatch custom event to update other components
     window.dispatchEvent(new CustomEvent('skillsUpdated'));
     
-    // Show congratulations and reset to welcome screen
-    toast.success(`🎉 Congratulations! All ${completedCount} skills completed!`, {
-      description: "You've mastered everything. Ready for a new learning path?",
-      duration: 5000,
+    toast.success(`Completed all ${completedCount} remaining skills! 🌟`, {
+      description: "All courses are now marked as completed.",
     });
-    
-    // After a delay, show welcome screen again
-    setTimeout(() => {
-      setShowWelcome(true);
-      setFilteredSkillIds(null);
-      localStorage.removeItem('skillverse_seen_welcome');
-    }, 3000);
   };
 
   // Keyboard accessibility
@@ -220,15 +207,19 @@ const Index = () => {
           </div>
           
           {/* Developer Complete All Button */}
-          <div className="h-px bg-gradient-to-r from-primary via-accent to-transparent opacity-30" />
-          <Button
-            onClick={handleCompleteAll}
-            className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold py-2 text-sm shadow-lg shadow-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/50"
-            size="sm"
-          >
-            <Zap className="w-4 h-4 mr-2" />
-            Complete All
-          </Button>
+          {skills.some(s => !s.completed) && (
+            <>
+              <div className="h-px bg-gradient-to-r from-primary via-accent to-transparent opacity-30" />
+              <Button
+                onClick={handleCompleteAll}
+                className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold py-2 text-sm shadow-lg shadow-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/50"
+                size="sm"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Complete All
+              </Button>
+            </>
+          )}
         </div>
       </div>
 

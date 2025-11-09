@@ -1,11 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
-import { Sparkles, Trophy, Settings, Map, Gamepad2, Award } from "lucide-react";
+import { Sparkles, Trophy, Settings, Map, Gamepad2, Award, LayoutDashboard } from "lucide-react";
 import { Button } from "./ui/button";
 
 export const Navigation = () => {
   const location = useLocation();
   
   const navItems = [
+    { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { path: "/", icon: Map, label: "My Galaxy" },
     { path: "/skills", icon: Sparkles, label: "Skills" },
     { path: "/learn", icon: Gamepad2, label: "Learn" },
