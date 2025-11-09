@@ -180,12 +180,8 @@ const Index = () => {
       {/* Navigation */}
       <Navigation />
 
-      {/* Left Side Stack - Bottom to Top */}
-      <div className="fixed bottom-6 left-6 z-50 flex flex-col gap-4 animate-fade-in">
-        {/* AI Learning Guide - Bottom */}
-        <AILearningGuide />
-        
-        {/* Stats Dashboard - Above AI Guide */}
+      {/* Left Side - Stats Dashboard */}
+      <div className="fixed bottom-6 left-6 z-50 animate-fade-in">
         <div className="glass-panel rounded-2xl p-5 w-72 border border-primary/20">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -213,6 +209,11 @@ const Index = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Right Side - AI Learning Guide */}
+      <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
+        <AILearningGuide />
       </div>
 
       {/* Complete All Button - Top Right */}

@@ -7,7 +7,6 @@ import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { NebulaMaterial } from "./NebulaShader";
-import { PlanetWithRings } from "./PlanetWithRings";
 
 interface GalaxyBackgroundProps {
   mousePosition: { x: number; y: number };
@@ -139,10 +138,8 @@ export const GalaxyBackground = ({
         </mesh>
       </group>
 
-      {/* Planet and main scene - medium parallax */}
+      {/* Main scene - medium parallax */}
       <group ref={galaxyGroupRef}>
-        <PlanetWithRings />
-        
         {/* Ambient cosmic lighting */}
         <ambientLight intensity={0.4} color="#8b5cf6" />
         <pointLight position={[20, 15, 10]} intensity={3} color="#a78bfa" distance={60} />
