@@ -30,6 +30,14 @@ const Index = () => {
     if (hasSeenWelcome) {
       setShowWelcome(false);
     }
+
+    // Listen for skills updates from other components
+    const handleSkillsUpdate = () => {
+      setSkills(buildSkillsFromStorage());
+    };
+
+    window.addEventListener('skillsUpdated', handleSkillsUpdate);
+    return () => window.removeEventListener('skillsUpdated', handleSkillsUpdate);
   }, []);
 
   const handleSearchSubmit = (skillIds: string[]) => {
@@ -104,6 +112,9 @@ const Index = () => {
     
     const updatedSkills = buildSkillsFromStorage();
     setSkills(updatedSkills);
+    
+    // Dispatch custom event to update other components
+    window.dispatchEvent(new CustomEvent('skillsUpdated'));
     
     toast.success(`Completed all ${completedCount} remaining skills! 🌟`, {
       description: "All courses are now marked as completed.",

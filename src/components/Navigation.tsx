@@ -6,8 +6,8 @@ export const Navigation = () => {
   const location = useLocation();
   
   const navItems = [
-    { path: "/", icon: Map, label: "My Galaxy" },
     { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { path: "/", icon: Map, label: "My Galaxy" },
     { path: "/skills", icon: Sparkles, label: "Skills" },
     { path: "/learn", icon: Gamepad2, label: "Learn" },
     { path: "/progress", icon: Trophy, label: "Progress" },

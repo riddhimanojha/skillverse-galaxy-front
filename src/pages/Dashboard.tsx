@@ -48,7 +48,12 @@ const Dashboard = () => {
       }
     });
     
-    refreshData();
+    // Force immediate state update
+    setSkills(buildSkillsFromStorage());
+    setProgress(getProgress());
+    
+    // Dispatch custom event to update other components
+    window.dispatchEvent(new CustomEvent('skillsUpdated'));
     
     toast.success(`Completed all ${completedCount} remaining skills! 🌟`, {
       description: "All courses are now marked as completed.",
