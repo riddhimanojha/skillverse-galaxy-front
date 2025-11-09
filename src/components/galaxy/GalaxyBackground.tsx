@@ -7,6 +7,7 @@ import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { NebulaMaterial } from "./NebulaShader";
+import { BlackHole } from "./BlackHole";
 
 interface GalaxyBackgroundProps {
   mousePosition: { x: number; y: number };
@@ -122,6 +123,10 @@ export const GalaxyBackground = ({
       <ambientLight intensity={0.3} color="#6b46c1" />
       <pointLight position={[10, 10, 10]} intensity={2} color="#9333ea" distance={50} />
       <pointLight position={[-10, -10, 5]} intensity={1.5} color="#3b82f6" distance={40} />
+      
+      {/* Black Holes */}
+      <BlackHole position={[-8, 4, -15]} size={1.5} />
+      <BlackHole position={[7, -5, -18]} size={1.2} />
     </group>
   );
 };
