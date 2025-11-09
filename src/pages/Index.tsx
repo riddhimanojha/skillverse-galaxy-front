@@ -57,16 +57,19 @@ const Index = () => {
 
   // Handle skill completion
   const handleComplete = (skillId: string) => {
+    // Update progress system first (XP, streak, etc.) - this also marks skill as completed
+    const newProgress = completeSkill(skillId);
+    
+    // Update the completed skills set for the skill graph
     const completedIds = new Set(skills.filter((s) => s.completed).map((s) => s.id));
     completedIds.add(skillId);
     saveProgress(completedIds);
     
-    // Update progress system (XP, streak, etc.)
-    const newProgress = completeSkill(skillId);
-    
+    // Reload all skills with updated completion status
     const updatedSkills = buildSkillsFromStorage();
     setSkills(updatedSkills);
     
+    // Update the currently selected skill to show new status
     const updatedSkill = updatedSkills.find((s) => s.id === skillId);
     if (updatedSkill) {
       setSelectedSkill(updatedSkill);
