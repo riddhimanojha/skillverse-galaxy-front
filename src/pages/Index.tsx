@@ -69,11 +69,8 @@ const Index = () => {
     const updatedSkills = buildSkillsFromStorage();
     setSkills(updatedSkills);
     
-    // Update the currently selected skill to show new status
-    const updatedSkill = updatedSkills.find((s) => s.id === skillId);
-    if (updatedSkill) {
-      setSelectedSkill(updatedSkill);
-    }
+    // Close the panel and return to galaxy view
+    setSelectedSkill(null);
     
     toast.success(`Skill completed! +100 XP 🎉`, {
       description: `Level ${newProgress.level} • ${newProgress.streak} day streak 🔥`,
