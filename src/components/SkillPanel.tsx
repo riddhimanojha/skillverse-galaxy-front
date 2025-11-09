@@ -127,7 +127,7 @@ export const SkillPanel = ({ skill, onClose, onComplete, onSkip, onUnmaster }: S
 
           {/* Footer Actions */}
           <div className="pt-8 border-t border-border/30 space-y-3">
-            {!skill.completed ? (
+          {!skill.completed ? (
               <>
                 <Button
                   onClick={() => navigate(`/learn?skill=${skill.id}`)}
@@ -135,14 +135,6 @@ export const SkillPanel = ({ skill, onClose, onComplete, onSkip, onUnmaster }: S
                 >
                   <GraduationCap className="w-4 h-4 mr-2" />
                   Start Learning
-                </Button>
-                <Button
-                  onClick={() => onComplete(skill.id)}
-                  variant="outline"
-                  className="w-full border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50 py-4 text-sm"
-                >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Mark as Completed
                 </Button>
                 <Button
                   onClick={() => onSkip(skill.id)}

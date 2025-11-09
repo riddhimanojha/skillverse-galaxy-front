@@ -8,8 +8,10 @@ import { ConstellationLines } from "@/components/ConstellationLines";
 import { ShootingStars } from "@/components/ShootingStars";
 import { SearchLearningPath } from "@/components/SearchLearningPath";
 import { toast } from "sonner";
-import { Skill, buildSkillsFromStorage } from "@/utils/skillGraph";
+import { Skill, buildSkillsFromStorage, initialSkills } from "@/utils/skillGraph";
 import { completeSkill, unmasterSkill } from "@/utils/progressSystem";
+import { Button } from "@/components/ui/button";
+import { Zap } from "lucide-react";
 
 const Index = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -87,6 +89,25 @@ const Index = () => {
     const updatedSkills = buildSkillsFromStorage();
     setSkills(updatedSkills);
     setSelectedSkill(null);
+  };
+
+  // Complete all skills at once (developer feature)
+  const handleCompleteAll = () => {
+    let completedCount = 0;
+    initialSkills.forEach((skill) => {
+      const currentSkill = skills.find(s => s.id === skill.id);
+      if (currentSkill && !currentSkill.completed) {
+        completeSkill(skill.id);
+        completedCount++;
+      }
+    });
+    
+    const updatedSkills = buildSkillsFromStorage();
+    setSkills(updatedSkills);
+    
+    toast.success(`Completed all ${completedCount} remaining skills! 🌟`, {
+      description: "All courses are now marked as completed.",
+    });
   };
 
   // Keyboard accessibility
@@ -173,6 +194,21 @@ const Index = () => {
             <span className="text-sm text-muted-foreground uppercase tracking-wider">Total Skills</span>
             <span className="font-bold text-xl text-foreground">{skills.length}</span>
           </div>
+          
+          {/* Developer Complete All Button */}
+          {skills.some(s => !s.completed) && (
+            <>
+              <div className="h-px bg-gradient-to-r from-primary via-accent to-transparent opacity-30" />
+              <Button
+                onClick={handleCompleteAll}
+                className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold py-2 text-sm shadow-lg shadow-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/50"
+                size="sm"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Complete All
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
