@@ -50,12 +50,12 @@ export const ConstellationLines = ({ skills }: ConstellationLinesProps) => {
           x2={`${line.x2}%`}
           y2={`${line.y2}%`}
           stroke={line.active ? "url(#lineGradientActive)" : "url(#lineGradientInactive)"}
-          strokeWidth={line.active ? "3" : "1"}
+          strokeWidth={line.active ? "2" : "1"}
           strokeDasharray={line.active ? "none" : "5,5"}
           className={line.active ? "animate-pulse" : ""}
           style={{
             filter: line.active 
-              ? "drop-shadow(0 0 12px hsl(var(--primary) / 0.8)) drop-shadow(0 0 20px hsl(var(--accent) / 0.4))" 
+              ? "drop-shadow(0 0 8px hsl(var(--primary) / 0.5))" 
               : "none",
           }}
         />

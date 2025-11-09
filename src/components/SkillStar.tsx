@@ -64,31 +64,17 @@ export const SkillStar = ({ skill, onClick }: SkillStarProps) => {
           skill.completed || skill.unlocked ? "animate-pulse" : ""
         }`}
         style={{
-          width: hover ? "60px" : "50px",
-          height: hover ? "60px" : "50px",
-          margin: hover ? "-25px" : "-20px",
+          width: hover ? "50px" : "40px",
+          height: hover ? "50px" : "40px",
+          margin: hover ? "-20px" : "-15px",
           backgroundColor: skill.completed
-            ? "hsl(var(--primary))"
+            ? "hsl(var(--glow-completed))"
             : skill.unlocked
-            ? "hsl(var(--accent))"
+            ? "hsl(var(--glow-unlocked))"
             : "hsl(var(--glow-locked))",
-          opacity: skill.completed ? 1 : skill.unlocked ? 0.8 : 0.3,
+          opacity: skill.completed ? 0.9 : skill.unlocked ? 0.7 : 0.3,
         }}
       />
-      
-      {/* Outer glow ring for completed */}
-      {skill.completed && (
-        <div
-          className="absolute inset-0 rounded-full animate-pulse"
-          style={{
-            width: "70px",
-            height: "70px",
-            margin: "-30px",
-            border: "2px solid hsl(var(--primary))",
-            boxShadow: "0 0 15px hsl(var(--primary)), 0 0 30px hsl(var(--accent) / 0.5)",
-          }}
-        />
-      )}
       
       {/* Core star */}
       <div

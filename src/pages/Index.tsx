@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { ThreeGalaxyCanvas } from "@/components/galaxy/ThreeGalaxyCanvas";
 import { SkillStar } from "@/components/SkillStar";
 import { SkillPanel } from "@/components/SkillPanel";
@@ -7,10 +7,6 @@ import { Navigation } from "@/components/Navigation";
 import { ConstellationLines } from "@/components/ConstellationLines";
 import { ShootingStars } from "@/components/ShootingStars";
 import { SearchLearningPath } from "@/components/SearchLearningPath";
-import { AIChat, AIChatHandle } from "@/components/AIChat";
-import { DashboardButton } from "@/components/DashboardButton";
-import { DashboardPanel } from "@/components/DashboardPanel";
-import { CompleteModal } from "@/components/CompleteModal";
 import { toast } from "sonner";
 import { Skill, buildSkillsFromStorage, initialSkills } from "@/utils/skillGraph";
 import { completeSkill, unmasterSkill } from "@/utils/progressSystem";
@@ -23,9 +19,6 @@ const Index = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 });
   const [showWelcome, setShowWelcome] = useState(true);
   const [filteredSkillIds, setFilteredSkillIds] = useState<string[] | null>(null);
-  const [showDashboard, setShowDashboard] = useState(false);
-  const [showCompleteModal, setShowCompleteModal] = useState(false);
-  const chatRef = useRef<AIChatHandle>(null);
 
   // Load skills from localStorage on mount
   useEffect(() => {
@@ -106,7 +99,7 @@ const Index = () => {
     setSelectedSkill(null);
   };
 
-  // Complete all skills at once
+  // Complete all skills at once (developer feature)
   const handleCompleteAll = () => {
     let completedCount = 0;
     initialSkills.forEach((skill) => {
@@ -123,13 +116,9 @@ const Index = () => {
     // Dispatch custom event to update other components
     window.dispatchEvent(new CustomEvent('skillsUpdated'));
     
-    // Show completion modal
-    setShowCompleteModal(true);
-  };
-
-  const handleModalBackToChat = () => {
-    setShowCompleteModal(false);
-    chatRef.current?.focus();
+    toast.success(`Completed all ${completedCount} remaining skills! 🌟`, {
+      description: "All courses are now marked as completed.",
+    });
   };
 
   // Keyboard accessibility
@@ -149,15 +138,12 @@ const Index = () => {
     : skills;
 
   return (
-    <div className="relative min-h-screen overflow-hidden flex">
+    <div className="relative min-h-screen overflow-hidden">
       {/* React Three Fiber Galaxy Background */}
       <ThreeGalaxyCanvas mousePosition={mousePosition} />
       
       {/* Shooting Stars Effect */}
       <ShootingStars />
-      
-      {/* Main Content Area - Constellation */}
-      <div className="flex-1 relative constellation-container">
 
       {/* Welcome Screen */}
       {showWelcome && (
@@ -187,70 +173,75 @@ const Index = () => {
         </div>
       )}
 
-        {/* Cosmic Logo */}
-        <CosmicLogo />
-        
-        {/* Navigation */}
-        <Navigation />
+      {/* Cosmic Logo */}
+      <CosmicLogo />
+      
+      {/* Navigation */}
+      <Navigation />
 
-        {/* Complete All Button - Top Right */}
-        {skills.some(s => !s.completed) && (
-          <div className="absolute top-8 right-8 z-40">
-            <Button
-              onClick={handleCompleteAll}
-              className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold px-6 py-3 text-sm shadow-2xl shadow-primary/50 transition-all duration-300 hover:shadow-xl hover:scale-105"
-            >
-              <Zap className="w-4 h-4 mr-2" />
-              Complete All
-            </Button>
+      {/* Stats Panel - Glassmorphism */}
+      <div className="fixed bottom-8 left-8 z-50 glass-panel rounded-2xl p-6 min-w-[220px] animate-fade-in border border-primary/20">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground uppercase tracking-wider">Mastered</span>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+              <span className="font-bold text-3xl text-primary cosmic-glow">
+                {skills.filter((s) => s.completed).length}
+              </span>
+            </div>
           </div>
-        )}
-
-        {/* Skill Stars/Nodes with Constellation Lines */}
-        <div className="relative w-full h-screen">
-          <ConstellationLines skills={displayedSkills} />
-          {displayedSkills.map((skill) => (
-            <SkillStar
-              key={skill.id}
-              skill={skill}
-              onClick={() => setSelectedSkill(skill)}
-            />
-          ))}
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground uppercase tracking-wider">Unlocked</span>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-secondary" />
+              <span className="font-bold text-2xl text-secondary">
+                {skills.filter((s) => s.unlocked).length}
+              </span>
+            </div>
+          </div>
+          <div className="h-px bg-gradient-to-r from-primary via-accent to-transparent opacity-30" />
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground uppercase tracking-wider">Total Skills</span>
+            <span className="font-bold text-xl text-foreground">{skills.length}</span>
+          </div>
+          
+          {/* Developer Complete All Button */}
+          {skills.some(s => !s.completed) && (
+            <>
+              <div className="h-px bg-gradient-to-r from-primary via-accent to-transparent opacity-30" />
+              <Button
+                onClick={handleCompleteAll}
+                className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-bold py-2 text-sm shadow-lg shadow-primary/30 transition-all duration-300 hover:shadow-xl hover:shadow-primary/50"
+                size="sm"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Complete All
+              </Button>
+            </>
+          )}
         </div>
-
-        {/* Course Detail Panel */}
-        <SkillPanel
-          skill={selectedSkill}
-          onClose={() => setSelectedSkill(null)}
-          onComplete={handleComplete}
-          onSkip={handleSkip}
-          onUnmaster={handleUnmaster}
-        />
       </div>
 
-      {/* AI Chat - Right Side */}
-      <div className="w-[400px] h-screen p-4 relative z-50">
-        <AIChat ref={chatRef} />
+      {/* Skill Stars/Nodes with Constellation Lines */}
+      <div className="relative w-full h-screen">
+        <ConstellationLines skills={displayedSkills} />
+        {displayedSkills.map((skill) => (
+          <SkillStar
+            key={skill.id}
+            skill={skill}
+            onClick={() => setSelectedSkill(skill)}
+          />
+        ))}
       </div>
 
-      {/* Dashboard Button - Bottom Right */}
-      <DashboardButton onClick={() => setShowDashboard(true)} />
-
-      {/* Dashboard Panel Overlay */}
-      <DashboardPanel
-        isOpen={showDashboard}
-        onClose={() => setShowDashboard(false)}
-        completed={skills.filter((s) => s.completed).length}
-        unlocked={skills.filter((s) => s.unlocked).length}
-        total={skills.length}
-      />
-
-      {/* Complete Modal */}
-      <CompleteModal
-        isOpen={showCompleteModal}
-        onClose={() => setShowCompleteModal(false)}
-        onBackToChat={handleModalBackToChat}
-        skills={skills}
+      {/* Course Detail Panel */}
+      <SkillPanel
+        skill={selectedSkill}
+        onClose={() => setSelectedSkill(null)}
+        onComplete={handleComplete}
+        onSkip={handleSkip}
+        onUnmaster={handleUnmaster}
       />
     </div>
   );
