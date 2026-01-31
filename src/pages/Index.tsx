@@ -4,7 +4,7 @@ import { ShootingStars } from "@/components/ShootingStars";
 import { AegisLogo } from "@/components/aegis/AegisLogo";
 import { AegisNavigation } from "@/components/aegis/AegisNavigation";
 import { ThreatGalaxy } from "@/components/aegis/ThreatGalaxy";
-import { OccamAgent } from "@/components/aegis/OccamAgent";
+import { InspectorPanel } from "@/components/aegis/InspectorPanel";
 import { ThreatDashboard } from "@/components/aegis/ThreatDashboard";
 import { useSecurityNodes } from "@/hooks/useSecurityNodes";
 import { SecurityNode } from "@/types/securityNode";
@@ -81,16 +81,12 @@ const Index = () => {
         total={stats.total}
       />
 
-      {/* Inspector Panel - Right Side */}
-      {selectedNode && (
-        <div className="fixed top-1/2 right-6 -translate-y-1/2 z-50 animate-fade-in">
-          <OccamAgent
-            selectedNode={selectedNode}
-            onDeployPatch={deployPatch}
-            onClose={() => setSelectedNode(null)}
-          />
-        </div>
-      )}
+      {/* Inspector Panel - Slides from Right */}
+      <InspectorPanel
+        selectedNode={selectedNode}
+        onDeployPatch={deployPatch}
+        onClose={() => setSelectedNode(null)}
+      />
 
       {/* Threat Galaxy - Stars/Nodes */}
       <div className="relative w-full h-screen pt-20">

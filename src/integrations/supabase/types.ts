@@ -47,6 +47,7 @@ export type Database = {
           created_at: string
           file_content: string | null
           file_name: string | null
+          fix_code: string | null
           id: string
           is_vulnerable: boolean
           line_no: number | null
@@ -58,6 +59,7 @@ export type Database = {
           created_at?: string
           file_content?: string | null
           file_name?: string | null
+          fix_code?: string | null
           id?: string
           is_vulnerable?: boolean
           line_no?: number | null
@@ -69,6 +71,7 @@ export type Database = {
           created_at?: string
           file_content?: string | null
           file_name?: string | null
+          fix_code?: string | null
           id?: string
           is_vulnerable?: boolean
           line_no?: number | null
