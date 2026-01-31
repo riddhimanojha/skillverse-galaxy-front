@@ -10,16 +10,26 @@ import { SearchLearningPath } from "@/components/SearchLearningPath";
 import { toast } from "sonner";
 import { Skill, buildSkillsFromStorage, initialSkills } from "@/utils/skillGraph";
 import { completeSkill, unmasterSkill } from "@/utils/progressSystem";
-import { Button } from "@/components/ui/button";
-import { Zap } from "lucide-react";
-import { AILearningGuide } from "@/components/AILearningGuide";
+import { OccamFixPanel } from "@/components/OccamFixPanel";
+import { HacktronBadge } from "@/components/HacktronBadge";
+import { useVulnerabilities } from "@/hooks/useVulnerabilities";
+import { Vulnerability } from "@/types/vulnerability";
+import { Shield, AlertTriangle } from "lucide-react";
 
 const Index = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null);
+  const [selectedVulnerability, setSelectedVulnerability] = useState<Vulnerability | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 });
   const [showWelcome, setShowWelcome] = useState(true);
   const [filteredSkillIds, setFilteredSkillIds] = useState<string[] | null>(null);
+
+  const { 
+    vulnerabilities, 
+    loading: vulnLoading, 
+    patchVulnerability,
+    getActiveVulnerabilities 
+  } = useVulnerabilities();
 
   // Load skills from localStorage on mount
   useEffect(() => {
@@ -68,14 +78,9 @@ const Index = () => {
 
   // Handle skill completion
   const handleComplete = (skillId: string) => {
-    // Update progress system (XP, streak, etc.) - this also marks skill as completed
     const newProgress = completeSkill(skillId);
-    
-    // Reload all skills with updated completion status
     const updatedSkills = buildSkillsFromStorage();
     setSkills(updatedSkills);
-    
-    // Close the panel and return to galaxy view
     setSelectedSkill(null);
     
     toast.success(`Skill completed! +100 XP 🎉`, {
@@ -94,49 +99,52 @@ const Index = () => {
   // Handle skill unmaster
   const handleUnmaster = (skillId: string) => {
     unmasterSkill(skillId);
-    
     const updatedSkills = buildSkillsFromStorage();
     setSkills(updatedSkills);
     setSelectedSkill(null);
   };
 
-  // Complete all skills at once (developer feature)
-  const handleCompleteAll = () => {
-    let completedCount = 0;
-    initialSkills.forEach((skill) => {
-      const currentSkill = skills.find(s => s.id === skill.id);
-      if (currentSkill && !currentSkill.completed) {
-        completeSkill(skill.id);
-        completedCount++;
-      }
-    });
-    
-    const updatedSkills = buildSkillsFromStorage();
-    setSkills(updatedSkills);
-    
-    // Dispatch custom event to update other components
-    window.dispatchEvent(new CustomEvent('skillsUpdated'));
-    
-    toast.success(`Completed all ${completedCount} remaining skills! 🌟`, {
-      description: "All courses are now marked as completed.",
-    });
+  // Get vulnerability for a skill (simple file path matching)
+  const getVulnerabilityForSkill = (skill: Skill): Vulnerability | null => {
+    return vulnerabilities.find(v => 
+      v.status === 'vulnerable' && (
+        v.file_path.toLowerCase().includes(skill.id.toLowerCase()) ||
+        v.category.toLowerCase().includes(skill.id.toLowerCase()) ||
+        skill.name.toLowerCase().includes(v.category.toLowerCase())
+      )
+    ) || null;
+  };
+
+  // Handle star click - check for vulnerability first
+  const handleStarClick = (skill: Skill) => {
+    const vuln = getVulnerabilityForSkill(skill);
+    if (vuln) {
+      setSelectedVulnerability(vuln);
+      setSelectedSkill(null);
+    } else {
+      setSelectedSkill(skill);
+      setSelectedVulnerability(null);
+    }
   };
 
   // Keyboard accessibility
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && selectedSkill) {
+      if (e.key === "Escape") {
         setSelectedSkill(null);
+        setSelectedVulnerability(null);
       }
     };
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [selectedSkill]);
+  }, []);
 
   const displayedSkills = filteredSkillIds 
     ? skills.filter(s => filteredSkillIds.includes(s.id))
     : skills;
+
+  const activeThreats = getActiveVulnerabilities();
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -155,7 +163,7 @@ const Index = () => {
                 Welcome to Skillverse
               </h1>
               <p className="text-2xl text-muted-foreground">
-                Your journey through the cosmos of knowledge begins here
+                Real-Time Security Threat Map • Powered by Hacktron
               </p>
             </div>
             
@@ -166,7 +174,7 @@ const Index = () => {
                   onClick={handleSkipWelcome}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors underline"
                 >
-                  Skip and explore all skills
+                  Skip and explore threat map
                 </button>
               </div>
             </div>
@@ -180,10 +188,41 @@ const Index = () => {
       {/* Navigation */}
       <Navigation />
 
-      {/* Left Side - Stats Dashboard */}
+      {/* Left Side - Threat Dashboard */}
       <div className="fixed bottom-6 left-6 z-50 animate-fade-in">
         <div className="glass-panel rounded-2xl p-5 w-72 border border-primary/20">
           <div className="space-y-3">
+            {/* Threat Counter */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                <AlertTriangle className="w-3 h-3 text-red-400" />
+                Active Threats
+              </span>
+              <div className="flex items-center gap-2">
+                <div className={`w-2.5 h-2.5 rounded-full ${activeThreats.length > 0 ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`} />
+                <span className={`font-bold text-2xl ${activeThreats.length > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                  {activeThreats.length}
+                </span>
+              </div>
+            </div>
+            
+            {/* Secured Counter */}
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                <Shield className="w-3 h-3 text-green-400" />
+                Secured
+              </span>
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                <span className="font-bold text-xl text-green-400">
+                  {vulnerabilities.filter(v => v.status === 'fixed').length}
+                </span>
+              </div>
+            </div>
+            
+            <div className="h-px bg-gradient-to-r from-primary via-accent to-transparent opacity-30" />
+            
+            {/* Mastered Skills */}
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground uppercase tracking-wider">Mastered</span>
               <div className="flex items-center gap-2">
@@ -193,16 +232,7 @@ const Index = () => {
                 </span>
               </div>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground uppercase tracking-wider">Unlocked</span>
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-secondary" />
-                <span className="font-bold text-xl text-secondary">
-                  {skills.filter((s) => s.unlocked).length}
-                </span>
-              </div>
-            </div>
-            <div className="h-px bg-gradient-to-r from-primary via-accent to-transparent opacity-30" />
+            
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground uppercase tracking-wider">Total Skills</span>
               <span className="font-bold text-lg text-foreground">{skills.length}</span>
@@ -211,20 +241,29 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Right Side - AI Learning Guide */}
-      <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
-        <AILearningGuide />
-      </div>
+      {/* Right Side - Occam Fix Panel */}
+      {selectedVulnerability && (
+        <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
+          <OccamFixPanel
+            vulnerability={selectedVulnerability}
+            onPatch={patchVulnerability}
+            onClose={() => setSelectedVulnerability(null)}
+          />
+        </div>
+      )}
 
+      {/* Hacktron Badge */}
+      <HacktronBadge />
 
       {/* Skill Stars/Nodes with Constellation Lines */}
       <div className="relative w-full h-screen">
-        <ConstellationLines skills={displayedSkills} />
+        <ConstellationLines skills={displayedSkills} vulnerabilities={vulnerabilities} />
         {displayedSkills.map((skill) => (
           <SkillStar
             key={skill.id}
             skill={skill}
-            onClick={() => setSelectedSkill(skill)}
+            onClick={() => handleStarClick(skill)}
+            vulnerability={getVulnerabilityForSkill(skill)}
           />
         ))}
       </div>
