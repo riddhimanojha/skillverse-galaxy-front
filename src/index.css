@@ -1,66 +1,56 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Orion Security Constellation - Design System */
 
 @layer base {
   :root {
-    /* Cosmic galaxy theme */
-    --background: 250 60% 5%;
-    --foreground: 240 10% 98%;
+    /* Orion Dark Theme */
+    --background: 230 60% 6%;
+    --foreground: 0 0% 100%;
 
-    /* Glassmorphism cards */
-    --card: 250 40% 10%;
-    --card-foreground: 240 10% 98%;
+    /* Glassmorphic cards */
+    --card: 230 50% 10%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 250 40% 12%;
-    --popover-foreground: 240 10% 98%;
+    --popover: 230 50% 12%;
+    --popover-foreground: 0 0% 100%;
 
-    /* Neon cosmic accents */
-    --primary: 280 100% 70%;
-    --primary-foreground: 0 0% 100%;
+    /* Cyan accent for clean state */
+    --primary: 187 100% 50%;
+    --primary-foreground: 230 60% 6%;
 
-    /* Cyan for unlocked skills */
-    --secondary: 190 100% 60%;
+    /* Success green */
+    --secondary: 160 100% 43%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Muted cosmic elements */
-    --muted: 250 30% 15%;
-    --muted-foreground: 240 20% 65%;
+    /* Muted elements */
+    --muted: 230 30% 15%;
+    --muted-foreground: 230 20% 65%;
 
-    /* Accent - electric purple */
-    --accent: 270 100% 65%;
-    --accent-foreground: 0 0% 100%;
+    /* Accent */
+    --accent: 187 100% 50%;
+    --accent-foreground: 230 60% 6%;
 
-    --destructive: 0 80% 60%;
+    /* Alert red */
+    --destructive: 343 90% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders with cosmic glow */
-    --border: 260 40% 25%;
-    --input: 250 40% 15%;
-    --ring: 280 100% 70%;
+    /* Borders */
+    --border: 230 30% 20%;
+    --input: 230 40% 15%;
+    --ring: 187 100% 50%;
 
     --radius: 1rem;
 
-    /* Glow effects */
-    --glow-completed: 280 100% 70%;
-    --glow-unlocked: 190 100% 60%;
-    --glow-locked: 240 20% 40%;
-    --glow-vulnerable: 0 100% 50%;
-    
-    /* Nebula gradient */
-    --nebula-start: 250 60% 8%;
-    --nebula-mid: 270 50% 12%;
-    --nebula-end: 280 40% 10%;
-    
-    /* Hacktron theme */
-    --threat-red: 0 85% 55%;
-    --threat-glow: 0 100% 60%;
+    /* Orion specific colors */
+    --orion-bg: 230 60% 6%;
+    --orion-cyan: 187 100% 50%;
+    --orion-red: 343 90% 58%;
+    --orion-green: 160 100% 43%;
   }
 
   * {
@@ -73,112 +63,95 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground overflow-auto;
+    font-family: 'Inter', system-ui, sans-serif;
   }
 }
 
 @layer utilities {
+  /* Pulsing glow animation for vulnerable stars */
+  .animate-pulse-glow {
+    animation: pulse-glow 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { 
+      opacity: 0.6; 
+      transform: scale(1);
+    }
+    50% { 
+      opacity: 1; 
+      transform: scale(1.1);
+    }
+  }
+
+  /* Scale in animation for modals */
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out;
+  }
+  
+  @keyframes scale-in {
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Fade in animation */
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+  
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Glass panel styling */
+  .glass-panel {
+    background: rgba(15, 21, 53, 0.6);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Radial gradient background */
+  .bg-gradient-radial {
+    background: radial-gradient(ellipse at center, transparent 0%, #0a0e27 70%);
+  }
+
+  /* Code block styling with JetBrains Mono */
+  .code-block,
+  pre code {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Cosmic text glow */
   .cosmic-glow {
     text-shadow: 0 0 20px hsl(var(--primary)), 
-                 0 0 40px hsl(var(--primary) / 0.5),
-                 0 0 60px hsl(var(--primary) / 0.3);
-    animation: glow-pulse 3s ease-in-out infinite;
+                 0 0 40px hsl(var(--primary) / 0.5);
   }
-  
-  @keyframes glow-pulse {
-    0%, 100% {
-      text-shadow: 0 0 20px hsl(var(--primary)), 
-                   0 0 40px hsl(var(--primary) / 0.5),
-                   0 0 60px hsl(var(--primary) / 0.3);
-    }
-    50% {
-      text-shadow: 0 0 30px hsl(var(--primary)), 
-                   0 0 60px hsl(var(--primary) / 0.7),
-                   0 0 90px hsl(var(--primary) / 0.5);
-    }
-  }
-  
-  .glass-panel {
-    background: linear-gradient(135deg, hsl(var(--card) / 0.8), hsl(var(--card) / 0.6));
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid hsl(var(--border) / 0.4);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5),
-                inset 0 1px 0 0 hsl(var(--primary) / 0.1);
-  }
-  
-  .skill-glow-completed {
-    filter: drop-shadow(0 0 20px hsl(var(--glow-completed))) 
-            drop-shadow(0 0 40px hsl(var(--glow-completed) / 0.6));
-  }
-  
-  .skill-glow-unlocked {
-    filter: drop-shadow(0 0 15px hsl(var(--glow-unlocked))) 
-            drop-shadow(0 0 30px hsl(var(--glow-unlocked) / 0.5));
-  }
-  
-  .skill-glow-locked {
-    filter: drop-shadow(0 0 8px hsl(var(--glow-locked)));
-  }
-  
-  .skill-glow-vulnerable {
-    filter: drop-shadow(0 0 25px hsl(var(--threat-red))) 
-            drop-shadow(0 0 50px hsl(var(--threat-red) / 0.8))
-            drop-shadow(0 0 80px hsl(var(--threat-red) / 0.5));
-    animation: threat-pulse 1.5s ease-in-out infinite;
-  }
-  
+
+  /* Threat pulse animation */
   @keyframes threat-pulse {
     0%, 100% {
-      filter: drop-shadow(0 0 25px hsl(var(--threat-red))) 
-              drop-shadow(0 0 50px hsl(var(--threat-red) / 0.8))
-              drop-shadow(0 0 80px hsl(var(--threat-red) / 0.5));
+      box-shadow: 0 0 20px #ff2563, 0 0 40px rgba(255, 37, 99, 0.5);
     }
     50% {
-      filter: drop-shadow(0 0 40px hsl(var(--threat-red))) 
-              drop-shadow(0 0 80px hsl(var(--threat-red)))
-              drop-shadow(0 0 120px hsl(var(--threat-red) / 0.7));
+      box-shadow: 0 0 40px #ff2563, 0 0 80px rgba(255, 37, 99, 0.7);
     }
   }
-  
-  .black-hole-glow {
-    animation: black-hole 2s ease-in-out infinite;
-  }
-  
-  @keyframes black-hole {
-    0%, 100% {
-      box-shadow: 0 0 30px hsl(var(--threat-red)),
-                  0 0 60px hsl(var(--threat-red) / 0.6),
-                  inset 0 0 30px rgba(0, 0, 0, 0.8);
-    }
-    50% {
-      box-shadow: 0 0 50px hsl(var(--threat-red)),
-                  0 0 100px hsl(var(--threat-red) / 0.8),
-                  inset 0 0 40px rgba(0, 0, 0, 0.9);
-    }
-  }
-  
-  .code-block {
-    font-family: 'JetBrains Mono', monospace;
-    background: hsl(var(--muted));
-    border-radius: 0.5rem;
-    padding: 1rem;
-    overflow-x: auto;
-  }
-  
-  .threat-line {
-    stroke: hsl(var(--threat-red));
-    stroke-width: 2;
-    animation: threat-line-pulse 1.5s ease-in-out infinite;
-  }
-  
-  @keyframes threat-line-pulse {
-    0%, 100% {
-      opacity: 0.6;
-      stroke-width: 2;
-    }
-    50% {
-      opacity: 1;
-      stroke-width: 3;
-    }
+
+  .threat-pulse {
+    animation: threat-pulse 1.5s ease-in-out infinite;
   }
 }
