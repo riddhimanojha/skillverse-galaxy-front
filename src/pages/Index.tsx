@@ -52,7 +52,7 @@ const Index = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4 animate-fade-in">
           <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
-          <p className="text-muted-foreground text-sm">Initializing Aegis Nebula...</p>
+          <p className="text-muted-foreground text-sm">Initializing Orion...</p>
         </div>
       </div>
     );
@@ -81,14 +81,16 @@ const Index = () => {
         total={stats.total}
       />
 
-      {/* Occam Agent Sidebar - Bottom Right */}
-      <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
-        <OccamAgent
-          selectedNode={selectedNode}
-          onDeployPatch={deployPatch}
-          onClose={() => setSelectedNode(null)}
-        />
-      </div>
+      {/* Inspector Panel - Right Side */}
+      {selectedNode && (
+        <div className="fixed top-1/2 right-6 -translate-y-1/2 z-50 animate-fade-in">
+          <OccamAgent
+            selectedNode={selectedNode}
+            onDeployPatch={deployPatch}
+            onClose={() => setSelectedNode(null)}
+          />
+        </div>
+      )}
 
       {/* Threat Galaxy - Stars/Nodes */}
       <div className="relative w-full h-screen pt-20">

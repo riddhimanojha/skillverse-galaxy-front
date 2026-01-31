@@ -11,11 +11,8 @@ export const AegisLogo = () => {
           <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse border-2 border-background" />
         </div>
         <div>
-          <h1 className="text-xl font-bold">
-            <span className="text-primary">Aegis</span>{" "}
-            <span className="text-foreground">Nebula</span>
-          </h1>
-          <p className="text-xs text-muted-foreground">Security Constellation</p>
+          <h1 className="text-xl font-bold text-foreground">Orion</h1>
+          <p className="text-xs text-muted-foreground">Security Monitor</p>
         </div>
       </div>
     </div>
