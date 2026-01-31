@@ -56,6 +56,11 @@ export default {
           completed: "hsl(var(--glow-completed))",
           unlocked: "hsl(var(--glow-unlocked))",
           locked: "hsl(var(--glow-locked))",
+          vulnerable: "hsl(var(--glow-vulnerable))",
+        },
+        threat: {
+          DEFAULT: "hsl(var(--threat-red))",
+          glow: "hsl(var(--threat-glow))",
         },
       },
       backgroundImage: {

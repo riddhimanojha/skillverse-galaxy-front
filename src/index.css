@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -49,11 +51,16 @@ All colors MUST be HSL.
     --glow-completed: 280 100% 70%;
     --glow-unlocked: 190 100% 60%;
     --glow-locked: 240 20% 40%;
+    --glow-vulnerable: 0 100% 50%;
     
     /* Nebula gradient */
     --nebula-start: 250 60% 8%;
     --nebula-mid: 270 50% 12%;
     --nebula-end: 280 40% 10%;
+    
+    /* Hacktron theme */
+    --threat-red: 0 85% 55%;
+    --threat-glow: 0 100% 60%;
   }
 
   * {
@@ -111,5 +118,67 @@ All colors MUST be HSL.
   
   .skill-glow-locked {
     filter: drop-shadow(0 0 8px hsl(var(--glow-locked)));
+  }
+  
+  .skill-glow-vulnerable {
+    filter: drop-shadow(0 0 25px hsl(var(--threat-red))) 
+            drop-shadow(0 0 50px hsl(var(--threat-red) / 0.8))
+            drop-shadow(0 0 80px hsl(var(--threat-red) / 0.5));
+    animation: threat-pulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes threat-pulse {
+    0%, 100% {
+      filter: drop-shadow(0 0 25px hsl(var(--threat-red))) 
+              drop-shadow(0 0 50px hsl(var(--threat-red) / 0.8))
+              drop-shadow(0 0 80px hsl(var(--threat-red) / 0.5));
+    }
+    50% {
+      filter: drop-shadow(0 0 40px hsl(var(--threat-red))) 
+              drop-shadow(0 0 80px hsl(var(--threat-red)))
+              drop-shadow(0 0 120px hsl(var(--threat-red) / 0.7));
+    }
+  }
+  
+  .black-hole-glow {
+    animation: black-hole 2s ease-in-out infinite;
+  }
+  
+  @keyframes black-hole {
+    0%, 100% {
+      box-shadow: 0 0 30px hsl(var(--threat-red)),
+                  0 0 60px hsl(var(--threat-red) / 0.6),
+                  inset 0 0 30px rgba(0, 0, 0, 0.8);
+    }
+    50% {
+      box-shadow: 0 0 50px hsl(var(--threat-red)),
+                  0 0 100px hsl(var(--threat-red) / 0.8),
+                  inset 0 0 40px rgba(0, 0, 0, 0.9);
+    }
+  }
+  
+  .code-block {
+    font-family: 'JetBrains Mono', monospace;
+    background: hsl(var(--muted));
+    border-radius: 0.5rem;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+  
+  .threat-line {
+    stroke: hsl(var(--threat-red));
+    stroke-width: 2;
+    animation: threat-line-pulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes threat-line-pulse {
+    0%, 100% {
+      opacity: 0.6;
+      stroke-width: 2;
+    }
+    50% {
+      opacity: 1;
+      stroke-width: 3;
+    }
   }
 }
