@@ -183,13 +183,11 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                       </Button>
                     </div>
                     <div className="bg-red-950/40 rounded-xl border border-red-500/30 overflow-hidden">
-                      <ScrollArea className="max-h-48">
-                        <pre className="p-4 text-sm overflow-x-auto">
-                          <code className="font-mono">
-                            {renderCodeBlock(selectedNode.file_content, 'vulnerable')}
-                          </code>
-                        </pre>
-                      </ScrollArea>
+                      <pre className="p-4 text-sm overflow-x-auto">
+                        <code className="font-mono">
+                          {renderCodeBlock(selectedNode.file_content, 'vulnerable')}
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 )}
@@ -214,13 +212,11 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                     </Button>
                   </div>
                   <div className="bg-green-950/30 rounded-xl border border-green-500/30 overflow-hidden">
-                    <ScrollArea className="max-h-56">
-                      <pre className="p-4 text-sm overflow-x-auto">
-                        <code className="font-mono">
-                          {renderCodeBlock(selectedNode.occam_fix, 'fix')}
-                        </code>
-                      </pre>
-                    </ScrollArea>
+                    <pre className="p-4 text-sm overflow-x-auto">
+                      <code className="font-mono">
+                        {renderCodeBlock(selectedNode.occam_fix, 'fix')}
+                      </code>
+                    </pre>
                   </div>
                 </div>
               </div>
