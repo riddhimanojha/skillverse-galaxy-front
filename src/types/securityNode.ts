@@ -4,5 +4,8 @@ export interface SecurityNode {
   is_vulnerable: boolean;
   severity: 'Critical' | 'High' | 'Medium';
   occam_fix: string;
+  file_name: string | null;
+  file_content: string | null;
+  line_no: number | null;
   created_at: string;
 }

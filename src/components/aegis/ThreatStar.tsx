@@ -121,7 +121,12 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
           <div className={`font-bold ${isVulnerable ? 'text-red-400' : 'text-green-400'}`}>
             {isVulnerable ? '🚨 ' : '🛡️ '}{node.category_name}
           </div>
-          <div className="flex items-center gap-2 mt-1">
+          {node.file_name && (
+            <div className="text-xs text-cyan-400 font-mono mt-1">
+              📄 {node.file_name}{node.line_no ? `:${node.line_no}` : ''}
+            </div>
+          )}
+          <div className="flex items-center gap-2 mt-1.5">
             <span className={`px-2 py-0.5 rounded text-xs font-bold ${
               isVulnerable 
                 ? node.severity === 'Critical' 
@@ -135,7 +140,7 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
             </span>
           </div>
           {isVulnerable && (
-            <div className="text-xs text-muted-foreground mt-1">Click to view fix</div>
+            <div className="text-xs text-muted-foreground mt-1.5">Click to inspect</div>
           )}
         </div>
       )}

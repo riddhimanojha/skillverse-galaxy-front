@@ -45,24 +45,33 @@ export type Database = {
         Row: {
           category_name: string
           created_at: string
+          file_content: string | null
+          file_name: string | null
           id: string
           is_vulnerable: boolean
+          line_no: number | null
           occam_fix: string
           severity: string
         }
         Insert: {
           category_name: string
           created_at?: string
+          file_content?: string | null
+          file_name?: string | null
           id?: string
           is_vulnerable?: boolean
+          line_no?: number | null
           occam_fix: string
           severity?: string
         }
         Update: {
           category_name?: string
           created_at?: string
+          file_content?: string | null
+          file_name?: string | null
           id?: string
           is_vulnerable?: boolean
+          line_no?: number | null
           occam_fix?: string
           severity?: string
         }
