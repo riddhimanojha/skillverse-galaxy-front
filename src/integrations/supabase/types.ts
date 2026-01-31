@@ -41,6 +41,33 @@ export type Database = {
         }
         Relationships: []
       }
+      security_nodes: {
+        Row: {
+          category_name: string
+          created_at: string
+          id: string
+          is_vulnerable: boolean
+          occam_fix: string
+          severity: string
+        }
+        Insert: {
+          category_name: string
+          created_at?: string
+          id?: string
+          is_vulnerable?: boolean
+          occam_fix: string
+          severity?: string
+        }
+        Update: {
+          category_name?: string
+          created_at?: string
+          id?: string
+          is_vulnerable?: boolean
+          occam_fix?: string
+          severity?: string
+        }
+        Relationships: []
+      }
       vulnerabilities: {
         Row: {
           category: string

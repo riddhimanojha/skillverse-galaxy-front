@@ -4,11 +4,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Orion Security Constellation - Design System */
+/* Aegis Nebula - Security Constellation Design System */
 
 @layer base {
   :root {
-    /* Orion Dark Theme */
+    /* Aegis Dark Theme */
     --background: 230 60% 6%;
     --foreground: 0 0% 100%;
 
@@ -32,11 +32,11 @@
     --muted-foreground: 230 20% 65%;
 
     /* Accent */
-    --accent: 187 100% 50%;
-    --accent-foreground: 230 60% 6%;
+    --accent: 270 100% 65%;
+    --accent-foreground: 0 0% 100%;
 
     /* Alert red */
-    --destructive: 343 90% 58%;
+    --destructive: 0 85% 55%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders */
@@ -46,11 +46,14 @@
 
     --radius: 1rem;
 
-    /* Orion specific colors */
-    --orion-bg: 230 60% 6%;
-    --orion-cyan: 187 100% 50%;
-    --orion-red: 343 90% 58%;
-    --orion-green: 160 100% 43%;
+    /* Nebula gradient */
+    --nebula-start: 230 60% 6%;
+    --nebula-mid: 250 50% 10%;
+    --nebula-end: 270 40% 8%;
+
+    /* Glow effects */
+    --glow-secure: 160 100% 50%;
+    --glow-vulnerable: 0 100% 55%;
   }
 
   * {
@@ -68,6 +71,16 @@
 }
 
 @layer utilities {
+  /* Nebula gradient background */
+  .bg-nebula-gradient {
+    background: linear-gradient(
+      to bottom,
+      hsl(var(--nebula-start)),
+      hsl(var(--nebula-mid)),
+      hsl(var(--nebula-end))
+    );
+  }
+
   /* Pulsing glow animation for vulnerable stars */
   .animate-pulse-glow {
     animation: pulse-glow 1.5s ease-in-out infinite;
@@ -126,7 +139,7 @@
 
   /* Radial gradient background */
   .bg-gradient-radial {
-    background: radial-gradient(ellipse at center, transparent 0%, #0a0e27 70%);
+    background: radial-gradient(ellipse at center, transparent 0%, hsl(var(--background)) 70%);
   }
 
   /* Code block styling with JetBrains Mono */
@@ -144,14 +157,19 @@
   /* Threat pulse animation */
   @keyframes threat-pulse {
     0%, 100% {
-      box-shadow: 0 0 20px #ff2563, 0 0 40px rgba(255, 37, 99, 0.5);
+      box-shadow: 0 0 20px hsl(var(--destructive)), 0 0 40px hsl(var(--destructive) / 0.5);
     }
     50% {
-      box-shadow: 0 0 40px #ff2563, 0 0 80px rgba(255, 37, 99, 0.7);
+      box-shadow: 0 0 40px hsl(var(--destructive)), 0 0 80px hsl(var(--destructive) / 0.7);
     }
   }
 
   .threat-pulse {
     animation: threat-pulse 1.5s ease-in-out infinite;
+  }
+
+  /* Secure glow */
+  .secure-glow {
+    box-shadow: 0 0 20px hsl(var(--secondary)), 0 0 40px hsl(var(--secondary) / 0.3);
   }
 }
