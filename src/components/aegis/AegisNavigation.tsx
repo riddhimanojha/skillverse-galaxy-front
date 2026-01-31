@@ -7,8 +7,8 @@ export const AegisNavigation = () => {
   const navItems = [
     { path: "/", label: "Threat Map", icon: Globe },
     { path: "/dashboard", label: "Command Center", icon: LayoutDashboard },
-    { path: "/skills", label: "Live Audits", icon: Shield },
-    { path: "/settings", label: "Settings", icon: Settings },
+    { path: "/skills", label: "Audits", icon: Shield },
+    { path: "/learn", label: "Remediate", icon: Settings },
   ];
 
   return (
