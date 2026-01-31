@@ -2,41 +2,30 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Shield, AlertTriangle, Copy, Check, Rocket, X, FileCode, Bug } from "lucide-react";
+import { AlertTriangle, Copy, Check, X, FileCode, Bug, Shield } from "lucide-react";
 import { SecurityNode } from "@/types/securityNode";
 import { toast } from "sonner";
 
-interface OccamAgentProps {
+interface InspectorPanelProps {
   selectedNode: SecurityNode | null;
   onDeployPatch: (id: string) => Promise<boolean>;
   onClose: () => void;
 }
 
-export const OccamAgent = ({ selectedNode, onDeployPatch, onClose }: OccamAgentProps) => {
+export const OccamAgent = ({ selectedNode, onDeployPatch, onClose }: InspectorPanelProps) => {
   const [deploying, setDeploying] = useState(false);
   const [copiedFix, setCopiedFix] = useState(false);
   const [copiedVuln, setCopiedVuln] = useState(false);
 
   if (!selectedNode) {
-    return (
-      <Card className="glass-panel border-primary/20 w-96">
-        <div className="p-4 border-b border-primary/20 flex items-center gap-2">
-          <Shield className="w-5 h-5 text-primary" />
-          <h3 className="font-bold">Occam Agent</h3>
-        </div>
-        <div className="p-6 text-center text-muted-foreground">
-          <Shield className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="text-sm">Click a threat star to inspect vulnerability details</p>
-        </div>
-      </Card>
-    );
+    return null;
   }
 
   const handleCopyFix = async () => {
     const fixedPart = selectedNode.occam_fix.split('// ✅')[1] || selectedNode.occam_fix;
     await navigator.clipboard.writeText(fixedPart.trim());
     setCopiedFix(true);
-    toast.success("Remediation copied to clipboard");
+    toast.success("Fix copied to clipboard");
     setTimeout(() => setCopiedFix(false), 2000);
   };
 
@@ -49,7 +38,7 @@ export const OccamAgent = ({ selectedNode, onDeployPatch, onClose }: OccamAgentP
     }
   };
 
-  const handleDeploy = async () => {
+  const handleApplyFix = async () => {
     setDeploying(true);
     const success = await onDeployPatch(selectedNode.id);
     setDeploying(false);
@@ -77,7 +66,6 @@ export const OccamAgent = ({ selectedNode, onDeployPatch, onClose }: OccamAgentP
       const isSecure = line.includes('✅');
       const isComment = line.trim().startsWith('//') || line.trim().startsWith('#');
       const isKeyword = /\b(def|return|if|else|import|from|class|function|const|let|var|async|await)\b/.test(line);
-      const isString = /(["'])(?:(?=(\\?))\2.)*?\1/.test(line);
       
       let className = 'text-foreground/80';
       if (type === 'vulnerable') {
@@ -90,8 +78,6 @@ export const OccamAgent = ({ selectedNode, onDeployPatch, onClose }: OccamAgentP
         className = 'text-muted-foreground italic';
       } else if (isKeyword) {
         className = 'text-purple-400';
-      } else if (isString) {
-        className = 'text-amber-400';
       } else {
         className = 'text-cyan-400';
       }
@@ -121,7 +107,7 @@ export const OccamAgent = ({ selectedNode, onDeployPatch, onClose }: OccamAgentP
           ) : (
             <Shield className="w-5 h-5 text-green-400" />
           )}
-          <h3 className="font-bold text-sm">Occam Agent</h3>
+          <h3 className="font-bold text-sm">Inspector</h3>
         </div>
         <button 
           onClick={onClose}
@@ -133,42 +119,41 @@ export const OccamAgent = ({ selectedNode, onDeployPatch, onClose }: OccamAgentP
       
       <ScrollArea className="max-h-[28rem]">
         <div className="p-4 space-y-4">
-          {/* Header Section */}
-          <div className="space-y-3">
-            <h4 className={`font-bold text-lg ${
-              selectedNode.is_vulnerable ? 'text-red-400' : 'text-green-400'
+          {/* Vulnerability Name */}
+          <h4 className={`font-bold text-lg ${
+            selectedNode.is_vulnerable ? 'text-red-400' : 'text-green-400'
+          }`}>
+            {selectedNode.category_name}
+          </h4>
+          
+          {/* Severity Badge */}
+          <div className="flex items-center gap-2">
+            <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getSeverityStyles()}`}>
+              {selectedNode.severity}
+            </span>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+              selectedNode.is_vulnerable 
+                ? 'bg-red-500/20 text-red-300' 
+                : 'bg-green-500/20 text-green-300'
             }`}>
-              {selectedNode.category_name}
-            </h4>
-            
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getSeverityStyles()}`}>
-                {selectedNode.severity}
-              </span>
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                selectedNode.is_vulnerable 
-                  ? 'bg-red-500/20 text-red-300' 
-                  : 'bg-green-500/20 text-green-300'
-              }`}>
-                {selectedNode.is_vulnerable ? 'VULNERABLE' : 'SECURE'}
-              </span>
-            </div>
-
-            {/* File Name */}
-            {selectedNode.file_name && (
-              <div className="flex items-center gap-2 text-sm">
-                <FileCode className="w-4 h-4 text-cyan-400" />
-                <span className="font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded">
-                  {selectedNode.file_name}
-                  {selectedNode.line_no && (
-                    <span className="text-muted-foreground">:{selectedNode.line_no}</span>
-                  )}
-                </span>
-              </div>
-            )}
+              {selectedNode.is_vulnerable ? 'VULNERABLE' : 'SECURE'}
+            </span>
           </div>
 
-          {/* Vulnerable Code Section */}
+          {/* Affected File Name */}
+          {selectedNode.file_name && (
+            <div className="flex items-center gap-2 text-sm">
+              <FileCode className="w-4 h-4 text-cyan-400" />
+              <span className="font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded">
+                {selectedNode.file_name}
+                {selectedNode.line_no && (
+                  <span className="text-muted-foreground">:{selectedNode.line_no}</span>
+                )}
+              </span>
+            </div>
+          )}
+
+          {/* Vulnerable Code Block */}
           {selectedNode.file_content && selectedNode.is_vulnerable && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -200,13 +185,13 @@ export const OccamAgent = ({ selectedNode, onDeployPatch, onClose }: OccamAgentP
             </div>
           )}
 
-          {/* Remediation Section */}
+          {/* Recommended Fix */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-green-400" />
                 <span className="text-xs text-green-400 uppercase tracking-wider font-semibold">
-                  Occam Fix
+                  Recommended Fix
                 </span>
               </div>
               <Button
@@ -232,10 +217,10 @@ export const OccamAgent = ({ selectedNode, onDeployPatch, onClose }: OccamAgentP
         </div>
       </ScrollArea>
 
-      {/* Deploy Button */}
+      {/* Apply Fix Button */}
       <div className="p-4 border-t border-border/30">
         <Button
-          onClick={handleDeploy}
+          onClick={handleApplyFix}
           disabled={deploying || !selectedNode.is_vulnerable}
           className={`w-full font-bold ${
             selectedNode.is_vulnerable 
@@ -246,18 +231,15 @@ export const OccamAgent = ({ selectedNode, onDeployPatch, onClose }: OccamAgentP
           {deploying ? (
             <>
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-              Deploying...
+              Applying...
             </>
           ) : !selectedNode.is_vulnerable ? (
             <>
               <Check className="w-4 h-4 mr-2" />
-              Already Secured
+              Secured
             </>
           ) : (
-            <>
-              <Rocket className="w-4 h-4 mr-2" />
-              Deploy Patch
-            </>
+            'Apply Fix'
           )}
         </Button>
       </div>
