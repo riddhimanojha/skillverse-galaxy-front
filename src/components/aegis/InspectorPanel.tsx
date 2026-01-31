@@ -94,15 +94,7 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
     <Sheet open={!!selectedNode} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="right"
-        className="
-    glass-panel
-    border-l border-primary/20
-    p-0
-    w-[420px]
-    max-w-[90vw]
-    h-screen
-    overflow-hidden
-  "
+        className="glass-panel border-l border-primary/20 p-0 w-[400px] max-w-[90vw] h-screen overflow-hidden fixed right-0 top-0"
       >
         {selectedNode && (
           <div className="flex flex-col h-full">
@@ -182,8 +174,8 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                       </Button>
                     </div>
                     <div className="bg-red-950/40 rounded-xl border border-red-500/30 overflow-hidden">
-                      <pre className="p-4 text-sm overflow-x-auto">
-                        <code className="font-mono">{renderCodeBlock(selectedNode.file_content, "vulnerable")}</code>
+                      <pre className="p-4 text-sm overflow-x-auto max-w-full">
+                        <code className="font-mono text-xs break-all whitespace-pre-wrap">{renderCodeBlock(selectedNode.file_content, "vulnerable")}</code>
                       </pre>
                     </div>
                   </div>
@@ -209,8 +201,8 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                     </Button>
                   </div>
                   <div className="bg-green-950/30 rounded-xl border border-green-500/30 overflow-hidden">
-                    <pre className="p-4 text-sm overflow-x-auto">
-                      <code className="font-mono">{renderCodeBlock(selectedNode.occam_fix, "fix")}</code>
+                    <pre className="p-4 text-sm overflow-x-auto max-w-full">
+                      <code className="font-mono text-xs break-all whitespace-pre-wrap">{renderCodeBlock(selectedNode.occam_fix, "fix")}</code>
                     </pre>
                   </div>
                 </div>
