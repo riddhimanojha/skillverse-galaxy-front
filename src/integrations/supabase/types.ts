@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      findings: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_vulnerable: boolean
+          remediation_code: string
+          severity: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          is_vulnerable?: boolean
+          remediation_code: string
+          severity?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_vulnerable?: boolean
+          remediation_code?: string
+          severity?: string
+        }
+        Relationships: []
+      }
       vulnerabilities: {
         Row: {
           category: string
