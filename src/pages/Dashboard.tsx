@@ -2,7 +2,6 @@ import { useSecurityNodes } from "@/hooks/useSecurityNodes";
 import { AegisLogo } from "@/components/aegis/AegisLogo";
 import { AegisNavigation } from "@/components/aegis/AegisNavigation";
 import { ShootingStars } from "@/components/ShootingStars";
-import { ActivityLog } from "@/components/aegis/ActivityLog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, Shield, Activity, TrendingUp, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -95,65 +94,59 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Two Column Layout: Nodes + Activity Log */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Node List */}
-          <Card className="glass-panel">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="w-5 h-5 text-primary" />
-                Security Nodes
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {nodes.map((node) => (
-                  <div 
-                    key={node.id}
-                    className={`flex items-center justify-between p-4 rounded-lg border ${
-                      node.is_vulnerable 
-                        ? 'bg-red-500/10 border-red-500/30' 
-                        : 'bg-green-500/10 border-green-500/30'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {node.is_vulnerable ? (
-                        <AlertTriangle className="w-5 h-5 text-red-400" />
-                      ) : (
-                        <CheckCircle2 className="w-5 h-5 text-green-400" />
-                      )}
-                      <div>
-                        <div className="font-medium">{node.category_name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {new Date(node.created_at).toLocaleString()}
-                        </div>
+        {/* Node List */}
+        <Card className="glass-panel">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="w-5 h-5 text-primary" />
+              Security Nodes
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {nodes.map((node) => (
+                <div 
+                  key={node.id}
+                  className={`flex items-center justify-between p-4 rounded-lg border ${
+                    node.is_vulnerable 
+                      ? 'bg-red-500/10 border-red-500/30' 
+                      : 'bg-green-500/10 border-green-500/30'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    {node.is_vulnerable ? (
+                      <AlertTriangle className="w-5 h-5 text-red-400" />
+                    ) : (
+                      <CheckCircle2 className="w-5 h-5 text-green-400" />
+                    )}
+                    <div>
+                      <div className="font-medium">{node.category_name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(node.created_at).toLocaleString()}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge className={`${
-                        node.severity === 'Critical' ? 'bg-red-500/20 text-red-400 border-red-500/40' :
-                        node.severity === 'High' ? 'bg-orange-500/20 text-orange-400 border-orange-500/40' :
-                        'bg-yellow-500/20 text-yellow-400 border-yellow-500/40'
-                      }`}>
-                        {node.severity}
-                      </Badge>
-                      <Badge className={`${
-                        node.is_vulnerable 
-                          ? 'bg-red-500/20 text-red-300' 
-                          : 'bg-green-500/20 text-green-300'
-                      }`}>
-                        {node.is_vulnerable ? 'VULNERABLE' : 'SECURE'}
-                      </Badge>
-                    </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Activity Log */}
-          <ActivityLog nodes={nodes} />
-        </div>
+                  <div className="flex items-center gap-2">
+                    <Badge className={`${
+                      node.severity === 'Critical' ? 'bg-red-500/20 text-red-400 border-red-500/40' :
+                      node.severity === 'High' ? 'bg-orange-500/20 text-orange-400 border-orange-500/40' :
+                      'bg-yellow-500/20 text-yellow-400 border-yellow-500/40'
+                    }`}>
+                      {node.severity}
+                    </Badge>
+                    <Badge className={`${
+                      node.is_vulnerable 
+                        ? 'bg-red-500/20 text-red-300' 
+                        : 'bg-green-500/20 text-green-300'
+                    }`}>
+                      {node.is_vulnerable ? 'VULNERABLE' : 'SECURE'}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

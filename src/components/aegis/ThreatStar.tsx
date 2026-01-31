@@ -6,10 +6,9 @@ interface ThreatStarProps {
   x: number;
   y: number;
   onClick: () => void;
-  hasConnectedThreat?: boolean; // Connected to a vulnerable node
 }
 
-export const ThreatStar = ({ node, x, y, onClick, hasConnectedThreat = false }: ThreatStarProps) => {
+export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
   const [ripple, setRipple] = useState(false);
   const [hover, setHover] = useState(false);
 
@@ -33,9 +32,6 @@ export const ThreatStar = ({ node, x, y, onClick, hasConnectedThreat = false }: 
     }
   };
 
-  // Purple influence color for connected threat warning
-  const influenceColor = 'hsl(280, 80%, 60%)';
-
   return (
     <div
       className="absolute duration-300 ease-out cursor-pointer"
@@ -52,23 +48,6 @@ export const ThreatStar = ({ node, x, y, onClick, hasConnectedThreat = false }: 
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {/* Connected threat warning halo (purple) - only for non-vulnerable stars */}
-      {hasConnectedThreat && !isVulnerable && (
-        <div 
-          className="absolute inset-0 rounded-full animate-pulse" 
-          style={{ 
-            width: "45px", 
-            height: "45px", 
-            margin: "-17px",
-            border: `1.5px solid ${influenceColor}`,
-            backgroundColor: 'transparent',
-            boxShadow: `0 0 15px ${influenceColor}, 0 0 30px rgba(168, 85, 247, 0.3)`,
-            opacity: 0.6,
-            animationDuration: "2.5s",
-          }} 
-        />
-      )}
-
       {/* Secure ripple effect */}
       {ripple && !isVulnerable && (
         <div 
@@ -82,7 +61,7 @@ export const ThreatStar = ({ node, x, y, onClick, hasConnectedThreat = false }: 
         />
       )}
 
-      {/* Vulnerability pulse effect (RED - only for directly vulnerable) */}
+      {/* Vulnerability pulse effect */}
       {isVulnerable && (
         <>
           <div 
@@ -139,8 +118,8 @@ export const ThreatStar = ({ node, x, y, onClick, hasConnectedThreat = false }: 
       {/* Hover tooltip */}
       {hover && (
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-5 px-4 py-3 glass-panel rounded-xl text-sm whitespace-nowrap animate-fade-in z-50">
-          <div className={`font-bold ${isVulnerable ? 'text-red-400' : hasConnectedThreat ? 'text-purple-400' : 'text-green-400'}`}>
-            {isVulnerable ? '🚨 ' : hasConnectedThreat ? '⚠️ ' : '🛡️ '}{node.category_name}
+          <div className={`font-bold ${isVulnerable ? 'text-red-400' : 'text-green-400'}`}>
+            {isVulnerable ? '🚨 ' : '🛡️ '}{node.category_name}
           </div>
           <div className="flex items-center gap-2 mt-1">
             <span className={`px-2 py-0.5 rounded text-xs font-bold ${
@@ -150,18 +129,13 @@ export const ThreatStar = ({ node, x, y, onClick, hasConnectedThreat = false }: 
                   : node.severity === 'High'
                   ? 'bg-orange-500/30 text-orange-300'
                   : 'bg-yellow-500/30 text-yellow-300'
-                : hasConnectedThreat
-                ? 'bg-purple-500/30 text-purple-300'
                 : 'bg-green-500/30 text-green-300'
             }`}>
-              {isVulnerable ? node.severity : hasConnectedThreat ? 'At Risk' : 'Secure'}
+              {isVulnerable ? node.severity : 'Secure'}
             </span>
           </div>
           {isVulnerable && (
             <div className="text-xs text-muted-foreground mt-1">Click to view fix</div>
-          )}
-          {hasConnectedThreat && !isVulnerable && (
-            <div className="text-xs text-purple-300/70 mt-1">Connected to vulnerability</div>
           )}
         </div>
       )}

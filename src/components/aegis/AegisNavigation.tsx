@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Globe, Shield } from "lucide-react";
+import { LayoutDashboard, Globe, Shield, Settings } from "lucide-react";
 
 export const AegisNavigation = () => {
   const location = useLocation();
@@ -8,6 +8,7 @@ export const AegisNavigation = () => {
     { path: "/", label: "Threat Map", icon: Globe },
     { path: "/dashboard", label: "Command Center", icon: LayoutDashboard },
     { path: "/skills", label: "Audits", icon: Shield },
+    { path: "/learn", label: "Remediate", icon: Settings },
   ];
 
   return (
