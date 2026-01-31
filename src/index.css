@@ -8,31 +8,31 @@
 
 @layer base {
   :root {
-    /* Aegis Dark Theme */
-    --background: 230 60% 6%;
+    /* Orion Dark Red Theme */
+    --background: 0 60% 6%;
     --foreground: 0 0% 100%;
 
     /* Glassmorphic cards */
-    --card: 230 50% 10%;
+    --card: 0 50% 10%;
     --card-foreground: 0 0% 100%;
 
-    --popover: 230 50% 12%;
+    --popover: 0 50% 12%;
     --popover-foreground: 0 0% 100%;
 
     /* Cyan accent for clean state */
     --primary: 187 100% 50%;
-    --primary-foreground: 230 60% 6%;
+    --primary-foreground: 0 60% 6%;
 
     /* Success green */
     --secondary: 160 100% 43%;
     --secondary-foreground: 0 0% 100%;
 
     /* Muted elements */
-    --muted: 230 30% 15%;
-    --muted-foreground: 230 20% 65%;
+    --muted: 0 30% 15%;
+    --muted-foreground: 0 20% 65%;
 
     /* Accent */
-    --accent: 270 100% 65%;
+    --accent: 0 100% 65%;
     --accent-foreground: 0 0% 100%;
 
     /* Alert red */
@@ -40,16 +40,16 @@
     --destructive-foreground: 0 0% 100%;
 
     /* Borders */
-    --border: 230 30% 20%;
-    --input: 230 40% 15%;
+    --border: 0 30% 20%;
+    --input: 0 40% 15%;
     --ring: 187 100% 50%;
 
     --radius: 1rem;
 
-    /* Nebula gradient */
-    --nebula-start: 230 60% 6%;
-    --nebula-mid: 250 50% 10%;
-    --nebula-end: 270 40% 8%;
+    /* Nebula gradient - now red */
+    --nebula-start: 0 60% 6%;
+    --nebula-mid: 0 50% 10%;
+    --nebula-end: 350 40% 8%;
 
     /* Glow effects */
     --glow-secure: 160 100% 50%;
