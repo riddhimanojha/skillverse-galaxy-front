@@ -52,7 +52,7 @@ const Index = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4 animate-fade-in">
           <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
-          <p className="text-muted-foreground text-sm">Initializing Aegis Nebula...</p>
+          <p className="text-muted-foreground text-sm">Initializing Orion...</p>
         </div>
       </div>
     );
