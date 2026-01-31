@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Shield, AlertTriangle, Copy, Check, Rocket, X } from "lucide-react";
+import { Shield, AlertTriangle, Copy, Check, Rocket, X, FileCode, Bug } from "lucide-react";
 import { SecurityNode } from "@/types/securityNode";
 import { toast } from "sonner";
 
@@ -14,30 +14,39 @@ interface OccamAgentProps {
 
 export const OccamAgent = ({ selectedNode, onDeployPatch, onClose }: OccamAgentProps) => {
   const [deploying, setDeploying] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copiedFix, setCopiedFix] = useState(false);
+  const [copiedVuln, setCopiedVuln] = useState(false);
 
   if (!selectedNode) {
     return (
-      <Card className="glass-panel border-primary/20 w-80">
+      <Card className="glass-panel border-primary/20 w-96">
         <div className="p-4 border-b border-primary/20 flex items-center gap-2">
           <Shield className="w-5 h-5 text-primary" />
           <h3 className="font-bold">Occam Agent</h3>
         </div>
         <div className="p-6 text-center text-muted-foreground">
           <Shield className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="text-sm">Click a threat star to view its Occam Fix</p>
+          <p className="text-sm">Click a threat star to inspect vulnerability details</p>
         </div>
       </Card>
     );
   }
 
-  const handleCopy = async () => {
-    // Extract just the fixed code
+  const handleCopyFix = async () => {
     const fixedPart = selectedNode.occam_fix.split('// ✅')[1] || selectedNode.occam_fix;
     await navigator.clipboard.writeText(fixedPart.trim());
-    setCopied(true);
-    toast.success("Fix copied to clipboard");
-    setTimeout(() => setCopied(false), 2000);
+    setCopiedFix(true);
+    toast.success("Remediation copied to clipboard");
+    setTimeout(() => setCopiedFix(false), 2000);
+  };
+
+  const handleCopyVuln = async () => {
+    if (selectedNode.file_content) {
+      await navigator.clipboard.writeText(selectedNode.file_content);
+      setCopiedVuln(true);
+      toast.success("Vulnerable code copied");
+      setTimeout(() => setCopiedVuln(false), 2000);
+    }
   };
 
   const handleDeploy = async () => {
@@ -62,8 +71,44 @@ export const OccamAgent = ({ selectedNode, onDeployPatch, onClose }: OccamAgentP
     }
   };
 
+  const renderCodeBlock = (code: string, type: 'vulnerable' | 'fix') => {
+    return code.split('\n').map((line, i) => {
+      const isVulnerable = line.includes('❌');
+      const isSecure = line.includes('✅');
+      const isComment = line.trim().startsWith('//') || line.trim().startsWith('#');
+      const isKeyword = /\b(def|return|if|else|import|from|class|function|const|let|var|async|await)\b/.test(line);
+      const isString = /(["'])(?:(?=(\\?))\2.)*?\1/.test(line);
+      
+      let className = 'text-foreground/80';
+      if (type === 'vulnerable') {
+        className = 'text-red-300/90';
+      } else if (isVulnerable) {
+        className = 'text-red-400 line-through opacity-60';
+      } else if (isSecure) {
+        className = 'text-green-400 font-medium';
+      } else if (isComment) {
+        className = 'text-muted-foreground italic';
+      } else if (isKeyword) {
+        className = 'text-purple-400';
+      } else if (isString) {
+        className = 'text-amber-400';
+      } else {
+        className = 'text-cyan-400';
+      }
+      
+      return (
+        <div key={i} className={className}>
+          <span className="text-muted-foreground/40 select-none mr-3 text-right inline-block w-4">
+            {i + 1}
+          </span>
+          {line}
+        </div>
+      );
+    });
+  };
+
   return (
-    <Card className={`glass-panel w-80 transition-all duration-300 ${
+    <Card className={`glass-panel w-96 transition-all duration-300 ${
       selectedNode.is_vulnerable ? 'border-red-500/40' : 'border-green-500/40'
     }`}>
       {/* Header */}
@@ -86,16 +131,17 @@ export const OccamAgent = ({ selectedNode, onDeployPatch, onClose }: OccamAgentP
         </button>
       </div>
       
-      <ScrollArea className="max-h-96">
+      <ScrollArea className="max-h-[28rem]">
         <div className="p-4 space-y-4">
-          {/* Category and Severity */}
-          <div className="space-y-2">
+          {/* Header Section */}
+          <div className="space-y-3">
             <h4 className={`font-bold text-lg ${
               selectedNode.is_vulnerable ? 'text-red-400' : 'text-green-400'
             }`}>
               {selectedNode.category_name}
             </h4>
-            <div className="flex items-center gap-2">
+            
+            <div className="flex items-center gap-2 flex-wrap">
               <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getSeverityStyles()}`}>
                 {selectedNode.severity}
               </span>
@@ -107,44 +153,81 @@ export const OccamAgent = ({ selectedNode, onDeployPatch, onClose }: OccamAgentP
                 {selectedNode.is_vulnerable ? 'VULNERABLE' : 'SECURE'}
               </span>
             </div>
+
+            {/* File Name */}
+            {selectedNode.file_name && (
+              <div className="flex items-center gap-2 text-sm">
+                <FileCode className="w-4 h-4 text-cyan-400" />
+                <span className="font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded">
+                  {selectedNode.file_name}
+                  {selectedNode.line_no && (
+                    <span className="text-muted-foreground">:{selectedNode.line_no}</span>
+                  )}
+                </span>
+              </div>
+            )}
           </div>
 
-          {/* Occam Fix Code Block */}
+          {/* Vulnerable Code Section */}
+          {selectedNode.file_content && selectedNode.is_vulnerable && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Bug className="w-4 h-4 text-red-400" />
+                  <span className="text-xs text-red-400 uppercase tracking-wider font-semibold">
+                    Vulnerable Code
+                  </span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCopyVuln}
+                  className="h-6 px-2 text-xs hover:bg-red-500/20"
+                >
+                  {copiedVuln ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                  {copiedVuln ? 'Copied!' : 'Copy'}
+                </Button>
+              </div>
+              <div className="bg-red-950/30 rounded-lg border border-red-500/30 overflow-hidden">
+                <ScrollArea className="max-h-32">
+                  <pre className="p-3 text-xs overflow-x-auto">
+                    <code className="font-mono">
+                      {renderCodeBlock(selectedNode.file_content, 'vulnerable')}
+                    </code>
+                  </pre>
+                </ScrollArea>
+              </div>
+            </div>
+          )}
+
+          {/* Remediation Section */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground uppercase tracking-wider">
-                Occam Fix
-              </span>
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-green-400" />
+                <span className="text-xs text-green-400 uppercase tracking-wider font-semibold">
+                  Occam Fix
+                </span>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={handleCopy}
-                className="h-6 px-2 text-xs"
+                onClick={handleCopyFix}
+                className="h-6 px-2 text-xs hover:bg-green-500/20"
               >
-                {copied ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
-                {copied ? 'Copied!' : 'Copy'}
+                {copiedFix ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                {copiedFix ? 'Copied!' : 'Copy'}
               </Button>
             </div>
-            <pre className="bg-background/80 rounded-lg p-3 overflow-x-auto border border-border/50 text-xs">
-              <code className="font-mono whitespace-pre-wrap">
-                {selectedNode.occam_fix.split('\n').map((line, i) => {
-                  const isVulnerable = line.includes('❌');
-                  const isSecure = line.includes('✅');
-                  const isComment = line.trim().startsWith('//');
-                  
-                  return (
-                    <div key={i} className={`
-                      ${isVulnerable ? 'text-red-400' : ''}
-                      ${isSecure ? 'text-green-400' : ''}
-                      ${isComment && !isVulnerable && !isSecure ? 'text-muted-foreground' : ''}
-                      ${!isComment && !isVulnerable && !isSecure ? 'text-cyan-400' : ''}
-                    `}>
-                      {line}
-                    </div>
-                  );
-                })}
-              </code>
-            </pre>
+            <div className="bg-green-950/20 rounded-lg border border-green-500/30 overflow-hidden">
+              <ScrollArea className="max-h-40">
+                <pre className="p-3 text-xs overflow-x-auto">
+                  <code className="font-mono">
+                    {renderCodeBlock(selectedNode.occam_fix, 'fix')}
+                  </code>
+                </pre>
+              </ScrollArea>
+            </div>
           </div>
         </div>
       </ScrollArea>
