@@ -102,19 +102,23 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
         }}
       />
 
-      {/* Hover tooltip */}
+      {/* Hover tooltip with problem/solution */}
       {hover && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-5 px-4 py-3 glass-panel rounded-xl text-sm whitespace-nowrap animate-fade-in z-50">
-          <div className={`font-bold ${isVulnerable ? 'text-red-400' : 'text-green-400'}`}>
-            {isVulnerable ? '🚨 ' : '🛡️ '}{node.category_name}
-          </div>
-          {isVulnerable ? (
-            <>
-              {node.file_name && (
-                <div className="text-xs text-cyan-400 font-mono mt-1">
-                  📄 {node.file_name}{node.line_no ? `:${node.line_no}` : ''}
-                </div>
-              )}
+        <div 
+          className="absolute left-1/2 -translate-x-1/2 mt-8 w-72 glass-panel rounded-xl animate-fade-in z-50 overflow-hidden"
+          style={{ top: '100%' }}
+        >
+          {/* Header */}
+          <div className={`px-4 py-2.5 ${isVulnerable ? 'bg-red-500/10' : 'bg-green-500/10'}`}>
+            <div className={`font-bold text-sm ${isVulnerable ? 'text-red-400' : 'text-green-400'}`}>
+              {isVulnerable ? '🚨 ' : '🛡️ '}{node.category_name}
+            </div>
+            {node.file_name && (
+              <div className="text-xs text-cyan-400 font-mono mt-0.5">
+                📄 {node.file_name}{node.line_no ? `:${node.line_no}` : ''}
+              </div>
+            )}
+            {isVulnerable && (
               <div className="flex items-center gap-2 mt-1.5">
                 <span className={`px-2 py-0.5 rounded text-xs font-bold ${
                   node.severity === 'Critical' 
@@ -125,12 +129,53 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
                 }`}>
                   {node.severity}
                 </span>
+                <span className="text-xs text-muted-foreground">
+                  Risk: {node.risk_weight ?? 5}/10
+                </span>
               </div>
-              <div className="text-xs text-muted-foreground mt-1.5">Click to inspect</div>
-            </>
+            )}
+          </div>
+          
+          {isVulnerable ? (
+            <div className="p-3 space-y-3">
+              {/* Problem Section */}
+              {node.file_content && (
+                <div className="space-y-1.5">
+                  <div className="text-xs font-semibold text-red-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>⚠️</span> Problem
+                  </div>
+                  <div className="bg-red-950/30 border border-red-500/20 rounded-lg p-2 overflow-hidden">
+                    <pre className="text-xs text-red-300/90 font-mono whitespace-pre-wrap overflow-x-auto max-h-20">
+                      {node.file_content.length > 150 
+                        ? node.file_content.substring(0, 150) + '...' 
+                        : node.file_content}
+                    </pre>
+                  </div>
+                </div>
+              )}
+              
+              {/* Solution Section */}
+              <div className="space-y-1.5">
+                <div className="text-xs font-semibold text-green-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>✅</span> Solution
+                </div>
+                <div className="bg-green-950/30 border border-green-500/20 rounded-lg p-2 overflow-hidden">
+                  <pre className="text-xs text-green-300/90 font-mono whitespace-pre-wrap overflow-x-auto max-h-20">
+                    {(node.fix_code || node.occam_fix).length > 150 
+                      ? (node.fix_code || node.occam_fix).substring(0, 150) + '...' 
+                      : (node.fix_code || node.occam_fix)}
+                  </pre>
+                </div>
+              </div>
+              
+              <div className="text-xs text-center text-muted-foreground pt-1 border-t border-border/30">
+                Click to view full details
+              </div>
+            </div>
           ) : (
-            <div className="text-xs text-green-400/80 mt-1">
-              ✓ No action needed
+            <div className="p-3 text-center">
+              <div className="text-green-400/80 text-sm">✓ This node is secured</div>
+              <div className="text-xs text-muted-foreground mt-1">No action needed</div>
             </div>
           )}
         </div>
