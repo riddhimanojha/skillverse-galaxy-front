@@ -93,11 +93,11 @@ export const useSecurityNodes = () => {
     };
   }, []);
 
-  // Deploy patch - set is_vulnerable to false (marks as resolved, not deleted)
+  // Deploy patch - set is_vulnerable to false and patch_approved to true
   const deployPatch = async (id: string): Promise<boolean> => {
     const { error } = await supabase
       .from('security_nodes')
-      .update({ is_vulnerable: false })
+      .update({ is_vulnerable: false, patch_approved: true })
       .eq('id', id);
 
     if (error) {
