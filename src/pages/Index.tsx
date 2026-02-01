@@ -5,7 +5,6 @@ import { AegisLogo } from "@/components/aegis/AegisLogo";
 import { AegisNavigation } from "@/components/aegis/AegisNavigation";
 import { ThreatGalaxy } from "@/components/aegis/ThreatGalaxy";
 import { InspectorPanel } from "@/components/aegis/InspectorPanel";
-import { ThreatDashboard } from "@/components/aegis/ThreatDashboard";
 import { useSecurityNodes } from "@/hooks/useSecurityNodes";
 import { SecurityNode } from "@/types/securityNode";
 import { Loader2 } from "lucide-react";
@@ -72,14 +71,6 @@ const Index = () => {
       {/* Navigation */}
       <AegisNavigation />
 
-      {/* Threat Dashboard - Bottom Left */}
-      <ThreatDashboard 
-        activeThreats={stats.activeThreats}
-        criticalThreats={stats.criticalThreats}
-        highThreats={stats.highThreats}
-        securedNodes={stats.securedNodes}
-        total={stats.total}
-      />
 
       {/* Inspector Panel - Slides from Right */}
       <InspectorPanel
