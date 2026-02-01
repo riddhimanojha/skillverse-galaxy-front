@@ -23,7 +23,7 @@ export const ThreeGalaxyCanvas = ({ mousePosition }: ThreeGalaxyCanvasProps) => 
         dpr={[1, 2]}
         frameloop="always"
         style={{
-          background: "radial-gradient(ellipse at center, hsl(0, 25%, 8%) 0%, hsl(350, 20%, 5%) 40%, hsl(0, 15%, 3%) 100%)",
+          background: "radial-gradient(ellipse at center, hsl(240, 20%, 18%) 0%, hsl(260, 25%, 12%) 40%, hsl(250, 30%, 8%) 100%)",
         }}
       >
         <GalaxyBackground mousePosition={mousePosition} starCount={12000} />
