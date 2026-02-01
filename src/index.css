@@ -98,18 +98,6 @@
     }
   }
 
-  /* Aura pulse - subtle, affects only the outer glow */
-  @keyframes pulse-aura {
-    0%, 100% { 
-      opacity: 0.2;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    50% { 
-      opacity: 0.35;
-      transform: translate(-50%, -50%) scale(1.15);
-    }
-  }
-
   /* Scale in animation for modals */
   .animate-scale-in {
     animation: scale-in 0.3s ease-out;

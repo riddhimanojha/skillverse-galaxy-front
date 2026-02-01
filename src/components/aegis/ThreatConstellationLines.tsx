@@ -34,32 +34,24 @@ export const ThreatConstellationLines = ({
     return map;
   }, [nodePositions]);
 
-  // Get edge color - darkened, desaturated versions of risk color
-  const getEdgeColor = (riskWeight: number | null, isVulnerable: boolean): { main: string; highlight: string } => {
+  // Get edge color based on risk_weight of the originating node
+  const getEdgeColor = (riskWeight: number | null, isVulnerable: boolean): string => {
     if (!isVulnerable) {
-      return {
-        main: 'hsl(160, 25%, 22%)',      // Muted dark green
-        highlight: 'hsl(160, 30%, 28%)', // Subtle lighter center
-      };
+      return 'hsl(145, 70%, 45%)'; // Green - secure
     }
     
-    const weight = riskWeight ?? 5;
+    // Use risk_weight to determine color intensity
+    // Higher risk_weight = more severe color
+    const weight = riskWeight ?? 50; // Default to medium if null
     
-    if (weight < 3) {
-      return {
-        main: 'hsl(45, 30%, 25%)',       // Dark muted golden
-        highlight: 'hsl(45, 35%, 32%)',
-      };
-    } else if (weight < 7) {
-      return {
-        main: 'hsl(25, 30%, 23%)',       // Dark muted orange
-        highlight: 'hsl(25, 35%, 30%)',
-      };
+    if (weight >= 80) {
+      return 'hsl(0, 85%, 55%)'; // Red for high risk
+    } else if (weight >= 50) {
+      return 'hsl(30, 90%, 55%)'; // Orange for medium-high
+    } else if (weight >= 25) {
+      return 'hsl(45, 90%, 55%)'; // Yellow-orange for medium
     }
-    return {
-      main: 'hsl(0, 28%, 22%)',          // Dark muted red
-      highlight: 'hsl(0, 32%, 28%)',
-    };
+    return 'hsl(60, 80%, 50%)'; // Yellow for low risk
   };
 
   // Build lines from actual file_relationships
@@ -69,13 +61,11 @@ export const ThreatConstellationLines = ({
       y1: number; 
       x2: number; 
       y2: number; 
-      mainColor: string;
-      highlightColor: string;
+      color: string;
       relation: string;
-      id: string;
     }> = [];
     
-    relationships.forEach((rel, idx) => {
+    relationships.forEach(rel => {
       const fromNode = fileToNode.get(rel.from_file);
       const toNode = fileToNode.get(rel.to_file);
       
@@ -86,17 +76,15 @@ export const ThreatConstellationLines = ({
         
         if (fromPos && toPos) {
           // Use the originating node's risk_weight for edge color
-          const colors = getEdgeColor(fromNode.risk_weight, fromNode.is_vulnerable);
+          const color = getEdgeColor(fromNode.risk_weight, fromNode.is_vulnerable);
           
           result.push({
             x1: fromPos.x,
             y1: fromPos.y,
             x2: toPos.x,
             y2: toPos.y,
-            mainColor: colors.main,
-            highlightColor: colors.highlight,
+            color,
             relation: rel.relation,
-            id: `edge-${idx}`,
           });
         }
       }
@@ -107,34 +95,16 @@ export const ThreatConstellationLines = ({
   
   return (
     <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-      <defs>
-        {lines.map((line) => (
-          <linearGradient
-            key={`grad-${line.id}`}
-            id={`gradient-${line.id}`}
-            x1={`${line.x1}%`}
-            y1={`${line.y1}%`}
-            x2={`${line.x2}%`}
-            y2={`${line.y2}%`}
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop offset="0%" stopColor={line.mainColor} />
-            <stop offset="50%" stopColor={line.highlightColor} />
-            <stop offset="100%" stopColor={line.mainColor} />
-          </linearGradient>
-        ))}
-      </defs>
-      {lines.map((line) => (
+      {lines.map((line, index) => (
         <line
-          key={line.id}
+          key={index}
           x1={`${line.x1}%`}
           y1={`${line.y1}%`}
           x2={`${line.x2}%`}
           y2={`${line.y2}%`}
-          stroke={`url(#gradient-${line.id})`}
-          strokeWidth="1.25"
-          strokeOpacity="0.55"
-          className="transition-opacity duration-300 hover:opacity-80"
+          stroke={line.color}
+          strokeWidth="2"
+          strokeOpacity="0.7"
         />
       ))}
     </svg>
