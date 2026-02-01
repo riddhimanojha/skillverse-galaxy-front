@@ -49,13 +49,13 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
     if (!selectedNode) return "";
     switch (selectedNode.severity) {
       case "Critical":
-        return "bg-red-500/20 text-red-400 border-red-500/40";
+        return "bg-[#E03E84]/20 text-[#E03E84] border-[#E03E84]/40";
       case "High":
-        return "bg-orange-500/20 text-orange-400 border-orange-500/40";
+        return "bg-[#9A2E4A]/20 text-[#9A2E4A] border-[#9A2E4A]/40";
       case "Medium":
-        return "bg-yellow-500/20 text-yellow-400 border-yellow-500/40";
+        return "bg-[#7A1E3A]/20 text-[#7A1E3A] border-[#7A1E3A]/40";
       default:
-        return "bg-blue-500/20 text-blue-400 border-blue-500/40";
+        return "bg-[#7FB7D6]/20 text-[#7FB7D6] border-[#7FB7D6]/40";
     }
   };
 
@@ -68,17 +68,17 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
 
       let className = "text-foreground/80";
       if (type === "vulnerable") {
-        className = "text-red-300/90";
+        className = "text-[#E03E84]/90";
       } else if (isVulnerable) {
-        className = "text-red-400 line-through opacity-60";
+        className = "text-[#E03E84] line-through opacity-60";
       } else if (isSecure) {
-        className = "text-green-400 font-medium";
+        className = "text-[#7FB7D6] font-medium";
       } else if (isComment) {
         className = "text-muted-foreground italic";
       } else if (isKeyword) {
-        className = "text-purple-400";
+        className = "text-[#9A2E4A]";
       } else {
-        className = "text-cyan-400";
+        className = "text-[#7FB7D6]";
       }
 
       return (
@@ -101,21 +101,21 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
             {/* Header */}
             <SheetHeader
               className={`p-6 border-b ${
-                selectedNode.is_vulnerable ? "border-red-500/30 bg-red-500/5" : "border-green-500/30 bg-green-500/5"
+                selectedNode.is_vulnerable ? "border-[#7A1E3A]/30 bg-[#7A1E3A]/5" : "border-[#7FB7D6]/30 bg-[#7FB7D6]/5"
               }`}
             >
               <div className="flex items-center gap-3">
                 {selectedNode.is_vulnerable ? (
-                  <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center">
-                    <AlertTriangle className="w-5 h-5 text-red-400" />
+                  <div className="w-10 h-10 rounded-xl bg-[#7A1E3A]/20 flex items-center justify-center">
+                    <AlertTriangle className="w-5 h-5 text-[#E03E84]" />
                   </div>
                 ) : (
-                  <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-green-400" />
+                  <div className="w-10 h-10 rounded-xl bg-[#7FB7D6]/20 flex items-center justify-center">
+                    <Shield className="w-5 h-5 text-[#7FB7D6]" />
                   </div>
                 )}
                 <div>
-                  <SheetTitle className={`text-xl ${selectedNode.is_vulnerable ? "text-red-400" : "text-green-400"}`}>
+                  <SheetTitle className={`text-xl ${selectedNode.is_vulnerable ? "text-[#E03E84]" : "text-[#7FB7D6]"}`}>
                     {selectedNode.category_name}
                   </SheetTitle>
                   <div className="flex items-center gap-2 mt-1">
@@ -124,7 +124,7 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                     </span>
                     <span
                       className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        selectedNode.is_vulnerable ? "bg-red-500/20 text-red-300" : "bg-green-500/20 text-green-300"
+                        selectedNode.is_vulnerable ? "bg-[#7A1E3A]/20 text-[#E03E84]" : "bg-[#7FB7D6]/20 text-[#7FB7D6]"
                       }`}
                     >
                       {selectedNode.is_vulnerable ? "VULNERABLE" : "SECURE"}
@@ -147,8 +147,8 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                           Affected File
                         </span>
                         <div className="flex items-center gap-2">
-                          <FileCode className="w-4 h-4 text-cyan-400" />
-                          <code className="font-mono text-sm text-cyan-400 bg-cyan-500/10 px-3 py-1.5 rounded-lg">
+                          <FileCode className="w-4 h-4 text-[#7FB7D6]" />
+                          <code className="font-mono text-sm text-[#7FB7D6] bg-[#7FB7D6]/10 px-3 py-1.5 rounded-lg">
                             {selectedNode.file_name}
                             {selectedNode.line_no && <span className="text-muted-foreground">:{selectedNode.line_no}</span>}
                           </code>
@@ -161,8 +161,8 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <Bug className="w-4 h-4 text-red-400" />
-                            <span className="text-xs text-red-400 uppercase tracking-wider font-semibold">
+                            <Bug className="w-4 h-4 text-[#E03E84]" />
+                            <span className="text-xs text-[#E03E84] uppercase tracking-wider font-semibold">
                               Vulnerable Code
                             </span>
                           </div>
@@ -170,13 +170,13 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                             variant="ghost"
                             size="sm"
                             onClick={handleCopyVuln}
-                            className="h-7 px-3 text-xs hover:bg-red-500/20 text-muted-foreground hover:text-red-400"
+                            className="h-7 px-3 text-xs hover:bg-[#7A1E3A]/20 text-muted-foreground hover:text-[#E03E84]"
                           >
                             {copiedVuln ? <Check className="w-3 h-3 mr-1.5" /> : <Copy className="w-3 h-3 mr-1.5" />}
                             {copiedVuln ? "Copied" : "Copy"}
                           </Button>
                         </div>
-                        <div className="bg-red-950/40 rounded-xl border border-red-500/30 overflow-hidden">
+                        <div className="bg-[#1A0A10] rounded-xl border border-[#7A1E3A]/30 overflow-hidden">
                           <pre className="p-4 overflow-x-auto max-w-full">
                             <code className="font-mono text-sm break-all whitespace-pre-wrap">{renderCodeBlock(selectedNode.file_content, "vulnerable")}</code>
                           </pre>
@@ -188,8 +188,8 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Shield className="w-4 h-4 text-green-400" />
-                          <span className="text-xs text-green-400 uppercase tracking-wider font-semibold">
+                          <Shield className="w-4 h-4 text-[#7FB7D6]" />
+                          <span className="text-xs text-[#7FB7D6] uppercase tracking-wider font-semibold">
                             Recommended Fix
                           </span>
                         </div>
@@ -197,13 +197,13 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                           variant="ghost"
                           size="sm"
                           onClick={handleCopyFix}
-                          className="h-7 px-3 text-xs hover:bg-green-500/20 text-muted-foreground hover:text-green-400"
+                          className="h-7 px-3 text-xs hover:bg-[#7FB7D6]/20 text-muted-foreground hover:text-[#7FB7D6]"
                         >
                           {copiedFix ? <Check className="w-3 h-3 mr-1.5" /> : <Copy className="w-3 h-3 mr-1.5" />}
                           {copiedFix ? "Copied" : "Copy"}
                         </Button>
                       </div>
-                      <div className="bg-green-950/30 rounded-xl border border-green-500/30 overflow-hidden">
+                      <div className="bg-[#0A1015] rounded-xl border border-[#7FB7D6]/30 overflow-hidden">
                         <pre className="p-4 overflow-x-auto max-w-full">
                           <code className="font-mono text-sm break-all whitespace-pre-wrap">
                             {renderCodeBlock(selectedNode.fix_code || selectedNode.occam_fix, "fix")}
@@ -215,19 +215,19 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                 ) : (
                   /* Already Secured - No Fix Needed */
                   <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
-                    <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center">
-                      <Shield className="w-10 h-10 text-green-400" />
+                    <div className="w-20 h-20 rounded-full bg-[#7FB7D6]/20 flex items-center justify-center">
+                      <Shield className="w-10 h-10 text-[#7FB7D6]" />
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-xl font-bold text-green-400">Already Secured</h3>
+                      <h3 className="text-xl font-bold text-[#7FB7D6]">Already Secured</h3>
                       <p className="text-muted-foreground text-sm max-w-xs">
                         This node has been patched and no longer requires any action. The vulnerability has been resolved.
                       </p>
                     </div>
                     {selectedNode.file_name && (
-                      <div className="flex items-center gap-2 mt-4 bg-green-500/10 px-4 py-2 rounded-lg">
-                        <FileCode className="w-4 h-4 text-green-400" />
-                        <code className="font-mono text-sm text-green-400">
+                      <div className="flex items-center gap-2 mt-4 bg-[#7FB7D6]/10 px-4 py-2 rounded-lg">
+                        <FileCode className="w-4 h-4 text-[#7FB7D6]" />
+                        <code className="font-mono text-sm text-[#7FB7D6]">
                           {selectedNode.file_name}
                         </code>
                       </div>
@@ -245,13 +245,13 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                 size="lg"
                 className={`w-full font-bold text-base ${
                   selectedNode.is_vulnerable
-                    ? "bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-500/20"
-                    : "bg-green-600/30 text-green-300/50 cursor-not-allowed"
+                    ? "bg-[#7FB7D6] hover:bg-[#8FC7E6] text-[#12080C] shadow-lg shadow-[#7FB7D6]/20"
+                    : "bg-[#7FB7D6]/30 text-[#7FB7D6]/50 cursor-not-allowed"
                 }`}
               >
                 {deploying ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                    <div className="w-5 h-5 border-2 border-[#12080C]/30 border-t-[#12080C] rounded-full animate-spin mr-2" />
                     Applying Fix...
                   </>
                 ) : !selectedNode.is_vulnerable ? (

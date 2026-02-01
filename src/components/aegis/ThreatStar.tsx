@@ -29,13 +29,13 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
   }, [isVulnerable]);
 
   const getRiskColor = () => {
-    if (!isVulnerable) return 'hsl(160, 100%, 50%)'; // Secure green
+    if (!isVulnerable) return '#7FB7D6'; // Muted sky blue - secure
     
     const weight = node.risk_weight ?? 5;
     
-    if (weight < 3) return 'hsl(45, 90%, 55%)';   // Golden
-    if (weight < 7) return 'hsl(25, 90%, 55%)';   // Orange
-    return 'hsl(0, 85%, 55%)';                     // Red
+    if (weight < 3) return '#7A1E3A';    // Deep crimson - low risk
+    if (weight < 7) return '#9A2E4A';    // Lighter crimson - medium risk
+    return '#E03E84';                     // Magenta - high/critical risk
   };
 
   // CSS keyframes for ambient drift - applied to inner content
@@ -127,7 +127,7 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
         />
       </div>
 
-      {/* Persistent file name label - outside drift wrapper to stay stable */}
+      {/* Persistent file name label - muted sky blue */}
       {node.file_name && (
         <div 
           className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none"
@@ -135,7 +135,7 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
             top: 'calc(100% + 10px)',
             fontSize: '11px',
             fontWeight: 500,
-            color: 'rgba(255, 255, 255, 0.6)',
+            color: 'rgba(127, 183, 214, 0.7)',
             letterSpacing: '0.01em',
           }}
         >
@@ -150,12 +150,12 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
           style={{ top: '100%' }}
         >
           {/* Header */}
-          <div className={`px-4 py-2.5 ${isVulnerable ? 'bg-red-500/10' : 'bg-green-500/10'}`}>
-            <div className={`font-bold text-sm ${isVulnerable ? 'text-red-400' : 'text-green-400'}`}>
+          <div className={`px-4 py-2.5 ${isVulnerable ? 'bg-[#7A1E3A]/10' : 'bg-[#7FB7D6]/10'}`}>
+            <div className={`font-bold text-sm ${isVulnerable ? 'text-[#E03E84]' : 'text-[#7FB7D6]'}`}>
               {isVulnerable ? '🚨 ' : '🛡️ '}{node.category_name}
             </div>
             {node.file_name && (
-              <div className="text-xs text-cyan-400 font-mono mt-0.5">
+              <div className="text-xs font-mono mt-0.5" style={{ color: 'rgba(127, 183, 214, 0.8)' }}>
                 📄 {node.file_name}{node.line_no ? `:${node.line_no}` : ''}
               </div>
             )}
@@ -163,10 +163,10 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
               <div className="flex items-center gap-2 mt-1.5">
                 <span className={`px-2 py-0.5 rounded text-xs font-bold ${
                   node.severity === 'Critical' 
-                    ? 'bg-red-500/30 text-red-300' 
+                    ? 'bg-[#E03E84]/30 text-[#E03E84]' 
                     : node.severity === 'High'
-                    ? 'bg-orange-500/30 text-orange-300'
-                    : 'bg-yellow-500/30 text-yellow-300'
+                    ? 'bg-[#9A2E4A]/30 text-[#9A2E4A]'
+                    : 'bg-[#7A1E3A]/30 text-[#7A1E3A]'
                 }`}>
                   {node.severity}
                 </span>
@@ -182,11 +182,11 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
               {/* Problem Section */}
               {node.file_content && (
                 <div className="space-y-1.5">
-                  <div className="text-xs font-semibold text-red-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <div className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5" style={{ color: '#E03E84' }}>
                     <span>⚠️</span> Problem
                   </div>
-                  <div className="bg-red-950/30 border border-red-500/20 rounded-lg p-2 overflow-hidden">
-                    <pre className="text-xs text-red-300/90 font-mono whitespace-pre-wrap overflow-x-auto max-h-20">
+                  <div className="rounded-lg p-2 overflow-hidden" style={{ background: 'rgba(122, 30, 58, 0.15)', border: '1px solid rgba(122, 30, 58, 0.25)' }}>
+                    <pre className="text-xs font-mono whitespace-pre-wrap overflow-x-auto max-h-20" style={{ color: 'rgba(224, 62, 132, 0.85)' }}>
                       {node.file_content.length > 150 
                         ? node.file_content.substring(0, 150) + '...' 
                         : node.file_content}
@@ -197,11 +197,11 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
               
               {/* Solution Section */}
               <div className="space-y-1.5">
-                <div className="text-xs font-semibold text-green-400 uppercase tracking-wider flex items-center gap-1.5">
+                <div className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5" style={{ color: '#7FB7D6' }}>
                   <span>✅</span> Solution
                 </div>
-                <div className="bg-green-950/30 border border-green-500/20 rounded-lg p-2 overflow-hidden">
-                  <pre className="text-xs text-green-300/90 font-mono whitespace-pre-wrap overflow-x-auto max-h-20">
+                <div className="rounded-lg p-2 overflow-hidden" style={{ background: 'rgba(127, 183, 214, 0.1)', border: '1px solid rgba(127, 183, 214, 0.2)' }}>
+                  <pre className="text-xs font-mono whitespace-pre-wrap overflow-x-auto max-h-20" style={{ color: 'rgba(127, 183, 214, 0.85)' }}>
                     {(node.fix_code || node.occam_fix).length > 150 
                       ? (node.fix_code || node.occam_fix).substring(0, 150) + '...' 
                       : (node.fix_code || node.occam_fix)}
@@ -215,7 +215,7 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
             </div>
           ) : (
             <div className="p-3 text-center">
-              <div className="text-green-400/80 text-sm">✓ This node is secured</div>
+              <div className="text-sm" style={{ color: 'rgba(127, 183, 214, 0.8)' }}>✓ This node is secured</div>
               <div className="text-xs text-muted-foreground mt-1">No action needed</div>
             </div>
           )}

@@ -4,57 +4,56 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Aegis Nebula - Security Constellation Design System */
+/* Orion - Premium Dark Security Design System */
 
 @layer base {
   :root {
-    /* Orion Dark Cosmic Theme */
-    /* Near-black with dark red undertone */
-    --background: 0 20% 5%;
-    --foreground: 0 0% 95%;
+    /* Deep red-black base #12080C */
+    --background: 340 33% 5%;
+    --foreground: 30 50% 95%;
 
-    /* Glassmorphic cards - dark indigo */
-    --card: 254 30% 10%;
-    --card-foreground: 0 0% 95%;
+    /* Card surfaces - slightly lighter red-black */
+    --card: 340 30% 8%;
+    --card-foreground: 30 50% 95%;
 
-    --popover: 254 30% 12%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 340 28% 10%;
+    --popover-foreground: 30 50% 95%;
 
-    /* Deep Indigo / Dark Purple #3C3160 */
-    --primary: 254 32% 28%;
-    --primary-foreground: 0 0% 95%;
+    /* Deep Crimson #7A1E3A - primary authority color */
+    --primary: 340 60% 30%;
+    --primary-foreground: 30 50% 95%;
 
-    /* Secure state - indigo */
-    --secondary: 254 32% 38%;
-    --secondary-foreground: 0 0% 95%;
+    /* Secondary - muted sky blue #7FB7D6 */
+    --secondary: 200 50% 67%;
+    --secondary-foreground: 340 33% 5%;
 
-    /* Muted elements - dark */
-    --muted: 254 20% 15%;
-    --muted-foreground: 254 15% 60%;
+    /* Muted elements - dark red-black */
+    --muted: 340 25% 12%;
+    --muted-foreground: 200 30% 55%;
 
-    /* Salmon / Coral Pink #F56F72 for accent */
-    --accent: 359 87% 70%;
-    --accent-foreground: 0 0% 95%;
+    /* Accent - deep crimson for highlights */
+    --accent: 340 60% 30%;
+    --accent-foreground: 30 50% 95%;
 
-    /* Magenta / Hot Pink #E03E84 for destructive/critical */
+    /* Magenta / Hot Pink #E03E84 for critical/destructive */
     --destructive: 334 73% 56%;
-    --destructive-foreground: 0 0% 95%;
+    --destructive-foreground: 30 50% 95%;
 
-    /* Borders - dark indigo */
-    --border: 254 25% 20%;
-    --input: 254 20% 12%;
-    --ring: 254 32% 28%;
+    /* Borders - dark crimson tint */
+    --border: 340 30% 15%;
+    --input: 340 25% 10%;
+    --ring: 340 60% 30%;
 
     --radius: 1rem;
 
-    /* Nebula gradient - dark red-black tones */
-    --nebula-start: 0 20% 5%;
-    --nebula-mid: 350 18% 7%;
-    --nebula-end: 0 15% 4%;
+    /* Nebula gradient - deep red-black tones */
+    --nebula-start: 340 33% 5%;
+    --nebula-mid: 340 28% 6%;
+    --nebula-end: 340 35% 4%;
 
     /* Glow effects */
-    --glow-secure: 254 32% 28%;
-    --glow-vulnerable: 359 87% 70%;
+    --glow-secure: 200 50% 67%;
+    --glow-vulnerable: 340 60% 30%;
   }
 
   * {
@@ -66,8 +65,10 @@
   }
 
   body {
-    @apply bg-background text-foreground overflow-auto;
+    @apply bg-background overflow-auto;
     font-family: 'Inter', system-ui, sans-serif;
+    /* Warm cream text at reduced opacity */
+    color: rgba(255, 248, 240, 0.75);
   }
 }
 
@@ -130,13 +131,13 @@
     }
   }
 
-  /* Glass panel styling - dark indigo with subtle transparency */
+  /* Glass panel styling - dark red-black with subtle transparency */
   .glass-panel {
-    background: rgba(15, 12, 25, 0.75);
+    background: rgba(18, 8, 12, 0.85);
     backdrop-filter: blur(24px) saturate(120%);
     -webkit-backdrop-filter: blur(24px) saturate(120%);
-    border: 1px solid rgba(60, 49, 96, 0.25);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(60, 49, 96, 0.1);
+    border: 1px solid rgba(122, 30, 58, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(122, 30, 58, 0.08);
   }
 
   /* Radial gradient background */
@@ -150,19 +151,19 @@
     font-family: 'JetBrains Mono', monospace;
   }
 
-  /* Cosmic text glow - soft indigo */
+  /* Cosmic text glow - soft crimson */
   .cosmic-glow {
     text-shadow: 0 0 20px hsl(var(--primary) / 0.4), 
                  0 0 40px hsl(var(--primary) / 0.2);
   }
 
-  /* Threat pulse animation - salmon/coral */
+  /* Threat pulse animation - deep crimson */
   @keyframes threat-pulse {
     0%, 100% {
-      box-shadow: 0 0 15px hsl(var(--accent) / 0.4), 0 0 30px hsl(var(--accent) / 0.2);
+      box-shadow: 0 0 15px hsl(var(--primary) / 0.4), 0 0 30px hsl(var(--primary) / 0.2);
     }
     50% {
-      box-shadow: 0 0 25px hsl(var(--accent) / 0.5), 0 0 50px hsl(var(--accent) / 0.3);
+      box-shadow: 0 0 25px hsl(var(--primary) / 0.5), 0 0 50px hsl(var(--primary) / 0.3);
     }
   }
 
@@ -170,8 +171,18 @@
     animation: threat-pulse 1.5s ease-in-out infinite;
   }
 
-  /* Secure glow - soft indigo */
+  /* Secure glow - muted sky blue */
   .secure-glow {
-    box-shadow: 0 0 15px hsl(var(--primary) / 0.3), 0 0 30px hsl(var(--primary) / 0.15);
+    box-shadow: 0 0 15px hsl(var(--secondary) / 0.3), 0 0 30px hsl(var(--secondary) / 0.15);
+  }
+
+  /* Warm cream text utility */
+  .text-warm-cream {
+    color: rgba(255, 248, 240, 0.75);
+  }
+
+  /* Muted sky blue text utility */
+  .text-sky-muted {
+    color: #7FB7D6;
   }
 }
