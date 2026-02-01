@@ -9,26 +9,29 @@ interface ThreatGalaxyProps {
   onNodeClick: (node: SecurityNode) => void;
 }
 
-// Predefined positions for a constellation pattern
-const getNodePositions = (nodeCount: number) => {
-  const positions = [
-    { x: 25, y: 35 },
-    { x: 45, y: 25 },
-    { x: 65, y: 40 },
-    { x: 35, y: 55 },
-    { x: 55, y: 65 },
-    { x: 75, y: 55 },
-  ];
-  return positions.slice(0, nodeCount);
+// Generate seeded random positions for consistent layout
+const getNodePositions = (nodes: SecurityNode[]) => {
+  return nodes.map((node, index) => {
+    // Use node id as seed for consistent positions
+    const seed = node.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const random1 = ((seed * 9301 + 49297) % 233280) / 233280;
+    const random2 = ((seed * 49297 + 9301) % 233280) / 233280;
+    
+    // Keep nodes within 15-85% range to avoid edges
+    const x = 15 + random1 * 70;
+    const y = 20 + random2 * 60;
+    
+    return { x, y };
+  });
 };
 
 export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxyProps) => {
-  const positions = getNodePositions(nodes.length);
+  const positions = getNodePositions(nodes);
   
   const nodePositions = nodes.map((node, index) => ({
     id: node.id,
-    x: positions[index]?.x || 50,
-    y: positions[index]?.y || 50,
+    x: positions[index]?.x ?? 50,
+    y: positions[index]?.y ?? 50,
   }));
 
   return (
