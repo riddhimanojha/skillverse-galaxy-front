@@ -34,20 +34,24 @@ export const ThreatConstellationLines = ({
     return map;
   }, [nodePositions]);
 
-  // Get edge color based on risk_weight - desaturated, darkened tones for premium feel
+  // Get edge color based on risk_weight of the originating node
   const getEdgeColor = (riskWeight: number | null, isVulnerable: boolean): string => {
     if (!isVulnerable) {
-      return 'hsl(160, 25%, 35%)'; // Muted teal-green - secure
+      return 'hsl(145, 70%, 45%)'; // Green - secure
     }
     
-    const weight = riskWeight ?? 5;
+    // Use risk_weight to determine color intensity
+    // Higher risk_weight = more severe color
+    const weight = riskWeight ?? 50; // Default to medium if null
     
-    if (weight >= 7) {
-      return 'hsl(0, 30%, 40%)'; // Desaturated dark rose
-    } else if (weight >= 3) {
-      return 'hsl(25, 25%, 38%)'; // Muted dark amber
+    if (weight >= 80) {
+      return 'hsl(0, 85%, 55%)'; // Red for high risk
+    } else if (weight >= 50) {
+      return 'hsl(30, 90%, 55%)'; // Orange for medium-high
+    } else if (weight >= 25) {
+      return 'hsl(45, 90%, 55%)'; // Yellow-orange for medium
     }
-    return 'hsl(45, 20%, 40%)'; // Desaturated dark gold
+    return 'hsl(60, 80%, 50%)'; // Yellow for low risk
   };
 
   // Build lines from actual file_relationships
@@ -99,9 +103,8 @@ export const ThreatConstellationLines = ({
           x2={`${line.x2}%`}
           y2={`${line.y2}%`}
           stroke={line.color}
-          strokeWidth="1.25"
-          strokeOpacity="0.35"
-          className="transition-opacity duration-300 hover:opacity-60"
+          strokeWidth="2"
+          strokeOpacity="0.7"
         />
       ))}
     </svg>
