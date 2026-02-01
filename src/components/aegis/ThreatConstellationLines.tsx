@@ -37,21 +37,20 @@ export const ThreatConstellationLines = ({
   // Get edge color based on risk_weight of the originating node
   const getEdgeColor = (riskWeight: number | null, isVulnerable: boolean): string => {
     if (!isVulnerable) {
-      return 'hsl(145, 70%, 45%)'; // Green - secure
+      return '#7FB7D6'; // Muted sky blue - secure
     }
     
     // Use risk_weight to determine color intensity
-    // Higher risk_weight = more severe color
     const weight = riskWeight ?? 50; // Default to medium if null
     
     if (weight >= 80) {
-      return 'hsl(0, 85%, 55%)'; // Red for high risk
+      return '#E03E84'; // Magenta - critical
     } else if (weight >= 50) {
-      return 'hsl(30, 90%, 55%)'; // Orange for medium-high
+      return '#9A2E4A'; // Lighter crimson - high
     } else if (weight >= 25) {
-      return 'hsl(45, 90%, 55%)'; // Yellow-orange for medium
+      return '#7A1E3A'; // Deep crimson - medium
     }
-    return 'hsl(60, 80%, 50%)'; // Yellow for low risk
+    return '#5A1530'; // Darker crimson - low risk
   };
 
   // Build lines from actual file_relationships
