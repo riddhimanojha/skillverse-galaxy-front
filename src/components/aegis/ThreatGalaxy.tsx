@@ -1,7 +1,9 @@
+import { useState, useEffect, useMemo, useRef } from "react";
 import { SecurityNode } from "@/types/securityNode";
 import { FileRelationship } from "@/types/fileRelationship";
 import { ThreatStar } from "./ThreatStar";
-import { ThreatConstellationLines } from "./ThreatConstellationLines";
+import { AnimatedEdge } from "./AnimatedEdge";
+import { seededRandom, generateNoiseDrift } from "@/utils/noiseGenerator";
 
 interface ThreatGalaxyProps {
   nodes: SecurityNode[];
@@ -29,25 +31,6 @@ const constellationPatterns = [
     { x: 50, y: 75 },   // Sword tip
     { x: 45, y: 60 },   // Extra
     { x: 55, y: 60 },   // Extra
-  ],
-  // Big Dipper-like pattern
-  [
-    { x: 20, y: 30 },
-    { x: 30, y: 25 },
-    { x: 40, y: 28 },
-    { x: 50, y: 35 },
-    { x: 55, y: 50 },
-    { x: 65, y: 55 },
-    { x: 75, y: 50 },
-    { x: 70, y: 40 },
-    { x: 60, y: 38 },
-    { x: 45, y: 55 },
-    { x: 35, y: 60 },
-    { x: 25, y: 65 },
-    { x: 80, y: 65 },
-    { x: 85, y: 35 },
-    { x: 15, y: 45 },
-    { x: 50, y: 70 },
   ],
 ];
 
@@ -81,79 +64,181 @@ const getNodePositions = (nodes: SecurityNode[]) => {
   });
 };
 
-export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxyProps) => {
-  const positions = getNodePositions(nodes);
+// Get edge color based on risk_weight
+const getEdgeColor = (riskWeight: number | null, isVulnerable: boolean): string => {
+  if (!isVulnerable) {
+    return '#7FB7D6'; // Muted sky blue - secure
+  }
   
-  const nodePositions = nodes.map((node, index) => ({
+  const weight = riskWeight ?? 5;
+  
+  if (weight >= 7) {
+    return '#E03E84'; // Magenta - critical
+  } else if (weight >= 4) {
+    return '#9A2E4A'; // Lighter crimson - high
+  }
+  return '#7A1E3A'; // Deep crimson - medium/low
+};
+
+export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxyProps) => {
+  // Track which nodes/edges are "new" for entry animations
+  const prevNodeIdsRef = useRef<Set<string>>(new Set());
+  const prevEdgeIdsRef = useRef<Set<string>>(new Set());
+  const [newNodeIds, setNewNodeIds] = useState<Set<string>>(new Set());
+  const [newEdgeIds, setNewEdgeIds] = useState<Set<string>>(new Set());
+  
+  // Live drift positions for edges to follow
+  const [nodeDriftPositions, setNodeDriftPositions] = useState<Map<string, { x: number; y: number }>>(new Map());
+  
+  const positions = useMemo(() => getNodePositions(nodes), [nodes]);
+  
+  const nodePositions = useMemo(() => nodes.map((node, index) => ({
     id: node.id,
     x: positions[index]?.x ?? 50,
     y: positions[index]?.y ?? 50,
-  }));
+  })), [nodes, positions]);
+
+  // Detect new nodes for entry animation
+  useEffect(() => {
+    const currentIds = new Set(nodes.map(n => n.id));
+    const previousIds = prevNodeIdsRef.current;
+    
+    const newIds = new Set<string>();
+    currentIds.forEach(id => {
+      if (!previousIds.has(id)) {
+        newIds.add(id);
+      }
+    });
+    
+    if (newIds.size > 0) {
+      setNewNodeIds(newIds);
+      
+      // Clear "new" status after animation completes
+      setTimeout(() => {
+        setNewNodeIds(new Set());
+      }, 1000);
+    }
+    
+    prevNodeIdsRef.current = currentIds;
+  }, [nodes]);
+
+  // Detect new edges for entry animation
+  useEffect(() => {
+    const currentEdgeIds = new Set(relationships.map(r => `${r.from_file}-${r.to_file}`));
+    const previousEdgeIds = prevEdgeIdsRef.current;
+    
+    const newIds = new Set<string>();
+    currentEdgeIds.forEach(id => {
+      if (!previousEdgeIds.has(id)) {
+        newIds.add(id);
+      }
+    });
+    
+    if (newIds.size > 0) {
+      setNewEdgeIds(newIds);
+      
+      // Clear "new" status after animation completes
+      setTimeout(() => {
+        setNewEdgeIds(new Set());
+      }, 1800);
+    }
+    
+    prevEdgeIdsRef.current = currentEdgeIds;
+  }, [relationships]);
+
+  // Animate node drift positions for edges to follow
+  useEffect(() => {
+    let animationFrame: number;
+    const startTimes = new Map<string, number>();
+    
+    nodes.forEach(node => {
+      const seed = node.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      startTimes.set(node.id, Date.now() + seed * 100);
+    });
+    
+    const animate = () => {
+      const newPositions = new Map<string, { x: number; y: number }>();
+      
+      nodes.forEach(node => {
+        const seed = node.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const startTime = startTimes.get(node.id) ?? Date.now();
+        const elapsed = Date.now() - startTime;
+        const maxDrift = 1 + seededRandom(seed * 50) * 3;
+        const drift = generateNoiseDrift(seed, elapsed, maxDrift);
+        newPositions.set(node.id, drift);
+      });
+      
+      setNodeDriftPositions(newPositions);
+      animationFrame = requestAnimationFrame(animate);
+    };
+    
+    animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [nodes]);
+
+  // Build edge data with animated positions
+  const edges = useMemo(() => {
+    return relationships.map(rel => {
+      const fromNode = nodes.find(n => n.file_name === rel.from_file);
+      const toNode = nodes.find(n => n.file_name === rel.to_file);
+      
+      if (!fromNode || !toNode) return null;
+      
+      const fromPos = nodePositions.find(p => p.id === fromNode.id);
+      const toPos = nodePositions.find(p => p.id === toNode.id);
+      
+      if (!fromPos || !toPos) return null;
+      
+      const fromDrift = nodeDriftPositions.get(fromNode.id) ?? { x: 0, y: 0 };
+      const toDrift = nodeDriftPositions.get(toNode.id) ?? { x: 0, y: 0 };
+      
+      const edgeId = `${rel.from_file}-${rel.to_file}`;
+      const color = getEdgeColor(fromNode.risk_weight, fromNode.is_vulnerable);
+      
+      return {
+        id: edgeId,
+        x1: fromPos.x + fromDrift.x * 0.08, // Convert px to % (rough approximation)
+        y1: fromPos.y + fromDrift.y * 0.08,
+        x2: toPos.x + toDrift.x * 0.08,
+        y2: toPos.y + toDrift.y * 0.08,
+        color,
+        riskWeight: fromNode.risk_weight ?? 5,
+        isNew: newEdgeIds.has(edgeId),
+      };
+    }).filter(Boolean);
+  }, [relationships, nodes, nodePositions, nodeDriftPositions, newEdgeIds]);
+
+  // Empty state - just show galaxy background
+  if (nodes.length === 0) {
+    return (
+      <div className="relative w-full h-full">
+        {/* Empty - galaxy background shows through */}
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full h-full">
-      {/* Constellation lines from file_relationships */}
+      {/* Animated curved edges */}
       <svg 
         className="absolute inset-0 w-full h-full pointer-events-none z-0"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
         style={{ overflow: 'visible' }}
       >
-        <defs>
-          {nodePositions.map((pos, index) => {
-            const node = nodes[index];
-            const isVulnerable = node?.is_vulnerable;
-            const riskWeight = node?.risk_weight ?? 5;
-            
-            let color = 'hsl(145, 70%, 45%)'; // Green - secure
-            if (isVulnerable) {
-              if (riskWeight >= 7) color = 'hsl(0, 85%, 55%)';
-              else if (riskWeight >= 3) color = 'hsl(30, 90%, 55%)';
-              else color = 'hsl(45, 90%, 55%)';
-            }
-            
-            return (
-              <linearGradient
-                key={`gradient-${index}`}
-                id={`line-gradient-${index}`}
-                x1="0%"
-                y1="0%"
-                x2="100%"
-                y2="0%"
-              >
-                <stop offset="0%" stopColor={color} stopOpacity="0.3" />
-                <stop offset="50%" stopColor={color} stopOpacity="0.7" />
-                <stop offset="100%" stopColor={color} stopOpacity="0.3" />
-              </linearGradient>
-            );
-          })}
-        </defs>
-        
-        {/* Draw lines based on relationships */}
-        {relationships.map((rel, index) => {
-          const fromNode = nodes.find(n => n.file_name === rel.from_file);
-          const toNode = nodes.find(n => n.file_name === rel.to_file);
-          
-          if (!fromNode || !toNode) return null;
-          
-          const fromPos = nodePositions.find(p => p.id === fromNode.id);
-          const toPos = nodePositions.find(p => p.id === toNode.id);
-          
-          if (!fromPos || !toPos) return null;
-          
-          const fromIdx = nodes.findIndex(n => n.id === fromNode.id);
-          
-          return (
-            <line
-              key={`line-${index}`}
-              x1={`${fromPos.x}%`}
-              y1={`${fromPos.y}%`}
-              x2={`${toPos.x}%`}
-              y2={`${toPos.y}%`}
-              stroke={`url(#line-gradient-${fromIdx})`}
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          );
-        })}
+        {edges.map((edge) => edge && (
+          <AnimatedEdge
+            key={edge.id}
+            id={edge.id}
+            x1={edge.x1}
+            y1={edge.y1}
+            x2={edge.x2}
+            y2={edge.y2}
+            color={edge.color}
+            riskWeight={edge.riskWeight}
+            isNew={edge.isNew}
+          />
+        ))}
       </svg>
       
       {/* Stars */}
@@ -164,6 +249,7 @@ export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxy
           x={nodePositions[index]?.x || 50}
           y={nodePositions[index]?.y || 50}
           onClick={() => onNodeClick(node)}
+          isNew={newNodeIds.has(node.id)}
         />
       ))}
     </div>
