@@ -22,14 +22,26 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
     }
   }, [isVulnerable]);
 
+  // Core color - muted for cinematic feel, used for rim/accent
   const getRiskColor = () => {
-    if (!isVulnerable) return 'hsl(160, 100%, 50%)'; // Secure green
+    if (!isVulnerable) return 'hsl(160, 60%, 45%)'; // Secure muted teal
     
     const weight = node.risk_weight ?? 5;
     
-    if (weight < 3) return 'hsl(45, 90%, 55%)';   // Golden
-    if (weight < 7) return 'hsl(25, 90%, 55%)';   // Orange
-    return 'hsl(0, 85%, 55%)';                     // Red
+    if (weight < 3) return 'hsl(45, 55%, 50%)';   // Muted gold
+    if (weight < 7) return 'hsl(25, 50%, 48%)';   // Muted amber
+    return 'hsl(0, 50%, 50%)';                     // Muted rose
+  };
+
+  // Darker core color for the node fill
+  const getCoreColor = () => {
+    if (!isVulnerable) return 'hsl(160, 40%, 20%)';
+    
+    const weight = node.risk_weight ?? 5;
+    
+    if (weight < 3) return 'hsl(45, 30%, 18%)';
+    if (weight < 7) return 'hsl(25, 30%, 16%)';
+    return 'hsl(0, 30%, 15%)';
   };
 
   return (
@@ -48,57 +60,32 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {/* Secure ripple effect */}
-      {ripple && !isVulnerable && (
-        <div 
-          className="absolute inset-0 rounded-full animate-ping opacity-60" 
-          style={{ 
-            width: "50px", 
-            height: "50px", 
-            margin: "-20px",
-            backgroundColor: getRiskColor() 
-          }}
-        />
-      )}
-
-      {/* Vulnerability pulse effect */}
-      {isVulnerable && (
-        <div 
-          className="absolute inset-0 rounded-full animate-ping" 
-          style={{ 
-            width: "45px", 
-            height: "45px", 
-            margin: "-18px",
-            backgroundColor: getRiskColor(),
-            opacity: 0.4,
-          }} 
-        />
-      )}
-      
-      {/* Pulsing glow aura */}
+      {/* Subtle outer rim glow - refined, not overpowering */}
       <div
-        className={`absolute inset-0 rounded-full blur-2xl transition-all duration-700 ${
+        className={`absolute inset-0 rounded-full transition-all duration-500 ${
           isVulnerable ? "animate-pulse" : ""
         }`}
         style={{
-          width: hover ? "60px" : "50px",
-          height: hover ? "60px" : "50px",
-          margin: hover ? "-25px" : "-20px",
-          backgroundColor: getRiskColor(),
-          opacity: isVulnerable ? 0.75 : 0.5,
+          width: hover ? "32px" : "28px",
+          height: hover ? "32px" : "28px",
+          margin: hover ? "-11px" : "-9px",
+          border: `1.5px solid ${getRiskColor()}`,
+          opacity: isVulnerable ? 0.6 : 0.4,
+          boxShadow: `0 0 12px ${getRiskColor()}40`,
         }}
       />
       
-      {/* Core star */}
+      {/* Core star - dark fill with colored rim accent */}
       <div
         className="relative rounded-full transition-all duration-500"
         style={{
-          width: isVulnerable ? "16px" : "12px",
-          height: isVulnerable ? "16px" : "12px",
-          backgroundColor: getRiskColor(),
-          boxShadow: isVulnerable
-            ? `0 0 40px ${getRiskColor()}, 0 0 60px ${getRiskColor()}, inset 0 0 10px rgba(255,255,255,0.3)`
-            : `0 0 20px ${getRiskColor()}, inset 0 0 8px rgba(255,255,255,0.5)`,
+          width: isVulnerable ? "14px" : "10px",
+          height: isVulnerable ? "14px" : "10px",
+          backgroundColor: getCoreColor(),
+          border: `1.5px solid ${getRiskColor()}`,
+          boxShadow: hover 
+            ? `0 0 16px ${getRiskColor()}60, inset 0 0 4px ${getRiskColor()}30`
+            : `0 0 8px ${getRiskColor()}40, inset 0 0 2px ${getRiskColor()}20`,
         }}
       />
 
