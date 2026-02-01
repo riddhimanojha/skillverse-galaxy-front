@@ -95,15 +95,46 @@ export const ThreatConstellationLines = ({
   
   return (
     <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+      <defs>
+        {lines.map((line, index) => (
+          <linearGradient
+            key={`grad-${index}`}
+            id={`edge-gradient-${index}`}
+            x1={`${line.x1}%`}
+            y1={`${line.y1}%`}
+            x2={`${line.x2}%`}
+            y2={`${line.y2}%`}
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0%" stopColor={line.color} stopOpacity="0.55" />
+            <stop offset="50%" stopColor={line.color} stopOpacity="0.85" />
+            <stop offset="100%" stopColor={line.color} stopOpacity="0.55" />
+          </linearGradient>
+        ))}
+      </defs>
+      {/* Outer darker edge layer */}
       {lines.map((line, index) => (
         <line
-          key={index}
+          key={`outer-${index}`}
           x1={`${line.x1}%`}
           y1={`${line.y1}%`}
           x2={`${line.x2}%`}
           y2={`${line.y2}%`}
-          stroke={line.color}
-          strokeWidth="2"
+          stroke="hsl(254, 30%, 5%)"
+          strokeWidth="3"
+          strokeOpacity="0.5"
+        />
+      ))}
+      {/* Main edge with gradient for inner highlight */}
+      {lines.map((line, index) => (
+        <line
+          key={`main-${index}`}
+          x1={`${line.x1}%`}
+          y1={`${line.y1}%`}
+          x2={`${line.x2}%`}
+          y2={`${line.y2}%`}
+          stroke={`url(#edge-gradient-${index})`}
+          strokeWidth="1.5"
           strokeOpacity="0.7"
         />
       ))}
