@@ -79,7 +79,7 @@ export const useSecurityNodes = () => {
     };
   }, []);
 
-  // Deploy patch - set is_vulnerable to false
+  // Deploy patch - set is_vulnerable to false (marks as resolved, not deleted)
   const deployPatch = async (id: string): Promise<boolean> => {
     const { error } = await supabase
       .from('security_nodes')
@@ -94,11 +94,34 @@ export const useSecurityNodes = () => {
     return true;
   };
 
-  // Get stats
+  // Check if an open finding exists for the same file and line
+  const hasOpenFinding = async (fileName: string, lineNo: number): Promise<boolean> => {
+    const { data, error } = await supabase
+      .from('security_nodes')
+      .select('id')
+      .eq('file_name', fileName)
+      .eq('line_no', lineNo)
+      .eq('is_vulnerable', true)
+      .limit(1);
+
+    if (error) {
+      console.error('Error checking for open finding:', error);
+      return false;
+    }
+    return (data?.length ?? 0) > 0;
+  };
+
+  // Get only open (active) nodes for display
+  const getOpenNodes = () => {
+    return nodes.filter(n => n.is_vulnerable);
+  };
+
+  // Get stats (only counts open vulnerabilities as active threats)
   const getStats = () => {
-    const activeThreats = nodes.filter(n => n.is_vulnerable).length;
-    const criticalThreats = nodes.filter(n => n.is_vulnerable && n.severity === 'Critical').length;
-    const highThreats = nodes.filter(n => n.is_vulnerable && n.severity === 'High').length;
+    const openNodes = nodes.filter(n => n.is_vulnerable);
+    const activeThreats = openNodes.length;
+    const criticalThreats = openNodes.filter(n => n.severity === 'Critical').length;
+    const highThreats = openNodes.filter(n => n.severity === 'High').length;
     const securedNodes = nodes.filter(n => !n.is_vulnerable).length;
     
     return { activeThreats, criticalThreats, highThreats, securedNodes, total: nodes.length };
@@ -108,6 +131,8 @@ export const useSecurityNodes = () => {
     nodes,
     loading,
     deployPatch,
+    hasOpenFinding,
+    getOpenNodes,
     getStats,
   };
 };
