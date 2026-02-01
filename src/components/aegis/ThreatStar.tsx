@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { SecurityNode } from "@/types/securityNode";
 
 interface ThreatStarProps {
@@ -11,61 +11,14 @@ interface ThreatStarProps {
 export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
   const [ripple, setRipple] = useState(false);
   const [hover, setHover] = useState(false);
-  const [drift, setDrift] = useState({ x: 0, y: 0 });
-  const velocityRef = useRef({ x: 0, y: 0 });
-  const animationRef = useRef<number>();
 
   const isVulnerable = node.is_vulnerable;
   
-  // Brownian motion parameters
-  const maxDrift = 2; // Maximum pixels from origin
-  const friction = 0.98; // Velocity damping
-  const impulseStrength = 0.15; // Random impulse magnitude
-  const impulseInterval = 100; // ms between random impulses
-
-  // Brownian motion effect
-  useEffect(() => {
-    let lastImpulse = 0;
-    
-    const animate = (timestamp: number) => {
-      // Apply random impulse at intervals
-      if (timestamp - lastImpulse > impulseInterval) {
-        velocityRef.current.x += (Math.random() - 0.5) * impulseStrength;
-        velocityRef.current.y += (Math.random() - 0.5) * impulseStrength;
-        lastImpulse = timestamp;
-      }
-      
-      // Apply friction
-      velocityRef.current.x *= friction;
-      velocityRef.current.y *= friction;
-      
-      // Update position
-      setDrift(prev => {
-        let newX = prev.x + velocityRef.current.x;
-        let newY = prev.y + velocityRef.current.y;
-        
-        // Soft boundary - pull back toward center if too far
-        const distance = Math.sqrt(newX * newX + newY * newY);
-        if (distance > maxDrift) {
-          const pullback = 0.02;
-          newX -= newX * pullback;
-          newY -= newY * pullback;
-        }
-        
-        return { x: newX, y: newY };
-      });
-      
-      animationRef.current = requestAnimationFrame(animate);
-    };
-    
-    animationRef.current = requestAnimationFrame(animate);
-    
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, []);
+  // Generate unique animation parameters based on node id for organic variation
+  const seed = node.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const animationDuration = 8 + (seed % 6); // 8-14 seconds
+  const animationDelay = (seed % 4); // 0-4 seconds delay
+  const driftAngle = (seed * 137.5) % 360; // Unique drift direction
 
   useEffect(() => {
     if (!isVulnerable) {
@@ -85,6 +38,16 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
     return 'hsl(0, 85%, 55%)';                     // Red
   };
 
+  // CSS keyframes for ambient drift - applied to inner content
+  const driftKeyframes = `
+    @keyframes drift-${seed} {
+      0%, 100% { transform: translate(0px, 0px); }
+      25% { transform: translate(${Math.cos(driftAngle * Math.PI / 180) * 2}px, ${Math.sin(driftAngle * Math.PI / 180) * 1.5}px); }
+      50% { transform: translate(${Math.cos((driftAngle + 90) * Math.PI / 180) * 1.5}px, ${Math.sin((driftAngle + 90) * Math.PI / 180) * 2}px); }
+      75% { transform: translate(${Math.cos((driftAngle + 180) * Math.PI / 180) * 2}px, ${Math.sin((driftAngle + 180) * Math.PI / 180) * 1}px); }
+    }
+  `;
+
   return (
     <div
       className="absolute duration-300 ease-out cursor-pointer"
@@ -101,10 +64,13 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {/* Brownian motion wrapper for visual elements */}
+      {/* Inject unique drift keyframes */}
+      <style>{driftKeyframes}</style>
+      
+      {/* Ambient drift wrapper for visual elements */}
       <div
         style={{
-          transform: `translate(${drift.x}px, ${drift.y}px)`,
+          animation: `drift-${seed} ${animationDuration}s ease-in-out ${animationDelay}s infinite`,
         }}
       >
         {/* Secure ripple effect */}
