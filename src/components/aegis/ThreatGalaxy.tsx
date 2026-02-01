@@ -9,7 +9,6 @@ interface ThreatGalaxyProps {
   onNodeClick: (node: SecurityNode) => void;
 }
 
-// Constellation-inspired layout patterns
 const constellationPatterns = [
   [
     { x: 50, y: 15 },
@@ -56,14 +55,12 @@ const getNodePositions = (nodes: SecurityNode[]) => {
   });
 };
 
-// Eye-safe color palette - simplified for performance
 const getEdgeColor = (riskWeight: number | null, isVulnerable: boolean) => {
-  if (!isVulnerable) return 'hsl(160, 35%, 45%)'; // Mint green
-  
+  if (!isVulnerable) return 'hsl(160, 35%, 45%)';
   const weight = riskWeight ?? 5;
-  if (weight >= 7) return 'hsl(355, 45%, 40%)'; // Deep red
-  if (weight >= 4) return 'hsl(35, 50%, 45%)';  // Amber
-  return 'hsl(185, 40%, 45%)'; // Teal
+  if (weight >= 7) return 'hsl(355, 45%, 40%)';
+  if (weight >= 4) return 'hsl(35, 50%, 45%)';
+  return 'hsl(185, 40%, 45%)';
 };
 
 export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxyProps) => {
@@ -77,7 +74,6 @@ export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxy
     })), [nodes, positions]
   );
 
-  // Build edge data - simplified
   const edges = useMemo(() => {
     return relationships.map((rel, index) => {
       const fromNode = nodes.find(n => n.file_name === rel.from_file);
@@ -90,30 +86,47 @@ export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxy
       
       if (!fromPos || !toPos) return null;
       
-      const color = getEdgeColor(fromNode.risk_weight, fromNode.is_vulnerable);
-      
       return {
         id: `edge-${index}`,
         x1: fromPos.x,
         y1: fromPos.y,
         x2: toPos.x,
         y2: toPos.y,
-        color,
+        color: getEdgeColor(fromNode.risk_weight, fromNode.is_vulnerable),
+        delay: index * 0.08, // Stagger edges
       };
     }).filter(Boolean);
   }, [relationships, nodes, nodePositions]);
 
   return (
     <div className="relative w-full h-full">
-      {/* Optimized SVG - no filters, minimal elements */}
+      {/* Entrance animation styles */}
+      <style>{`
+        @keyframes edgeFadeIn {
+          0% { opacity: 0; stroke-dashoffset: 100; }
+          100% { opacity: 1; stroke-dashoffset: 0; }
+        }
+        .edge-line {
+          stroke-dasharray: 100;
+          stroke-dashoffset: 100;
+          animation: edgeFadeIn 0.8s ease-out forwards;
+        }
+        .edge-glow {
+          stroke-dasharray: 100;
+          stroke-dashoffset: 100;
+          animation: edgeFadeIn 0.8s ease-out forwards;
+        }
+      `}</style>
+
       <svg 
         className="absolute inset-0 w-full h-full pointer-events-none"
         style={{ overflow: 'visible' }}
       >
         {edges.map((edge) => edge && (
           <g key={edge.id}>
-            {/* Glow layer - using opacity instead of filter */}
+            {/* Soft glow layer */}
             <line
+              className="edge-glow"
               x1={`${edge.x1}%`}
               y1={`${edge.y1}%`}
               x2={`${edge.x2}%`}
@@ -121,10 +134,15 @@ export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxy
               stroke={edge.color}
               strokeWidth="4"
               strokeLinecap="round"
-              opacity="0.15"
+              style={{ 
+                animationDelay: `${edge.delay + 0.3}s`,
+                opacity: 0.15,
+              }}
+              pathLength="100"
             />
             {/* Core line */}
             <line
+              className="edge-line"
               x1={`${edge.x1}%`}
               y1={`${edge.y1}%`}
               x2={`${edge.x2}%`}
@@ -132,13 +150,17 @@ export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxy
               stroke={edge.color}
               strokeWidth="1.5"
               strokeLinecap="round"
-              opacity="0.7"
+              style={{ 
+                animationDelay: `${edge.delay + 0.3}s`,
+                opacity: 0.7,
+              }}
+              pathLength="100"
             />
           </g>
         ))}
       </svg>
       
-      {/* Stars - using shared CSS classes */}
+      {/* Stars with staggered entrance */}
       {nodes.map((node, index) => (
         <ThreatStar
           key={node.id}
@@ -146,6 +168,7 @@ export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxy
           x={nodePositions[index]?.x || 50}
           y={nodePositions[index]?.y || 50}
           onClick={() => onNodeClick(node)}
+          entranceDelay={index * 0.06}
         />
       ))}
     </div>
