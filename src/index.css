@@ -8,52 +8,53 @@
 
 @layer base {
   :root {
-    /* Orion Dark Red Theme */
-    --background: 0 60% 6%;
-    --foreground: 0 0% 100%;
+    /* Orion Elegant Cosmic Theme */
+    /* Cream / Off-White #FFF8F0 */
+    --background: 32 100% 97%;
+    --foreground: 254 32% 28%;
 
-    /* Glassmorphic cards */
-    --card: 0 50% 10%;
-    --card-foreground: 0 0% 100%;
+    /* Glassmorphic cards - cream tinted */
+    --card: 32 50% 95%;
+    --card-foreground: 254 32% 28%;
 
-    --popover: 0 50% 12%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 32 40% 96%;
+    --popover-foreground: 254 32% 28%;
 
-    /* Cyan accent for clean state */
-    --primary: 187 100% 50%;
-    --primary-foreground: 0 60% 6%;
+    /* Deep Indigo / Dark Purple #3C3160 */
+    --primary: 254 32% 28%;
+    --primary-foreground: 32 100% 97%;
 
-    /* Success green */
-    --secondary: 160 100% 43%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secure state - indigo */
+    --secondary: 254 32% 38%;
+    --secondary-foreground: 32 100% 97%;
 
     /* Muted elements */
-    --muted: 0 30% 15%;
-    --muted-foreground: 0 20% 65%;
+    --muted: 254 20% 90%;
+    --muted-foreground: 254 20% 45%;
 
-    /* Accent */
-    --accent: 0 100% 65%;
-    --accent-foreground: 0 0% 100%;
+    /* Salmon / Coral Pink #F56F72 for accent */
+    --accent: 359 87% 70%;
+    --accent-foreground: 32 100% 97%;
 
-    /* Alert red */
-    --destructive: 0 85% 55%;
-    --destructive-foreground: 0 0% 100%;
+    /* Magenta / Hot Pink #E03E84 for destructive/critical */
+    --destructive: 334 73% 56%;
+    --destructive-foreground: 32 100% 97%;
 
-    /* Borders */
-    --border: 0 30% 20%;
-    --input: 0 40% 15%;
-    --ring: 187 100% 50%;
+    /* Borders - soft indigo */
+    --border: 254 20% 85%;
+    --input: 254 15% 92%;
+    --ring: 254 32% 28%;
 
     --radius: 1rem;
 
-    /* Nebula gradient - now red */
-    --nebula-start: 0 60% 6%;
-    --nebula-mid: 0 50% 10%;
-    --nebula-end: 350 40% 8%;
+    /* Nebula gradient - indigo tones */
+    --nebula-start: 32 100% 97%;
+    --nebula-mid: 254 25% 92%;
+    --nebula-end: 254 30% 88%;
 
     /* Glow effects */
-    --glow-secure: 160 100% 50%;
-    --glow-vulnerable: 0 100% 55%;
+    --glow-secure: 254 32% 28%;
+    --glow-vulnerable: 359 87% 70%;
   }
 
   * {
@@ -129,12 +130,13 @@
     }
   }
 
-  /* Glass panel styling */
+  /* Glass panel styling - cream with soft indigo tint */
   .glass-panel {
-    background: rgba(15, 21, 53, 0.6);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 248, 240, 0.85);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid rgba(60, 49, 96, 0.15);
+    box-shadow: 0 4px 24px rgba(60, 49, 96, 0.08);
   }
 
   /* Radial gradient background */
@@ -148,19 +150,19 @@
     font-family: 'JetBrains Mono', monospace;
   }
 
-  /* Cosmic text glow */
+  /* Cosmic text glow - soft indigo */
   .cosmic-glow {
-    text-shadow: 0 0 20px hsl(var(--primary)), 
-                 0 0 40px hsl(var(--primary) / 0.5);
+    text-shadow: 0 0 20px hsl(var(--primary) / 0.4), 
+                 0 0 40px hsl(var(--primary) / 0.2);
   }
 
-  /* Threat pulse animation */
+  /* Threat pulse animation - salmon/coral */
   @keyframes threat-pulse {
     0%, 100% {
-      box-shadow: 0 0 20px hsl(var(--destructive)), 0 0 40px hsl(var(--destructive) / 0.5);
+      box-shadow: 0 0 15px hsl(var(--accent) / 0.4), 0 0 30px hsl(var(--accent) / 0.2);
     }
     50% {
-      box-shadow: 0 0 40px hsl(var(--destructive)), 0 0 80px hsl(var(--destructive) / 0.7);
+      box-shadow: 0 0 25px hsl(var(--accent) / 0.5), 0 0 50px hsl(var(--accent) / 0.3);
     }
   }
 
@@ -168,8 +170,8 @@
     animation: threat-pulse 1.5s ease-in-out infinite;
   }
 
-  /* Secure glow */
+  /* Secure glow - soft indigo */
   .secure-glow {
-    box-shadow: 0 0 20px hsl(var(--secondary)), 0 0 40px hsl(var(--secondary) / 0.3);
+    box-shadow: 0 0 15px hsl(var(--primary) / 0.3), 0 0 30px hsl(var(--primary) / 0.15);
   }
 }
