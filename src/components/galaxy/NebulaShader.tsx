@@ -11,10 +11,10 @@ export class NebulaMaterial extends THREE.ShaderMaterial {
     super({
       uniforms: {
         time: { value: 0 },
-        colorA: { value: new THREE.Color(0.58, 0.2, 0.92) }, // Electric violet
-        colorB: { value: new THREE.Color(0.4, 0.6, 0.95) }, // Cosmic blue
-        colorC: { value: new THREE.Color(0.2, 0.11, 0.35) }, // Dark space purple
-        colorD: { value: new THREE.Color(0.65, 0.3, 0.8) }, // Purple glow
+        colorA: { value: new THREE.Color(0.25, 0.08, 0.06) }, // Deep crimson
+        colorB: { value: new THREE.Color(0.18, 0.05, 0.08) }, // Dark blood red
+        colorC: { value: new THREE.Color(0.08, 0.03, 0.04) }, // Near-black red
+        colorD: { value: new THREE.Color(0.22, 0.06, 0.08) }, // Subtle crimson glow
       },
       vertexShader: `
         varying vec2 vUv;
