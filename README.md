@@ -1,73 +1,81 @@
-# Welcome to your Lovable project
+# 🌌 Orion
+**Turn Application Risk Into Visual Intelligence.**
 
-## Project info
 
-**URL**: https://lovable.dev/projects/aada2abc-a968-469a-96f2-7c2c96dbecb3
 
-## How can I edit this code?
+> "Vulnerabilities shouldn't be rows in a spreadsheet. Orion maps them as a living network, where risk pulses through glowing connections."
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🔭 The Concept
+Security tools today are noisy. Developers are forced to stare at endless, static lists of CVEs in dashboards that disconnect the vulnerability from the architecture. It is hard to prioritize, hard to visualize, and hard to fix without breaking the build.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/aada2abc-a968-469a-96f2-7c2c96dbecb3) and start prompting.
+**Orion** is a live, visual security system that turns application risk into something developers can immediately understand. Instead of static lists, it maps real files as nodes and real file dependencies as glowing connections. Vulnerabilities appear live as the system is scanned locally and pushed to the cloud, with risk expressed through color, motion, and intensity rather than noisy dashboards.
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🌟 Key Features
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 1. Visual Risk Mapping
+Orion replaces dashboards with a spatial map.
+* **Live Nodes:** Real files appear as interactive nodes; dependencies appear as connections.
+* **Visual Risk:** Risk is expressed through color, motion, and intensity, not text.
+* **Propagation:** See exactly how a vulnerability in one library cascades through your codebase.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 2. The "Hacktron" Integration
 
-Follow these steps:
+* **Vulnerability Simulation:** The **Hacktron** AI (running on a secondary device) detects vulnerability live. 
+* **Instant Visualization:** Orion detects the vulnerable vector and immediately lights up the compromised nodes in red.
+* **Automated Defense:** The system identifies the exact entry point of the vulnerability.
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### 3. Bi-Directional Remediation
+Resolving an issue stabilizes the system without deleting history.
+* **Precision Fixes:** Clicking a glowing node reveals the file, line number, and a minimal, practical fix.
+* **Auto-Sync:** Once a solution is applied in the Orion interface, the fixed code is automatically pushed back to the local developer environment (laptop).
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 4. Calm, Premium UI
+A focused design system built for clarity.
+* **System-Level View:** A clean, "glassmorphic" interface that helps developers prioritize what actually matters.
+* **Interactive Graph:** Zoom, pan, and explore the architecture of your security.
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## 🛠 Tech Stack
 
-**Edit a file directly in GitHub**
+| Layer | Technology | Description |
+| :--- | :--- | :--- |
+| **Language** | **TypeScript** | Static typing for safer and cleaner React code. |
+| **Frontend Framework** | **React 18** | Component-based UI structure for the visualizer. |
+| **Backend & DB** | **Supabase** | Real-time database and auth for syncing node states. |
+| **Attack Engine** | **Hacktron** | Custom external module for running live vulnerability exploits. |
+| **Build Tool** | **Vite + SWC** | Fast development server & optimized builds. |
+| **Routing** | **react-router-dom** | Client-side navigation between views. |
+| **State Management** | **@tanstack/react-query** | Efficient API handling & caching. |
+| **Styling** | **Tailwind CSS** | Utility-first styling with custom variables for the dark aesthetic. |
+| **Linting** | **ESLint + TS ESLint** | Code quality & consistency. |
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 📸 Interface
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+ Home Screen 
+ 
+<img width="2535" height="1511" alt="image" src="https://github.com/user-attachments/assets/f14dbf87-3549-423c-ac92-f7221fd0d7cc" />
+ Hover
+ 
+<img width="1266" height="1169" alt="image" src="https://github.com/user-attachments/assets/44d0c0b8-353e-4ccf-a44e-b5f41a5ad10b" />
+ Node Details
+ 
+<img width="2508" height="1277" alt="image" src="https://github.com/user-attachments/assets/61a94e7d-eb3a-4d49-9784-51b8c5a443db" />
+ Command Center
+ 
+<img width="2349" height="1244" alt="image" src="https://github.com/user-attachments/assets/e1c9e0fd-48de-4eff-89a3-82090fbeee62" />
 
-## What technologies are used for this project?
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 👥 The Team
+* **Riddhiman** - Front End
+* **Ribhav** - Back-End + Front End
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/aada2abc-a968-469a-96f2-7c2c96dbecb3) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+---
