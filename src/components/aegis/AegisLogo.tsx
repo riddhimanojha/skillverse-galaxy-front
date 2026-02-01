@@ -12,7 +12,7 @@ export const AegisLogo = () => {
         
         {/* Logo text with embossed treatment - deep crimson gradient */}
         <h1 
-          className="relative text-2xl font-bold tracking-tight"
+          className="relative text-3xl font-bold tracking-tight"
           style={{
             fontFamily: "'Inter', system-ui, sans-serif",
             fontWeight: 700,
@@ -29,7 +29,7 @@ export const AegisLogo = () => {
         
         {/* Subtle tagline - muted sky blue */}
         <p 
-          className="text-[10px] uppercase tracking-widest mt-0.5"
+          className="text-[11px] uppercase tracking-widest mt-0.5"
           style={{
             color: 'rgba(127, 183, 214, 0.5)',
             letterSpacing: '0.15em',
@@ -41,7 +41,7 @@ export const AegisLogo = () => {
         
         {/* Subtle underline accent - deep crimson fade */}
         <div 
-          className="h-px w-16 mt-2 opacity-35"
+          className="h-px w-20 mt-2 opacity-35"
           style={{
             background: 'linear-gradient(90deg, #7A1E3A 0%, transparent 100%)',
           }}
