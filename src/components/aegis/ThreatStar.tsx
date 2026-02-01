@@ -63,29 +63,16 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
 
       {/* Vulnerability pulse effect */}
       {isVulnerable && (
-        <>
-          <div 
-            className="absolute inset-0 rounded-full animate-ping" 
-            style={{ 
-              width: "70px", 
-              height: "70px", 
-              margin: "-30px",
-              backgroundColor: getSeverityColor(),
-              opacity: 0.4,
-            }} 
-          />
-          <div 
-            className="absolute inset-0 rounded-full animate-pulse" 
-            style={{ 
-              width: "55px", 
-              height: "55px", 
-              margin: "-22px",
-              border: `2px solid ${getSeverityColor()}`,
-              backgroundColor: 'transparent',
-              boxShadow: `0 0 30px ${getSeverityColor()}, inset 0 0 20px rgba(0,0,0,0.5)`,
-            }} 
-          />
-        </>
+        <div 
+          className="absolute inset-0 rounded-full animate-ping" 
+          style={{ 
+            width: "45px", 
+            height: "45px", 
+            margin: "-18px",
+            backgroundColor: getSeverityColor(),
+            opacity: 0.35,
+          }} 
+        />
       )}
       
       {/* Pulsing glow aura */}
