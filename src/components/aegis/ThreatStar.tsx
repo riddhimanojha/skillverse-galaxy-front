@@ -50,14 +50,11 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
 
   return (
     <div
-      className="absolute duration-300 ease-out cursor-pointer"
+      className="absolute cursor-pointer"
       style={{
         left: `${x}%`,
         top: `${y}%`,
-        transform: hover 
-          ? "translate(-50%, -50%) scale(1.4)" 
-          : "translate(-50%, -50%) scale(1)",
-        transition: "all 0.25s ease-out",
+        transform: "translate(-50%, -50%)",
         zIndex: hover ? 20 : 10,
       }}
       onClick={onClick}
@@ -67,10 +64,12 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
       {/* Inject unique drift keyframes */}
       <style>{driftKeyframes}</style>
       
-      {/* Ambient drift wrapper for visual elements */}
+      {/* Ambient drift wrapper for visual elements - scale applied here only */}
       <div
         style={{
           animation: `drift-${seed} ${animationDuration}s ease-in-out ${animationDelay}s infinite`,
+          transform: hover ? "scale(1.4)" : "scale(1)",
+          transition: "transform 0.25s ease-out",
         }}
       >
         {/* Secure ripple effect */}
