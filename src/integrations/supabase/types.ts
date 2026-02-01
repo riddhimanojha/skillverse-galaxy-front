@@ -73,6 +73,8 @@ export type Database = {
           is_vulnerable: boolean
           line_no: number | null
           occam_fix: string
+          patch_applied: boolean | null
+          patch_approved: boolean | null
           risk_weight: number | null
           severity: string
         }
@@ -86,6 +88,8 @@ export type Database = {
           is_vulnerable?: boolean
           line_no?: number | null
           occam_fix: string
+          patch_applied?: boolean | null
+          patch_approved?: boolean | null
           risk_weight?: number | null
           severity?: string
         }
@@ -99,6 +103,8 @@ export type Database = {
           is_vulnerable?: boolean
           line_no?: number | null
           occam_fix?: string
+          patch_applied?: boolean | null
+          patch_approved?: boolean | null
           risk_weight?: number | null
           severity?: string
         }
