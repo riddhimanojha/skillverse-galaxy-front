@@ -89,16 +89,16 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
         }}
       />
       
-      {/* Core star */}
+      {/* Core star with dark inner core and colored outer ring */}
       <div
         className="relative rounded-full transition-all duration-500"
         style={{
           width: isVulnerable ? "16px" : "12px",
           height: isVulnerable ? "16px" : "12px",
-          backgroundColor: getRiskColor(),
+          background: `radial-gradient(circle at 40% 40%, hsl(254, 30%, 8%) 0%, hsl(254, 30%, 8%) 45%, ${getRiskColor()} 70%, ${getRiskColor()} 100%)`,
           boxShadow: isVulnerable
-            ? `0 0 40px ${getRiskColor()}, 0 0 60px ${getRiskColor()}, inset 0 0 10px rgba(255,255,255,0.3)`
-            : `0 0 20px ${getRiskColor()}, inset 0 0 8px rgba(255,255,255,0.5)`,
+            ? `0 0 40px ${getRiskColor()}, 0 0 60px ${getRiskColor()}, inset 0 0 4px rgba(0,0,0,0.8), 0 0 2px ${getRiskColor()}`
+            : `0 0 20px ${getRiskColor()}, inset 0 0 4px rgba(0,0,0,0.6), 0 0 1px ${getRiskColor()}`,
         }}
       />
 
