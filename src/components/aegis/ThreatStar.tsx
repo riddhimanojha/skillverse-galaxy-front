@@ -6,6 +6,7 @@ interface ThreatStarProps {
   x: number;
   y: number;
   onClick: () => void;
+  entranceDelay?: number;
 }
 
 const getRiskColor = (isVulnerable: boolean, riskWeight: number | null) => {
@@ -16,7 +17,7 @@ const getRiskColor = (isVulnerable: boolean, riskWeight: number | null) => {
   return '#E03E84';
 };
 
-export const ThreatStar = memo(({ node, x, y, onClick }: ThreatStarProps) => {
+export const ThreatStar = memo(({ node, x, y, onClick, entranceDelay = 0 }: ThreatStarProps) => {
   const [hover, setHover] = useState(false);
   const isVulnerable = node.is_vulnerable;
   const color = getRiskColor(isVulnerable, node.risk_weight);
@@ -29,13 +30,35 @@ export const ThreatStar = memo(({ node, x, y, onClick }: ThreatStarProps) => {
         top: `${y}%`,
         transform: "translate(-50%, -50%)",
         zIndex: hover ? 20 : 10,
-        willChange: 'transform',
+        opacity: 0,
+        animation: `starEntrance 0.6s ease-out ${entranceDelay}s forwards`,
       }}
       onClick={onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {/* Visual container with GPU-accelerated transform */}
+      {/* Keyframes for smooth entrance */}
+      <style>{`
+        @keyframes starEntrance {
+          0% {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.3);
+          }
+          60% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
+          }
+          100% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+        @keyframes glowPulse {
+          0%, 100% { opacity: 0.15; transform: scale(1); }
+          50% { opacity: 0.25; transform: scale(1.1); }
+        }
+      `}</style>
+
       <div
         className="transition-transform duration-200"
         style={{
@@ -43,9 +66,9 @@ export const ThreatStar = memo(({ node, x, y, onClick }: ThreatStarProps) => {
           willChange: 'transform',
         }}
       >
-        {/* Glow aura - simplified, no blur filter */}
+        {/* Glow aura */}
         <div
-          className="absolute rounded-full transition-opacity duration-300"
+          className="absolute rounded-full"
           style={{
             width: "40px",
             height: "40px",
@@ -53,6 +76,7 @@ export const ThreatStar = memo(({ node, x, y, onClick }: ThreatStarProps) => {
             backgroundColor: color,
             opacity: isVulnerable ? 0.25 : 0.15,
             filter: 'blur(8px)',
+            animation: isVulnerable ? 'glowPulse 3s ease-in-out infinite' : 'none',
           }}
         />
         
@@ -84,10 +108,10 @@ export const ThreatStar = memo(({ node, x, y, onClick }: ThreatStarProps) => {
         </div>
       )}
 
-      {/* Hover tooltip - only render when needed */}
+      {/* Hover tooltip */}
       {hover && (
         <div 
-          className="absolute left-1/2 -translate-x-1/2 mt-8 w-72 rounded-xl z-50 overflow-hidden"
+          className="absolute left-1/2 -translate-x-1/2 mt-8 w-72 rounded-xl z-50 overflow-hidden animate-fade-in"
           style={{ 
             top: '100%',
             background: 'rgba(18, 8, 12, 0.95)',
@@ -120,10 +144,7 @@ export const ThreatStar = memo(({ node, x, y, onClick }: ThreatStarProps) => {
               <div className="flex items-center gap-2 mt-1.5">
                 <span 
                   className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase"
-                  style={{
-                    background: 'rgba(224, 62, 132, 0.2)',
-                    color: '#E03E84',
-                  }}
+                  style={{ background: 'rgba(224, 62, 132, 0.2)', color: '#E03E84' }}
                 >
                   {node.severity}
                 </span>
