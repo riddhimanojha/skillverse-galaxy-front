@@ -137,77 +137,103 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
             {/* Content */}
             <ScrollArea className="flex-1">
               <div className="p-6 space-y-6">
-                {/* Affected File */}
-                {selectedNode.file_name && (
-                  <div className="space-y-2">
-                    <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                      Affected File
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <FileCode className="w-4 h-4 text-cyan-400" />
-                      <code className="font-mono text-sm text-cyan-400 bg-cyan-500/10 px-3 py-1.5 rounded-lg">
-                        {selectedNode.file_name}
-                        {selectedNode.line_no && <span className="text-muted-foreground">:{selectedNode.line_no}</span>}
-                      </code>
-                    </div>
-                  </div>
-                )}
-
-                {/* Vulnerable Code */}
-                {selectedNode.file_content && selectedNode.is_vulnerable && (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Bug className="w-4 h-4 text-red-400" />
-                        <span className="text-xs text-red-400 uppercase tracking-wider font-semibold">
-                          Vulnerable Code
+                {/* Show different content based on vulnerability status */}
+                {selectedNode.is_vulnerable ? (
+                  <>
+                    {/* Affected File */}
+                    {selectedNode.file_name && (
+                      <div className="space-y-2">
+                        <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+                          Affected File
                         </span>
+                        <div className="flex items-center gap-2">
+                          <FileCode className="w-4 h-4 text-cyan-400" />
+                          <code className="font-mono text-sm text-cyan-400 bg-cyan-500/10 px-3 py-1.5 rounded-lg">
+                            {selectedNode.file_name}
+                            {selectedNode.line_no && <span className="text-muted-foreground">:{selectedNode.line_no}</span>}
+                          </code>
+                        </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleCopyVuln}
-                        className="h-7 px-3 text-xs hover:bg-red-500/20 text-muted-foreground hover:text-red-400"
-                      >
-                        {copiedVuln ? <Check className="w-3 h-3 mr-1.5" /> : <Copy className="w-3 h-3 mr-1.5" />}
-                        {copiedVuln ? "Copied" : "Copy"}
-                      </Button>
+                    )}
+
+                    {/* Vulnerable Code */}
+                    {selectedNode.file_content && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Bug className="w-4 h-4 text-red-400" />
+                            <span className="text-xs text-red-400 uppercase tracking-wider font-semibold">
+                              Vulnerable Code
+                            </span>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleCopyVuln}
+                            className="h-7 px-3 text-xs hover:bg-red-500/20 text-muted-foreground hover:text-red-400"
+                          >
+                            {copiedVuln ? <Check className="w-3 h-3 mr-1.5" /> : <Copy className="w-3 h-3 mr-1.5" />}
+                            {copiedVuln ? "Copied" : "Copy"}
+                          </Button>
+                        </div>
+                        <div className="bg-red-950/40 rounded-xl border border-red-500/30 overflow-hidden">
+                          <pre className="p-4 overflow-x-auto max-w-full">
+                            <code className="font-mono text-sm break-all whitespace-pre-wrap">{renderCodeBlock(selectedNode.file_content, "vulnerable")}</code>
+                          </pre>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Fixed Code Preview */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Shield className="w-4 h-4 text-green-400" />
+                          <span className="text-xs text-green-400 uppercase tracking-wider font-semibold">
+                            Recommended Fix
+                          </span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleCopyFix}
+                          className="h-7 px-3 text-xs hover:bg-green-500/20 text-muted-foreground hover:text-green-400"
+                        >
+                          {copiedFix ? <Check className="w-3 h-3 mr-1.5" /> : <Copy className="w-3 h-3 mr-1.5" />}
+                          {copiedFix ? "Copied" : "Copy"}
+                        </Button>
+                      </div>
+                      <div className="bg-green-950/30 rounded-xl border border-green-500/30 overflow-hidden">
+                        <pre className="p-4 overflow-x-auto max-w-full">
+                          <code className="font-mono text-sm break-all whitespace-pre-wrap">
+                            {renderCodeBlock(selectedNode.fix_code || selectedNode.occam_fix, "fix")}
+                          </code>
+                        </pre>
+                      </div>
                     </div>
-                    <div className="bg-red-950/40 rounded-xl border border-red-500/30 overflow-hidden">
-                      <pre className="p-4 overflow-x-auto max-w-full">
-                        <code className="font-mono text-sm break-all whitespace-pre-wrap">{renderCodeBlock(selectedNode.file_content, "vulnerable")}</code>
-                      </pre>
+                  </>
+                ) : (
+                  /* Already Secured - No Fix Needed */
+                  <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
+                    <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center">
+                      <Shield className="w-10 h-10 text-green-400" />
                     </div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-bold text-green-400">Already Secured</h3>
+                      <p className="text-muted-foreground text-sm max-w-xs">
+                        This node has been patched and no longer requires any action. The vulnerability has been resolved.
+                      </p>
+                    </div>
+                    {selectedNode.file_name && (
+                      <div className="flex items-center gap-2 mt-4 bg-green-500/10 px-4 py-2 rounded-lg">
+                        <FileCode className="w-4 h-4 text-green-400" />
+                        <code className="font-mono text-sm text-green-400">
+                          {selectedNode.file_name}
+                        </code>
+                      </div>
+                    )}
                   </div>
                 )}
-
-                {/* Fixed Code Preview */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-green-400" />
-                      <span className="text-xs text-green-400 uppercase tracking-wider font-semibold">
-                        Fixed Code Preview
-                      </span>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleCopyFix}
-                      className="h-7 px-3 text-xs hover:bg-green-500/20 text-muted-foreground hover:text-green-400"
-                    >
-                      {copiedFix ? <Check className="w-3 h-3 mr-1.5" /> : <Copy className="w-3 h-3 mr-1.5" />}
-                      {copiedFix ? "Copied" : "Copy"}
-                    </Button>
-                  </div>
-                  <div className="bg-green-950/30 rounded-xl border border-green-500/30 overflow-hidden">
-                    <pre className="p-4 overflow-x-auto max-w-full">
-                      <code className="font-mono text-sm break-all whitespace-pre-wrap">
-                        {renderCodeBlock(selectedNode.fix_code || selectedNode.occam_fix, "fix")}
-                      </code>
-                    </pre>
-                  </div>
-                </div>
               </div>
             </ScrollArea>
 

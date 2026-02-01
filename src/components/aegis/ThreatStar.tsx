@@ -121,26 +121,30 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
           <div className={`font-bold ${isVulnerable ? 'text-red-400' : 'text-green-400'}`}>
             {isVulnerable ? '🚨 ' : '🛡️ '}{node.category_name}
           </div>
-          {node.file_name && (
-            <div className="text-xs text-cyan-400 font-mono mt-1">
-              📄 {node.file_name}{node.line_no ? `:${node.line_no}` : ''}
+          {isVulnerable ? (
+            <>
+              {node.file_name && (
+                <div className="text-xs text-cyan-400 font-mono mt-1">
+                  📄 {node.file_name}{node.line_no ? `:${node.line_no}` : ''}
+                </div>
+              )}
+              <div className="flex items-center gap-2 mt-1.5">
+                <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                  node.severity === 'Critical' 
+                    ? 'bg-red-500/30 text-red-300' 
+                    : node.severity === 'High'
+                    ? 'bg-orange-500/30 text-orange-300'
+                    : 'bg-yellow-500/30 text-yellow-300'
+                }`}>
+                  {node.severity}
+                </span>
+              </div>
+              <div className="text-xs text-muted-foreground mt-1.5">Click to inspect</div>
+            </>
+          ) : (
+            <div className="text-xs text-green-400/80 mt-1">
+              ✓ No action needed
             </div>
-          )}
-          <div className="flex items-center gap-2 mt-1.5">
-            <span className={`px-2 py-0.5 rounded text-xs font-bold ${
-              isVulnerable 
-                ? node.severity === 'Critical' 
-                  ? 'bg-red-500/30 text-red-300' 
-                  : node.severity === 'High'
-                  ? 'bg-orange-500/30 text-orange-300'
-                  : 'bg-yellow-500/30 text-yellow-300'
-                : 'bg-green-500/30 text-green-300'
-            }`}>
-              {isVulnerable ? node.severity : 'Secure'}
-            </span>
-          </div>
-          {isVulnerable && (
-            <div className="text-xs text-muted-foreground mt-1.5">Click to inspect</div>
           )}
         </div>
       )}
