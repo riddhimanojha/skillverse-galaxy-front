@@ -14,7 +14,8 @@ const Index = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 });
   const [selectedNode, setSelectedNode] = useState<SecurityNode | null>(null);
 
-  const { nodes, loading, deployPatch, getStats } = useSecurityNodes();
+  const { loading, deployPatch, getOpenNodes, getStats } = useSecurityNodes();
+  const openNodes = getOpenNodes();
   const stats = getStats();
 
   // Mouse tracking for parallax
@@ -91,7 +92,7 @@ const Index = () => {
       {/* Threat Galaxy - Stars/Nodes */}
       <div className="relative w-full h-screen pt-20">
         <ThreatGalaxy 
-          nodes={nodes} 
+          nodes={openNodes} 
           onNodeClick={handleNodeClick}
         />
       </div>
