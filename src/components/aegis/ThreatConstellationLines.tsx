@@ -69,54 +69,17 @@ export const ThreatConstellationLines = ({ nodes, nodePositions }: ThreatConstel
   
   return (
     <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-      <defs>
-        <linearGradient id="secureGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="hsl(160, 100%, 50%)" stopOpacity="0.3" />
-          <stop offset="50%" stopColor="hsl(180, 100%, 50%)" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="hsl(160, 100%, 50%)" stopOpacity="0.3" />
-        </linearGradient>
-        <linearGradient id="threatGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="hsl(0, 100%, 55%)" stopOpacity="0.5" />
-          <stop offset="50%" stopColor="hsl(0, 100%, 65%)" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="hsl(0, 100%, 55%)" stopOpacity="0.5" />
-        </linearGradient>
-        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      
       {lines.map((line, index) => (
-        <g key={index}>
-          {/* Glow layer */}
-          {line.threatened && (
-            <line
-              x1={`${line.x1}%`}
-              y1={`${line.y1}%`}
-              x2={`${line.x2}%`}
-              y2={`${line.y2}%`}
-              stroke="hsl(0, 100%, 55%)"
-              strokeWidth="6"
-              strokeOpacity="0.3"
-              style={{ filter: "blur(4px)" }}
-            />
-          )}
-          {/* Main line */}
-          <line
-            x1={`${line.x1}%`}
-            y1={`${line.y1}%`}
-            x2={`${line.x2}%`}
-            y2={`${line.y2}%`}
-            stroke={line.threatened ? "url(#threatGradient)" : "url(#secureGradient)"}
-            strokeWidth={line.threatened ? "2.5" : "1.5"}
-            strokeDasharray={line.threatened ? "none" : "8,4"}
-            className={line.threatened ? "animate-pulse" : ""}
-            style={{ filter: "url(#glow)" }}
-          />
-        </g>
+        <line
+          key={index}
+          x1={`${line.x1}%`}
+          y1={`${line.y1}%`}
+          x2={`${line.x2}%`}
+          y2={`${line.y2}%`}
+          stroke="hsl(280, 60%, 50%)"
+          strokeWidth="1.5"
+          strokeOpacity="0.6"
+        />
       ))}
     </svg>
   );
