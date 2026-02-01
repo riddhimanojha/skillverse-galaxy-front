@@ -22,14 +22,17 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
     }
   }, [isVulnerable]);
 
-  const getSeverityColor = () => {
+  const getRiskColor = () => {
     if (!isVulnerable) return 'hsl(160, 100%, 50%)'; // Secure green
-    switch (node.severity) {
-      case 'Critical': return 'hsl(0, 100%, 55%)';
-      case 'High': return 'hsl(25, 100%, 55%)';
-      case 'Medium': return 'hsl(45, 100%, 55%)';
-      default: return 'hsl(0, 100%, 55%)';
-    }
+    
+    // Use risk_weight to determine color (0-100 scale)
+    const weight = node.risk_weight ?? 50;
+    
+    if (weight >= 80) return 'hsl(0, 90%, 55%)';    // Red - critical risk
+    if (weight >= 60) return 'hsl(15, 90%, 55%)';   // Red-orange
+    if (weight >= 40) return 'hsl(30, 90%, 55%)';   // Orange
+    if (weight >= 20) return 'hsl(45, 90%, 55%)';   // Yellow-orange
+    return 'hsl(55, 85%, 50%)';                      // Yellow - low risk
   };
 
   return (
@@ -56,8 +59,8 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
             width: "50px", 
             height: "50px", 
             margin: "-20px",
-            backgroundColor: "hsl(160, 100%, 50%)" 
-          }} 
+            backgroundColor: getRiskColor() 
+          }}
         />
       )}
 
@@ -69,8 +72,8 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
             width: "45px", 
             height: "45px", 
             margin: "-18px",
-            backgroundColor: getSeverityColor(),
-            opacity: 0.35,
+            backgroundColor: getRiskColor(),
+            opacity: 0.4,
           }} 
         />
       )}
@@ -84,8 +87,8 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
           width: hover ? "60px" : "50px",
           height: hover ? "60px" : "50px",
           margin: hover ? "-25px" : "-20px",
-          backgroundColor: getSeverityColor(),
-          opacity: isVulnerable ? 0.8 : 0.5,
+          backgroundColor: getRiskColor(),
+          opacity: isVulnerable ? 0.75 : 0.5,
         }}
       />
       
@@ -95,10 +98,10 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
         style={{
           width: isVulnerable ? "16px" : "12px",
           height: isVulnerable ? "16px" : "12px",
-          backgroundColor: getSeverityColor(),
+          backgroundColor: getRiskColor(),
           boxShadow: isVulnerable
-            ? `0 0 40px ${getSeverityColor()}, 0 0 60px ${getSeverityColor()}, inset 0 0 10px rgba(255,255,255,0.3)`
-            : `0 0 20px ${getSeverityColor()}, inset 0 0 8px rgba(255,255,255,0.5)`,
+            ? `0 0 40px ${getRiskColor()}, 0 0 60px ${getRiskColor()}, inset 0 0 10px rgba(255,255,255,0.3)`
+            : `0 0 20px ${getRiskColor()}, inset 0 0 8px rgba(255,255,255,0.5)`,
         }}
       />
 
