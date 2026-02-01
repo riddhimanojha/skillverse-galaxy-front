@@ -13,6 +13,12 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
   const [hover, setHover] = useState(false);
 
   const isVulnerable = node.is_vulnerable;
+  
+  // Generate unique animation parameters based on node id for organic variation
+  const seed = node.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const animationDuration = 8 + (seed % 6); // 8-14 seconds
+  const animationDelay = (seed % 4); // 0-4 seconds delay
+  const driftAngle = (seed * 137.5) % 360; // Unique drift direction
 
   useEffect(() => {
     if (!isVulnerable) {
@@ -32,6 +38,16 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
     return 'hsl(0, 85%, 55%)';                     // Red
   };
 
+  // CSS keyframes for ambient drift - applied to inner content
+  const driftKeyframes = `
+    @keyframes drift-${seed} {
+      0%, 100% { transform: translate(0px, 0px); }
+      25% { transform: translate(${Math.cos(driftAngle * Math.PI / 180) * 2}px, ${Math.sin(driftAngle * Math.PI / 180) * 1.5}px); }
+      50% { transform: translate(${Math.cos((driftAngle + 90) * Math.PI / 180) * 1.5}px, ${Math.sin((driftAngle + 90) * Math.PI / 180) * 2}px); }
+      75% { transform: translate(${Math.cos((driftAngle + 180) * Math.PI / 180) * 2}px, ${Math.sin((driftAngle + 180) * Math.PI / 180) * 1}px); }
+    }
+  `;
+
   return (
     <div
       className="absolute duration-300 ease-out cursor-pointer"
@@ -48,61 +64,71 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {/* Secure ripple effect */}
-      {ripple && !isVulnerable && (
-        <div 
-          className="absolute inset-0 rounded-full animate-ping opacity-60" 
-          style={{ 
-            width: "50px", 
-            height: "50px", 
-            margin: "-20px",
-            backgroundColor: getRiskColor() 
+      {/* Inject unique drift keyframes */}
+      <style>{driftKeyframes}</style>
+      
+      {/* Ambient drift wrapper for visual elements */}
+      <div
+        style={{
+          animation: `drift-${seed} ${animationDuration}s ease-in-out ${animationDelay}s infinite`,
+        }}
+      >
+        {/* Secure ripple effect */}
+        {ripple && !isVulnerable && (
+          <div 
+            className="absolute inset-0 rounded-full animate-ping opacity-60" 
+            style={{ 
+              width: "50px", 
+              height: "50px", 
+              margin: "-20px",
+              backgroundColor: getRiskColor() 
+            }}
+          />
+        )}
+
+        {/* Vulnerability pulse effect */}
+        {isVulnerable && (
+          <div 
+            className="absolute inset-0 rounded-full animate-ping" 
+            style={{ 
+              width: "45px", 
+              height: "45px", 
+              margin: "-18px",
+              backgroundColor: getRiskColor(),
+              opacity: 0.4,
+            }} 
+          />
+        )}
+        
+        {/* Pulsing glow aura */}
+        <div
+          className={`absolute inset-0 rounded-full blur-2xl transition-all duration-700 ${
+            isVulnerable ? "animate-pulse" : ""
+          }`}
+          style={{
+            width: hover ? "60px" : "50px",
+            height: hover ? "60px" : "50px",
+            margin: hover ? "-25px" : "-20px",
+            backgroundColor: getRiskColor(),
+            opacity: isVulnerable ? 0.75 : 0.5,
           }}
         />
-      )}
-
-      {/* Vulnerability pulse effect */}
-      {isVulnerable && (
-        <div 
-          className="absolute inset-0 rounded-full animate-ping" 
-          style={{ 
-            width: "45px", 
-            height: "45px", 
-            margin: "-18px",
+        
+        {/* Core star */}
+        <div
+          className="relative rounded-full transition-all duration-500"
+          style={{
+            width: isVulnerable ? "16px" : "12px",
+            height: isVulnerable ? "16px" : "12px",
             backgroundColor: getRiskColor(),
-            opacity: 0.4,
-          }} 
+            boxShadow: isVulnerable
+              ? `0 0 40px ${getRiskColor()}, 0 0 60px ${getRiskColor()}, inset 0 0 10px rgba(255,255,255,0.3)`
+              : `0 0 20px ${getRiskColor()}, inset 0 0 8px rgba(255,255,255,0.5)`,
+          }}
         />
-      )}
-      
-      {/* Pulsing glow aura */}
-      <div
-        className={`absolute inset-0 rounded-full blur-2xl transition-all duration-700 ${
-          isVulnerable ? "animate-pulse" : ""
-        }`}
-        style={{
-          width: hover ? "60px" : "50px",
-          height: hover ? "60px" : "50px",
-          margin: hover ? "-25px" : "-20px",
-          backgroundColor: getRiskColor(),
-          opacity: isVulnerable ? 0.75 : 0.5,
-        }}
-      />
-      
-      {/* Core star */}
-      <div
-        className="relative rounded-full transition-all duration-500"
-        style={{
-          width: isVulnerable ? "16px" : "12px",
-          height: isVulnerable ? "16px" : "12px",
-          backgroundColor: getRiskColor(),
-          boxShadow: isVulnerable
-            ? `0 0 40px ${getRiskColor()}, 0 0 60px ${getRiskColor()}, inset 0 0 10px rgba(255,255,255,0.3)`
-            : `0 0 20px ${getRiskColor()}, inset 0 0 8px rgba(255,255,255,0.5)`,
-        }}
-      />
+      </div>
 
-      {/* Persistent file name label */}
+      {/* Persistent file name label - outside drift wrapper to stay stable */}
       {node.file_name && (
         <div 
           className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none"
