@@ -1,7 +1,7 @@
 import { SecurityNode } from "@/types/securityNode";
 import { FileRelationship } from "@/types/fileRelationship";
 import { ThreatStar } from "./ThreatStar";
-import { ThreatConstellationLines } from "./ThreatConstellationLines";
+import { useMemo } from "react";
 
 interface ThreatGalaxyProps {
   nodes: SecurityNode[];
@@ -30,43 +30,20 @@ const constellationPatterns = [
     { x: 45, y: 60 },   // Extra
     { x: 55, y: 60 },   // Extra
   ],
-  // Big Dipper-like pattern
-  [
-    { x: 20, y: 30 },
-    { x: 30, y: 25 },
-    { x: 40, y: 28 },
-    { x: 50, y: 35 },
-    { x: 55, y: 50 },
-    { x: 65, y: 55 },
-    { x: 75, y: 50 },
-    { x: 70, y: 40 },
-    { x: 60, y: 38 },
-    { x: 45, y: 55 },
-    { x: 35, y: 60 },
-    { x: 25, y: 65 },
-    { x: 80, y: 65 },
-    { x: 85, y: 35 },
-    { x: 15, y: 45 },
-    { x: 50, y: 70 },
-  ],
 ];
 
 // Generate constellation positions with slight randomization for organic feel
 const getNodePositions = (nodes: SecurityNode[]) => {
-  const pattern = constellationPatterns[0]; // Use Orion-like pattern
+  const pattern = constellationPatterns[0];
   
   return nodes.map((node, index) => {
-    // Use predefined position or generate one based on pattern
     const basePos = pattern[index % pattern.length];
-    
-    // Add slight variation using node id as seed for consistency
     const seed = node.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const offsetX = ((seed % 100) / 100 - 0.5) * 8; // ±4% variation
+    const offsetX = ((seed % 100) / 100 - 0.5) * 8;
     const offsetY = (((seed * 7) % 100) / 100 - 0.5) * 8;
     
-    // If we have more nodes than pattern positions, spiral outward
     if (index >= pattern.length) {
-      const angle = (index * 137.5 * Math.PI) / 180; // Golden angle
+      const angle = (index * 137.5 * Math.PI) / 180;
       const radius = 15 + (index - pattern.length) * 5;
       return {
         x: 50 + Math.cos(angle) * radius,
@@ -81,6 +58,38 @@ const getNodePositions = (nodes: SecurityNode[]) => {
   });
 };
 
+// Eye-safe color palette - desaturated, darkened
+const getEdgeColor = (riskWeight: number | null, isVulnerable: boolean) => {
+  if (!isVulnerable) {
+    // Light mint green - calm, low-saturation
+    return {
+      stroke: 'hsl(160, 35%, 45%)',
+      glow: 'hsl(160, 30%, 40%)',
+    };
+  }
+  
+  const weight = riskWeight ?? 5;
+  
+  if (weight >= 7) {
+    // High-risk: muted deep red - warm and dark
+    return {
+      stroke: 'hsl(355, 45%, 40%)',
+      glow: 'hsl(355, 40%, 35%)',
+    };
+  } else if (weight >= 4) {
+    // Medium: amber / soft orange
+    return {
+      stroke: 'hsl(35, 50%, 45%)',
+      glow: 'hsl(35, 45%, 40%)',
+    };
+  }
+  // Low: cool cyan / teal
+  return {
+    stroke: 'hsl(185, 40%, 45%)',
+    glow: 'hsl(185, 35%, 40%)',
+  };
+};
+
 export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxyProps) => {
   const positions = getNodePositions(nodes);
   
@@ -90,70 +99,183 @@ export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxy
     y: positions[index]?.y ?? 50,
   }));
 
+  // Build edge data with colors and animation delays
+  const edges = useMemo(() => {
+    return relationships.map((rel, index) => {
+      const fromNode = nodes.find(n => n.file_name === rel.from_file);
+      const toNode = nodes.find(n => n.file_name === rel.to_file);
+      
+      if (!fromNode || !toNode) return null;
+      
+      const fromPos = nodePositions.find(p => p.id === fromNode.id);
+      const toPos = nodePositions.find(p => p.id === toNode.id);
+      
+      if (!fromPos || !toPos) return null;
+      
+      const colors = getEdgeColor(fromNode.risk_weight, fromNode.is_vulnerable);
+      const delay = index * 0.15; // Stagger animations
+      
+      // Calculate line length for animation
+      const dx = (toPos.x - fromPos.x);
+      const dy = (toPos.y - fromPos.y);
+      const length = Math.sqrt(dx * dx + dy * dy);
+      
+      return {
+        id: `edge-${index}`,
+        x1: fromPos.x,
+        y1: fromPos.y,
+        x2: toPos.x,
+        y2: toPos.y,
+        colors,
+        delay,
+        length,
+      };
+    }).filter(Boolean);
+  }, [relationships, nodes, nodePositions]);
+
   return (
     <div className="relative w-full h-full">
-      {/* Constellation lines from file_relationships */}
+      {/* SVG for edges with soft glow filters */}
       <svg 
         className="absolute inset-0 w-full h-full pointer-events-none z-0"
         style={{ overflow: 'visible' }}
       >
         <defs>
-          {nodePositions.map((pos, index) => {
-            const node = nodes[index];
-            const isVulnerable = node?.is_vulnerable;
-            const riskWeight = node?.risk_weight ?? 5;
-            
-            let color = 'hsl(145, 70%, 45%)'; // Green - secure
-            if (isVulnerable) {
-              if (riskWeight >= 7) color = 'hsl(0, 85%, 55%)';
-              else if (riskWeight >= 3) color = 'hsl(30, 90%, 55%)';
-              else color = 'hsl(45, 90%, 55%)';
-            }
-            
-            return (
-              <linearGradient
-                key={`gradient-${index}`}
-                id={`line-gradient-${index}`}
-                x1="0%"
-                y1="0%"
-                x2="100%"
-                y2="0%"
-              >
-                <stop offset="0%" stopColor={color} stopOpacity="0.3" />
-                <stop offset="50%" stopColor={color} stopOpacity="0.7" />
-                <stop offset="100%" stopColor={color} stopOpacity="0.3" />
-              </linearGradient>
-            );
-          })}
+          {/* Soft glow filter - diffuse, ambient light feel */}
+          <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur1" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur2" />
+            <feMerge>
+              <feMergeNode in="blur2" />
+              <feMergeNode in="blur1" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          
+          {/* Even softer outer glow for ambient effect */}
+          <filter id="ambient-glow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur" />
+            <feComponentTransfer in="blur">
+              <feFuncA type="linear" slope="0.25" />
+            </feComponentTransfer>
+          </filter>
+
+          {/* Gradient for energy flow animation */}
+          {edges.map((edge, i) => edge && (
+            <linearGradient
+              key={`gradient-${i}`}
+              id={`energy-gradient-${i}`}
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="0%"
+            >
+              <stop offset="0%" stopColor={edge.colors.stroke} stopOpacity="0.15" />
+              <stop offset="40%" stopColor={edge.colors.stroke} stopOpacity="0.5">
+                <animate
+                  attributeName="offset"
+                  values="0;0.6;1;0"
+                  dur="4s"
+                  repeatCount="indefinite"
+                  begin={`${edge.delay + 1.5}s`}
+                />
+              </stop>
+              <stop offset="50%" stopColor={edge.colors.glow} stopOpacity="0.7">
+                <animate
+                  attributeName="offset"
+                  values="0.1;0.7;1.1;0.1"
+                  dur="4s"
+                  repeatCount="indefinite"
+                  begin={`${edge.delay + 1.5}s`}
+                />
+              </stop>
+              <stop offset="60%" stopColor={edge.colors.stroke} stopOpacity="0.5">
+                <animate
+                  attributeName="offset"
+                  values="0.2;0.8;1.2;0.2"
+                  dur="4s"
+                  repeatCount="indefinite"
+                  begin={`${edge.delay + 1.5}s`}
+                />
+              </stop>
+              <stop offset="100%" stopColor={edge.colors.stroke} stopOpacity="0.15" />
+            </linearGradient>
+          ))}
         </defs>
         
-        {/* Draw lines based on relationships */}
-        {relationships.map((rel, index) => {
-          const fromNode = nodes.find(n => n.file_name === rel.from_file);
-          const toNode = nodes.find(n => n.file_name === rel.to_file);
-          
-          if (!fromNode || !toNode) return null;
-          
-          const fromPos = nodePositions.find(p => p.id === fromNode.id);
-          const toPos = nodePositions.find(p => p.id === toNode.id);
-          
-          if (!fromPos || !toPos) return null;
-          
-          const fromIdx = nodes.findIndex(n => n.id === fromNode.id);
-          
-          return (
+        {/* Render edges with layered glow effect */}
+        {edges.map((edge, index) => edge && (
+          <g key={edge.id}>
+            {/* Ambient outer glow layer - very soft */}
             <line
-              key={`line-${index}`}
-              x1={`${fromPos.x}%`}
-              y1={`${fromPos.y}%`}
-              x2={`${toPos.x}%`}
-              y2={`${toPos.y}%`}
-              stroke={`url(#line-gradient-${fromIdx})`}
-              strokeWidth="1.5"
+              x1={`${edge.x1}%`}
+              y1={`${edge.y1}%`}
+              x2={`${edge.x2}%`}
+              y2={`${edge.y2}%`}
+              stroke={edge.colors.glow}
+              strokeWidth="6"
               strokeLinecap="round"
+              opacity="0.12"
+              filter="url(#ambient-glow)"
+              style={{
+                strokeDasharray: `${edge.length * 10}`,
+                strokeDashoffset: `${edge.length * 10}`,
+                animation: `drawLine 1.4s ease-out ${edge.delay}s forwards`,
+              }}
             />
-          );
-        })}
+            
+            {/* Inner glow layer */}
+            <line
+              x1={`${edge.x1}%`}
+              y1={`${edge.y1}%`}
+              x2={`${edge.x2}%`}
+              y2={`${edge.y2}%`}
+              stroke={edge.colors.glow}
+              strokeWidth="3"
+              strokeLinecap="round"
+              opacity="0.2"
+              filter="url(#soft-glow)"
+              style={{
+                strokeDasharray: `${edge.length * 10}`,
+                strokeDashoffset: `${edge.length * 10}`,
+                animation: `drawLine 1.4s ease-out ${edge.delay}s forwards`,
+              }}
+            />
+            
+            {/* Main line with energy flow gradient */}
+            <line
+              x1={`${edge.x1}%`}
+              y1={`${edge.y1}%`}
+              x2={`${edge.x2}%`}
+              y2={`${edge.y2}%`}
+              stroke={`url(#energy-gradient-${index})`}
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              style={{
+                strokeDasharray: `${edge.length * 10}`,
+                strokeDashoffset: `${edge.length * 10}`,
+                animation: `drawLine 1.4s ease-out ${edge.delay}s forwards`,
+              }}
+            />
+            
+            {/* Core solid line */}
+            <line
+              x1={`${edge.x1}%`}
+              y1={`${edge.y1}%`}
+              x2={`${edge.x2}%`}
+              y2={`${edge.y2}%`}
+              stroke={edge.colors.stroke}
+              strokeWidth="1.4"
+              strokeLinecap="round"
+              opacity="0.6"
+              style={{
+                strokeDasharray: `${edge.length * 10}`,
+                strokeDashoffset: `${edge.length * 10}`,
+                animation: `drawLine 1.4s ease-out ${edge.delay}s forwards`,
+              }}
+            />
+          </g>
+        ))}
       </svg>
       
       {/* Stars */}
@@ -166,6 +288,15 @@ export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxy
           onClick={() => onNodeClick(node)}
         />
       ))}
+      
+      {/* CSS for draw animation */}
+      <style>{`
+        @keyframes drawLine {
+          to {
+            stroke-dashoffset: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 };
