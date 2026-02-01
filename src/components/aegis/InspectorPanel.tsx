@@ -156,7 +156,7 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                       </div>
                     )}
 
-                    {/* Vulnerable Code */}
+                    {/* Vulnerable Code - Glassmorphic Code Surface */}
                     {selectedNode.file_content && (
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
@@ -176,15 +176,46 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                             {copiedVuln ? "Copied" : "Copy"}
                           </Button>
                         </div>
-                        <div className="bg-[#1A0A10] rounded-xl border border-[#7A1E3A]/30 overflow-hidden">
-                          <pre className="p-4 overflow-x-auto max-w-full">
-                            <code className="font-mono text-sm break-all whitespace-pre-wrap">{renderCodeBlock(selectedNode.file_content, "vulnerable")}</code>
+                        {/* Glassmorphic code surface with vignette */}
+                        <div 
+                          className="relative rounded-2xl overflow-hidden"
+                          style={{
+                            background: 'linear-gradient(135deg, rgba(26, 10, 16, 0.95) 0%, rgba(18, 8, 12, 0.98) 100%)',
+                            backdropFilter: 'blur(12px)',
+                            border: '1px solid rgba(122, 30, 58, 0.25)',
+                            boxShadow: 'inset 0 0 60px rgba(0, 0, 0, 0.4), 0 8px 32px rgba(0, 0, 0, 0.3)',
+                          }}
+                        >
+                          {/* Risk-level accent bar */}
+                          <div 
+                            className="absolute left-0 top-0 bottom-0 w-1"
+                            style={{
+                              background: selectedNode.severity === 'Critical' 
+                                ? 'linear-gradient(180deg, #E03E84 0%, #7A1E3A 100%)'
+                                : selectedNode.severity === 'High'
+                                ? 'linear-gradient(180deg, #9A2E4A 0%, #5A1530 100%)'
+                                : 'linear-gradient(180deg, #7A1E3A 0%, #3A0E1D 100%)',
+                            }}
+                          />
+                          <pre 
+                            className="p-5 pl-6 overflow-x-auto max-w-full"
+                            style={{ lineHeight: '1.75' }}
+                          >
+                            <code 
+                              className="break-all whitespace-pre-wrap"
+                              style={{ 
+                                fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
+                                fontSize: '13px',
+                              }}
+                            >
+                              {renderCodeBlock(selectedNode.file_content, "vulnerable")}
+                            </code>
                           </pre>
                         </div>
                       </div>
                     )}
 
-                    {/* Fixed Code Preview */}
+                    {/* Fixed Code Preview - Glassmorphic Code Surface */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -203,9 +234,34 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                           {copiedFix ? "Copied" : "Copy"}
                         </Button>
                       </div>
-                      <div className="bg-[#0A1015] rounded-xl border border-[#7FB7D6]/30 overflow-hidden">
-                        <pre className="p-4 overflow-x-auto max-w-full">
-                          <code className="font-mono text-sm break-all whitespace-pre-wrap">
+                      {/* Glassmorphic code surface with vignette */}
+                      <div 
+                        className="relative rounded-2xl overflow-hidden"
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(10, 16, 21, 0.95) 0%, rgba(8, 12, 18, 0.98) 100%)',
+                          backdropFilter: 'blur(12px)',
+                          border: '1px solid rgba(127, 183, 214, 0.2)',
+                          boxShadow: 'inset 0 0 60px rgba(0, 0, 0, 0.35), 0 8px 32px rgba(0, 0, 0, 0.25)',
+                        }}
+                      >
+                        {/* Secure accent bar */}
+                        <div 
+                          className="absolute left-0 top-0 bottom-0 w-1"
+                          style={{
+                            background: 'linear-gradient(180deg, #7FB7D6 0%, #4A8BA8 100%)',
+                          }}
+                        />
+                        <pre 
+                          className="p-5 pl-6 overflow-x-auto max-w-full"
+                          style={{ lineHeight: '1.75' }}
+                        >
+                          <code 
+                            className="break-all whitespace-pre-wrap"
+                            style={{ 
+                              fontFamily: "'JetBrains Mono', 'SF Mono', monospace",
+                              fontSize: '13px',
+                            }}
+                          >
                             {renderCodeBlock(selectedNode.fix_code || selectedNode.occam_fix, "fix")}
                           </code>
                         </pre>

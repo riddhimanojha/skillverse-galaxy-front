@@ -1,25 +1,79 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { SecurityNode } from "@/types/securityNode";
+import { generateNoiseDrift, seededRandom } from "@/utils/noiseGenerator";
 
 interface ThreatStarProps {
   node: SecurityNode;
   x: number;
   y: number;
   onClick: () => void;
+  isNew?: boolean;
 }
 
-export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
+export const ThreatStar = ({ node, x, y, onClick, isNew = false }: ThreatStarProps) => {
   const [ripple, setRipple] = useState(false);
   const [hover, setHover] = useState(false);
+  const [noiseOffset, setNoiseOffset] = useState({ x: 0, y: 0 });
+  const [entryState, setEntryState] = useState<'entering' | 'entered'>('entered');
+  const [glowBloom, setGlowBloom] = useState(0);
+  const startTimeRef = useRef<number>(0);
 
   const isVulnerable = node.is_vulnerable;
   
-  // Generate unique animation parameters based on node id for organic variation
-  const seed = node.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const animationDuration = 8 + (seed % 6); // 8-14 seconds
-  const animationDelay = (seed % 4); // 0-4 seconds delay
-  const driftAngle = (seed * 137.5) % 360; // Unique drift direction
+  // Generate unique seed based on node id for consistent per-node randomness
+  const seed = useMemo(() => 
+    node.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0),
+    [node.id]
+  );
 
+  // Entry animation duration (randomized per node)
+  const entryDuration = useMemo(() => 
+    400 + seededRandom(seed * 100) * 300, // 400-700ms
+    [seed]
+  );
+
+  // Cinematic entry animation for new nodes
+  useEffect(() => {
+    if (isNew) {
+      setEntryState('entering');
+      setGlowBloom(1);
+      
+      // Fade in the glow bloom
+      const bloomTimer = setTimeout(() => {
+        setGlowBloom(0);
+      }, entryDuration * 0.6);
+      
+      // Complete entry
+      const entryTimer = setTimeout(() => {
+        setEntryState('entered');
+      }, entryDuration);
+      
+      return () => {
+        clearTimeout(bloomTimer);
+        clearTimeout(entryTimer);
+      };
+    }
+  }, [isNew, entryDuration]);
+
+  // Organic Perlin-based micro-drift animation
+  useEffect(() => {
+    let animationFrame: number;
+    startTimeRef.current = Date.now() + seed * 100; // Offset start time per node
+    
+    const animate = () => {
+      const elapsed = Date.now() - startTimeRef.current;
+      // Max drift varies per node (1-4px)
+      const maxDrift = 1 + seededRandom(seed * 50) * 3;
+      const offset = generateNoiseDrift(seed, elapsed, maxDrift);
+      setNoiseOffset(offset);
+      animationFrame = requestAnimationFrame(animate);
+    };
+    
+    animationFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [seed]);
+
+  // Secure ripple effect
   useEffect(() => {
     if (!isVulnerable) {
       setRipple(true);
@@ -37,16 +91,32 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
     if (weight < 7) return '#9A2E4A';    // Lighter crimson - medium risk
     return '#E03E84';                     // Magenta - high/critical risk
   };
+  
+  // Per-node glow variance based on risk
+  const glowVariance = useMemo(() => {
+    const weight = node.risk_weight ?? 5;
+    const baseBlur = isVulnerable ? 22 + (weight / 10) * 8 : 18;
+    const baseOpacity = isVulnerable ? 0.45 + (weight / 10) * 0.2 : 0.3;
+    
+    return {
+      blur: baseBlur + seededRandom(seed * 10) * 6,
+      opacity: baseOpacity + seededRandom(seed * 11) * 0.1,
+    };
+  }, [seed, isVulnerable, node.risk_weight]);
 
-  // CSS keyframes for ambient drift - applied to inner content
-  const driftKeyframes = `
-    @keyframes drift-${seed} {
-      0%, 100% { transform: translate(0px, 0px); }
-      25% { transform: translate(${Math.cos(driftAngle * Math.PI / 180) * 2}px, ${Math.sin(driftAngle * Math.PI / 180) * 1.5}px); }
-      50% { transform: translate(${Math.cos((driftAngle + 90) * Math.PI / 180) * 1.5}px, ${Math.sin((driftAngle + 90) * Math.PI / 180) * 2}px); }
-      75% { transform: translate(${Math.cos((driftAngle + 180) * Math.PI / 180) * 2}px, ${Math.sin((driftAngle + 180) * Math.PI / 180) * 1}px); }
+  // Entry animation styles
+  const entryStyles = useMemo(() => {
+    if (entryState === 'entering') {
+      return {
+        opacity: 0,
+        transform: 'scale(0.85)',
+      };
     }
-  `;
+    return {
+      opacity: 1,
+      transform: 'scale(1)',
+    };
+  }, [entryState]);
 
   return (
     <div
@@ -56,73 +126,89 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
         top: `${y}%`,
         transform: "translate(-50%, -50%)",
         zIndex: hover ? 20 : 10,
+        ...entryStyles,
+        transition: `opacity ${entryDuration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94), transform ${entryDuration}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`,
       }}
       onClick={onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      {/* Inject unique drift keyframes */}
-      <style>{driftKeyframes}</style>
-      
-      {/* Ambient drift wrapper for visual elements - scale applied here only */}
+      {/* Organic drift wrapper - Perlin-like motion applied via noiseOffset */}
       <div
         style={{
-          animation: `drift-${seed} ${animationDuration}s ease-in-out ${animationDelay}s infinite`,
-          transform: hover ? "scale(1.4)" : "scale(1)",
-          transition: "transform 0.25s ease-out",
+          transform: `translate(${noiseOffset.x}px, ${noiseOffset.y}px) scale(${hover ? 1.3 : 1})`,
+          transition: "transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
         }}
       >
-        {/* Secure ripple effect */}
-        {ripple && !isVulnerable && (
+        {/* Entry bloom effect - peaks briefly then settles */}
+        {glowBloom > 0 && (
           <div 
-            className="absolute inset-0 rounded-full animate-ping opacity-60" 
+            className="absolute inset-0 rounded-full pointer-events-none"
             style={{ 
-              width: "50px", 
-              height: "50px", 
-              margin: "-20px",
-              backgroundColor: getRiskColor() 
+              width: "80px", 
+              height: "80px", 
+              margin: "-36px",
+              background: `radial-gradient(circle, ${getRiskColor()} 0%, transparent 70%)`,
+              opacity: glowBloom * 0.6,
+              filter: 'blur(15px)',
+              transition: `opacity ${entryDuration * 0.5}ms ease-out`,
             }}
           />
         )}
 
-        {/* Vulnerability pulse effect */}
-        {isVulnerable && (
+        {/* Secure ripple effect */}
+        {ripple && !isVulnerable && (
           <div 
-            className="absolute inset-0 rounded-full animate-ping" 
+            className="absolute inset-0 rounded-full animate-ping pointer-events-none" 
             style={{ 
               width: "45px", 
               height: "45px", 
               margin: "-18px",
               backgroundColor: getRiskColor(),
               opacity: 0.4,
+            }}
+          />
+        )}
+
+        {/* Vulnerability pulse effect - subtle, not flashy */}
+        {isVulnerable && entryState === 'entered' && (
+          <div 
+            className="absolute inset-0 rounded-full animate-pulse pointer-events-none" 
+            style={{ 
+              width: "40px", 
+              height: "40px", 
+              margin: "-16px",
+              backgroundColor: getRiskColor(),
+              opacity: 0.25,
+              filter: 'blur(10px)',
             }} 
           />
         )}
         
-        {/* Pulsing glow aura */}
+        {/* Soft glow aura with per-node variance */}
         <div
-          className={`absolute inset-0 rounded-full blur-2xl transition-all duration-700 ${
-            isVulnerable ? "animate-pulse" : ""
-          }`}
+          className="absolute inset-0 rounded-full transition-all duration-700 pointer-events-none"
           style={{
-            width: hover ? "60px" : "50px",
-            height: hover ? "60px" : "50px",
-            margin: hover ? "-25px" : "-20px",
+            width: hover ? "55px" : "45px",
+            height: hover ? "55px" : "45px",
+            margin: hover ? "-22px" : "-18px",
             backgroundColor: getRiskColor(),
-            opacity: isVulnerable ? 0.75 : 0.5,
+            opacity: glowVariance.opacity,
+            filter: `blur(${glowVariance.blur}px)`,
           }}
         />
         
-        {/* Core star */}
+        {/* Core star with soft inner glow */}
         <div
           className="relative rounded-full transition-all duration-500"
           style={{
-            width: isVulnerable ? "16px" : "12px",
-            height: isVulnerable ? "16px" : "12px",
+            width: isVulnerable ? "14px" : "10px",
+            height: isVulnerable ? "14px" : "10px",
             backgroundColor: getRiskColor(),
-            boxShadow: isVulnerable
-              ? `0 0 40px ${getRiskColor()}, 0 0 60px ${getRiskColor()}, inset 0 0 10px rgba(255,255,255,0.3)`
-              : `0 0 20px ${getRiskColor()}, inset 0 0 8px rgba(255,255,255,0.5)`,
+            boxShadow: `
+              0 0 ${isVulnerable ? 25 : 15}px ${getRiskColor()},
+              inset 0 0 ${isVulnerable ? 6 : 4}px rgba(255,255,255,0.4)
+            `,
           }}
         />
       </div>
