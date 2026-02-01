@@ -8,49 +8,49 @@
 
 @layer base {
   :root {
-    /* Orion Elegant Cosmic Theme */
-    /* Cream / Off-White #FFF8F0 */
-    --background: 32 100% 97%;
-    --foreground: 254 32% 28%;
+    /* Orion Dark Cosmic Theme */
+    /* Near-black with dark red undertone */
+    --background: 0 20% 5%;
+    --foreground: 0 0% 95%;
 
-    /* Glassmorphic cards - cream tinted */
-    --card: 32 50% 95%;
-    --card-foreground: 254 32% 28%;
+    /* Glassmorphic cards - dark indigo */
+    --card: 254 30% 10%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 32 40% 96%;
-    --popover-foreground: 254 32% 28%;
+    --popover: 254 30% 12%;
+    --popover-foreground: 0 0% 95%;
 
     /* Deep Indigo / Dark Purple #3C3160 */
     --primary: 254 32% 28%;
-    --primary-foreground: 32 100% 97%;
+    --primary-foreground: 0 0% 95%;
 
     /* Secure state - indigo */
     --secondary: 254 32% 38%;
-    --secondary-foreground: 32 100% 97%;
+    --secondary-foreground: 0 0% 95%;
 
-    /* Muted elements */
-    --muted: 254 20% 90%;
-    --muted-foreground: 254 20% 45%;
+    /* Muted elements - dark */
+    --muted: 254 20% 15%;
+    --muted-foreground: 254 15% 60%;
 
     /* Salmon / Coral Pink #F56F72 for accent */
     --accent: 359 87% 70%;
-    --accent-foreground: 32 100% 97%;
+    --accent-foreground: 0 0% 95%;
 
     /* Magenta / Hot Pink #E03E84 for destructive/critical */
     --destructive: 334 73% 56%;
-    --destructive-foreground: 32 100% 97%;
+    --destructive-foreground: 0 0% 95%;
 
-    /* Borders - soft indigo */
-    --border: 254 20% 85%;
-    --input: 254 15% 92%;
+    /* Borders - dark indigo */
+    --border: 254 25% 20%;
+    --input: 254 20% 12%;
     --ring: 254 32% 28%;
 
     --radius: 1rem;
 
-    /* Nebula gradient - indigo tones */
-    --nebula-start: 32 100% 97%;
-    --nebula-mid: 254 25% 92%;
-    --nebula-end: 254 30% 88%;
+    /* Nebula gradient - dark red-black tones */
+    --nebula-start: 0 20% 5%;
+    --nebula-mid: 350 18% 7%;
+    --nebula-end: 0 15% 4%;
 
     /* Glow effects */
     --glow-secure: 254 32% 28%;
