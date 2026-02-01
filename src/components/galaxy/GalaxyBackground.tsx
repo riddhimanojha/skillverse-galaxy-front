@@ -130,9 +130,9 @@ export const GalaxyBackground = ({
         <mesh position={[0, 0, 0]}>
           <sphereGeometry args={[46, 48, 48]} />
           <meshBasicMaterial
-            color="#7c3aed"
+            color="#2a0a0a"
             transparent
-            opacity={0.1}
+            opacity={0.15}
             blending={THREE.AdditiveBlending}
           />
         </mesh>
