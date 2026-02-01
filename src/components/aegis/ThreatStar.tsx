@@ -127,68 +127,123 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
         />
       </div>
 
-      {/* Persistent file name label - muted sky blue */}
+      {/* Persistent file name label - refined styling */}
       {node.file_name && (
         <div 
           className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none"
           style={{
-            top: 'calc(100% + 10px)',
-            fontSize: '11px',
+            top: 'calc(100% + 12px)',
+            fontSize: '10px',
             fontWeight: 500,
-            color: 'rgba(127, 183, 214, 0.7)',
-            letterSpacing: '0.01em',
+            fontFamily: "'JetBrains Mono', monospace",
+            color: 'rgba(127, 183, 214, 0.55)',
+            letterSpacing: '0.02em',
+            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
           }}
         >
           {node.file_name}
         </div>
       )}
 
-      {/* Hover tooltip with problem/solution */}
+      {/* Hover tooltip with problem/solution - refined glass effect */}
       {hover && (
         <div 
-          className="absolute left-1/2 -translate-x-1/2 mt-8 w-72 glass-panel rounded-xl animate-fade-in z-50 overflow-hidden"
-          style={{ top: '100%' }}
+          className="absolute left-1/2 -translate-x-1/2 mt-10 w-80 rounded-2xl animate-fade-in z-50 overflow-hidden"
+          style={{ 
+            top: '100%',
+            background: 'rgba(18, 8, 12, 0.92)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            border: '1px solid rgba(122, 30, 58, 0.2)',
+            boxShadow: '0 16px 48px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 248, 240, 0.03)',
+          }}
         >
           {/* Header */}
-          <div className={`px-4 py-2.5 ${isVulnerable ? 'bg-[#7A1E3A]/10' : 'bg-[#7FB7D6]/10'}`}>
-            <div className={`font-bold text-sm ${isVulnerable ? 'text-[#E03E84]' : 'text-[#7FB7D6]'}`}>
-              {isVulnerable ? '🚨 ' : '🛡️ '}{node.category_name}
+          <div 
+            className="px-4 py-3"
+            style={{
+              background: isVulnerable ? 'rgba(122, 30, 58, 0.12)' : 'rgba(127, 183, 214, 0.08)',
+              borderBottom: `1px solid ${isVulnerable ? 'rgba(122, 30, 58, 0.15)' : 'rgba(127, 183, 214, 0.1)'}`,
+            }}
+          >
+            <div 
+              className="font-semibold text-sm"
+              style={{ color: isVulnerable ? '#E03E84' : '#7FB7D6' }}
+            >
+              {node.category_name}
             </div>
             {node.file_name && (
-              <div className="text-xs font-mono mt-0.5" style={{ color: 'rgba(127, 183, 214, 0.8)' }}>
-                📄 {node.file_name}{node.line_no ? `:${node.line_no}` : ''}
+              <div 
+                className="text-xs mt-1"
+                style={{ 
+                  fontFamily: "'JetBrains Mono', monospace",
+                  color: 'rgba(127, 183, 214, 0.6)',
+                }}
+              >
+                {node.file_name}{node.line_no ? `:${node.line_no}` : ''}
               </div>
             )}
             {isVulnerable && (
-              <div className="flex items-center gap-2 mt-1.5">
-                <span className={`px-2 py-0.5 rounded text-xs font-bold ${
-                  node.severity === 'Critical' 
-                    ? 'bg-[#E03E84]/30 text-[#E03E84]' 
-                    : node.severity === 'High'
-                    ? 'bg-[#9A2E4A]/30 text-[#9A2E4A]'
-                    : 'bg-[#7A1E3A]/30 text-[#7A1E3A]'
-                }`}>
+              <div className="flex items-center gap-2 mt-2">
+                <span 
+                  className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide"
+                  style={{
+                    background: node.severity === 'Critical' 
+                      ? 'rgba(224, 62, 132, 0.2)' 
+                      : node.severity === 'High'
+                      ? 'rgba(154, 46, 74, 0.2)'
+                      : 'rgba(122, 30, 58, 0.2)',
+                    color: node.severity === 'Critical' 
+                      ? '#E03E84' 
+                      : node.severity === 'High'
+                      ? '#9A2E4A'
+                      : '#7A1E3A',
+                    border: `1px solid ${node.severity === 'Critical' 
+                      ? 'rgba(224, 62, 132, 0.3)' 
+                      : node.severity === 'High'
+                      ? 'rgba(154, 46, 74, 0.3)'
+                      : 'rgba(122, 30, 58, 0.3)'}`,
+                  }}
+                >
                   {node.severity}
                 </span>
-                <span className="text-xs text-muted-foreground">
-                  Risk: {node.risk_weight ?? 5}/10
+                <span 
+                  className="text-[10px]"
+                  style={{ color: 'rgba(255, 248, 240, 0.4)' }}
+                >
+                  Risk {node.risk_weight ?? 5}/10
                 </span>
               </div>
             )}
           </div>
           
           {isVulnerable ? (
-            <div className="p-3 space-y-3">
+            <div className="p-4 space-y-3">
               {/* Problem Section */}
               {node.file_content && (
-                <div className="space-y-1.5">
-                  <div className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5" style={{ color: '#E03E84' }}>
-                    <span>⚠️</span> Problem
+                <div className="space-y-2">
+                  <div 
+                    className="text-[10px] font-semibold uppercase tracking-widest"
+                    style={{ color: 'rgba(224, 62, 132, 0.7)' }}
+                  >
+                    Problem
                   </div>
-                  <div className="rounded-lg p-2 overflow-hidden" style={{ background: 'rgba(122, 30, 58, 0.15)', border: '1px solid rgba(122, 30, 58, 0.25)' }}>
-                    <pre className="text-xs font-mono whitespace-pre-wrap overflow-x-auto max-h-20" style={{ color: 'rgba(224, 62, 132, 0.85)' }}>
-                      {node.file_content.length > 150 
-                        ? node.file_content.substring(0, 150) + '...' 
+                  <div 
+                    className="rounded-lg p-2.5 overflow-hidden"
+                    style={{ 
+                      background: 'rgba(122, 30, 58, 0.1)', 
+                      border: '1px solid rgba(122, 30, 58, 0.15)',
+                    }}
+                  >
+                    <pre 
+                      className="text-[11px] whitespace-pre-wrap overflow-x-auto max-h-16"
+                      style={{ 
+                        fontFamily: "'JetBrains Mono', monospace",
+                        color: 'rgba(224, 62, 132, 0.8)',
+                      }}
+                    >
+                      {node.file_content.length > 120 
+                        ? node.file_content.substring(0, 120) + '...' 
                         : node.file_content}
                     </pre>
                   </div>
@@ -196,27 +251,58 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
               )}
               
               {/* Solution Section */}
-              <div className="space-y-1.5">
-                <div className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5" style={{ color: '#7FB7D6' }}>
-                  <span>✅</span> Solution
+              <div className="space-y-2">
+                <div 
+                  className="text-[10px] font-semibold uppercase tracking-widest"
+                  style={{ color: 'rgba(127, 183, 214, 0.7)' }}
+                >
+                  Solution
                 </div>
-                <div className="rounded-lg p-2 overflow-hidden" style={{ background: 'rgba(127, 183, 214, 0.1)', border: '1px solid rgba(127, 183, 214, 0.2)' }}>
-                  <pre className="text-xs font-mono whitespace-pre-wrap overflow-x-auto max-h-20" style={{ color: 'rgba(127, 183, 214, 0.85)' }}>
-                    {(node.fix_code || node.occam_fix).length > 150 
-                      ? (node.fix_code || node.occam_fix).substring(0, 150) + '...' 
+                <div 
+                  className="rounded-lg p-2.5 overflow-hidden"
+                  style={{ 
+                    background: 'rgba(127, 183, 214, 0.06)', 
+                    border: '1px solid rgba(127, 183, 214, 0.12)',
+                  }}
+                >
+                  <pre 
+                    className="text-[11px] whitespace-pre-wrap overflow-x-auto max-h-16"
+                    style={{ 
+                      fontFamily: "'JetBrains Mono', monospace",
+                      color: 'rgba(127, 183, 214, 0.8)',
+                    }}
+                  >
+                    {(node.fix_code || node.occam_fix).length > 120 
+                      ? (node.fix_code || node.occam_fix).substring(0, 120) + '...' 
                       : (node.fix_code || node.occam_fix)}
                   </pre>
                 </div>
               </div>
               
-              <div className="text-xs text-center text-muted-foreground pt-1 border-t border-border/30">
-                Click to view full details
+              <div 
+                className="text-[10px] text-center pt-2"
+                style={{ 
+                  color: 'rgba(255, 248, 240, 0.35)',
+                  borderTop: '1px solid rgba(122, 30, 58, 0.1)',
+                }}
+              >
+                Click for details
               </div>
             </div>
           ) : (
-            <div className="p-3 text-center">
-              <div className="text-sm" style={{ color: 'rgba(127, 183, 214, 0.8)' }}>✓ This node is secured</div>
-              <div className="text-xs text-muted-foreground mt-1">No action needed</div>
+            <div className="p-4 text-center">
+              <div 
+                className="text-sm font-medium"
+                style={{ color: 'rgba(127, 183, 214, 0.8)' }}
+              >
+                Secured
+              </div>
+              <div 
+                className="text-[11px] mt-1"
+                style={{ color: 'rgba(255, 248, 240, 0.35)' }}
+              >
+                No action needed
+              </div>
             </div>
           )}
         </div>
