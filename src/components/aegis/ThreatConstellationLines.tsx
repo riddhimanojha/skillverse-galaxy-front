@@ -93,8 +93,31 @@ export const ThreatConstellationLines = ({
     return result;
   }, [relationships, fileToNode, nodeIdToPosition]);
   
+  // Node size offset (stars are centered with translate(-50%, -50%))
+  // Lines already use same % coordinates, but SVG elements don't auto-center
+  // We need to adjust the SVG viewport to match the positioned stars
+  
   return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
+    <svg 
+      className="absolute inset-0 w-full h-full pointer-events-none z-0"
+      style={{ overflow: 'visible' }}
+    >
+      <defs>
+        {lines.map((line, index) => (
+          <linearGradient
+            key={`gradient-${index}`}
+            id={`line-gradient-${index}`}
+            x1="0%"
+            y1="0%"
+            x2="100%"
+            y2="0%"
+          >
+            <stop offset="0%" stopColor={line.color} stopOpacity="0.8" />
+            <stop offset="50%" stopColor={line.color} stopOpacity="0.5" />
+            <stop offset="100%" stopColor={line.color} stopOpacity="0.8" />
+          </linearGradient>
+        ))}
+      </defs>
       {lines.map((line, index) => (
         <line
           key={index}
@@ -102,9 +125,9 @@ export const ThreatConstellationLines = ({
           y1={`${line.y1}%`}
           x2={`${line.x2}%`}
           y2={`${line.y2}%`}
-          stroke={line.color}
-          strokeWidth="2"
-          strokeOpacity="0.7"
+          stroke={`url(#line-gradient-${index})`}
+          strokeWidth="1.5"
+          strokeLinecap="round"
         />
       ))}
     </svg>
