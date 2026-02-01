@@ -181,13 +181,13 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                   </div>
                 )}
 
-                {/* Recommended Fix */}
+                {/* Fixed Code Preview */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Shield className="w-4 h-4 text-green-400" />
                       <span className="text-xs text-green-400 uppercase tracking-wider font-semibold">
-                        Recommended Fix
+                        Fixed Code Preview
                       </span>
                     </div>
                     <Button
@@ -202,7 +202,9 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
                   </div>
                   <div className="bg-green-950/30 rounded-xl border border-green-500/30 overflow-hidden">
                     <pre className="p-4 overflow-x-auto max-w-full">
-                      <code className="font-mono text-sm break-all whitespace-pre-wrap">{renderCodeBlock(selectedNode.occam_fix, "fix")}</code>
+                      <code className="font-mono text-sm break-all whitespace-pre-wrap">
+                        {renderCodeBlock(selectedNode.fix_code || selectedNode.occam_fix, "fix")}
+                      </code>
                     </pre>
                   </div>
                 </div>
