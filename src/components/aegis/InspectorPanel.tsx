@@ -19,10 +19,10 @@ export const InspectorPanel = ({ selectedNode, onDeployPatch, onClose }: Inspect
 
   const handleCopyFix = async () => {
     if (!selectedNode) return;
-    const fixedPart = selectedNode.occam_fix.split("// ✅")[1] || selectedNode.occam_fix;
-    await navigator.clipboard.writeText(fixedPart.trim());
+    const codeToUse = selectedNode.fix_code || selectedNode.occam_fix;
+    await navigator.clipboard.writeText(codeToUse.trim());
     setCopiedFix(true);
-    toast.success("Fix copied to clipboard");
+    toast.success("Fix code copied to clipboard");
     setTimeout(() => setCopiedFix(false), 2000);
   };
 
