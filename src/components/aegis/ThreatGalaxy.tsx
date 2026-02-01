@@ -93,11 +93,68 @@ export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxy
   return (
     <div className="relative w-full h-full">
       {/* Constellation lines from file_relationships */}
-      <ThreatConstellationLines 
-        nodes={nodes} 
-        nodePositions={nodePositions} 
-        relationships={relationships}
-      />
+      <svg 
+        className="absolute inset-0 w-full h-full pointer-events-none z-0"
+        style={{ overflow: 'visible' }}
+      >
+        <defs>
+          {nodePositions.map((pos, index) => {
+            const node = nodes[index];
+            const isVulnerable = node?.is_vulnerable;
+            const riskWeight = node?.risk_weight ?? 5;
+            
+            let color = 'hsl(145, 70%, 45%)'; // Green - secure
+            if (isVulnerable) {
+              if (riskWeight >= 7) color = 'hsl(0, 85%, 55%)';
+              else if (riskWeight >= 3) color = 'hsl(30, 90%, 55%)';
+              else color = 'hsl(45, 90%, 55%)';
+            }
+            
+            return (
+              <linearGradient
+                key={`gradient-${index}`}
+                id={`line-gradient-${index}`}
+                x1="0%"
+                y1="0%"
+                x2="100%"
+                y2="0%"
+              >
+                <stop offset="0%" stopColor={color} stopOpacity="0.3" />
+                <stop offset="50%" stopColor={color} stopOpacity="0.7" />
+                <stop offset="100%" stopColor={color} stopOpacity="0.3" />
+              </linearGradient>
+            );
+          })}
+        </defs>
+        
+        {/* Draw lines based on relationships */}
+        {relationships.map((rel, index) => {
+          const fromNode = nodes.find(n => n.file_name === rel.from_file);
+          const toNode = nodes.find(n => n.file_name === rel.to_file);
+          
+          if (!fromNode || !toNode) return null;
+          
+          const fromPos = nodePositions.find(p => p.id === fromNode.id);
+          const toPos = nodePositions.find(p => p.id === toNode.id);
+          
+          if (!fromPos || !toPos) return null;
+          
+          const fromIdx = nodes.findIndex(n => n.id === fromNode.id);
+          
+          return (
+            <line
+              key={`line-${index}`}
+              x1={`${fromPos.x}%`}
+              y1={`${fromPos.y}%`}
+              x2={`${toPos.x}%`}
+              y2={`${toPos.y}%`}
+              stroke={`url(#line-gradient-${fromIdx})`}
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          );
+        })}
+      </svg>
       
       {/* Stars */}
       {nodes.map((node, index) => (

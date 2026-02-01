@@ -107,10 +107,10 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
         <div 
           className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none"
           style={{
-            top: 'calc(100% + 8px)',
-            fontSize: '10px',
+            top: 'calc(100% + 10px)',
+            fontSize: '11px',
             fontWeight: 500,
-            color: 'rgba(255, 255, 255, 0.55)',
+            color: 'rgba(255, 255, 255, 0.6)',
             letterSpacing: '0.01em',
           }}
         >
