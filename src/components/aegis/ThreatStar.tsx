@@ -25,14 +25,11 @@ export const ThreatStar = ({ node, x, y, onClick }: ThreatStarProps) => {
   const getRiskColor = () => {
     if (!isVulnerable) return 'hsl(160, 100%, 50%)'; // Secure green
     
-    // Use risk_weight to determine color (0-100 scale)
-    const weight = node.risk_weight ?? 50;
+    const weight = node.risk_weight ?? 5;
     
-    if (weight >= 80) return 'hsl(0, 90%, 55%)';    // Red - critical risk
-    if (weight >= 60) return 'hsl(15, 90%, 55%)';   // Red-orange
-    if (weight >= 40) return 'hsl(30, 90%, 55%)';   // Orange
-    if (weight >= 20) return 'hsl(45, 90%, 55%)';   // Yellow-orange
-    return 'hsl(55, 85%, 50%)';                      // Yellow - low risk
+    if (weight < 3) return 'hsl(45, 90%, 55%)';   // Golden
+    if (weight < 7) return 'hsl(25, 90%, 55%)';   // Orange
+    return 'hsl(0, 85%, 55%)';                     // Red
   };
 
   return (
