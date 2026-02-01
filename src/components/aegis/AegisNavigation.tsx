@@ -23,8 +23,8 @@ export const AegisNavigation = () => {
               to={item.path}
               className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${
                 isActive 
-                  ? 'bg-primary/20 text-primary' 
-                  : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
+                  ? 'bg-primary/30 text-white shadow-[0_0_15px_rgba(60,49,96,0.4)]' 
+                  : 'text-muted-foreground hover:text-white hover:bg-white/5'
               }`}
             >
               <Icon className="w-4 h-4" />
