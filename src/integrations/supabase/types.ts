@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      file_relationships: {
+        Row: {
+          from_file: string
+          id: string
+          relation: string
+          to_file: string
+        }
+        Insert: {
+          from_file: string
+          id?: string
+          relation: string
+          to_file: string
+        }
+        Update: {
+          from_file?: string
+          id?: string
+          relation?: string
+          to_file?: string
+        }
+        Relationships: []
+      }
       findings: {
         Row: {
           category: string
@@ -52,6 +73,7 @@ export type Database = {
           is_vulnerable: boolean
           line_no: number | null
           occam_fix: string
+          risk_weight: number | null
           severity: string
         }
         Insert: {
@@ -64,6 +86,7 @@ export type Database = {
           is_vulnerable?: boolean
           line_no?: number | null
           occam_fix: string
+          risk_weight?: number | null
           severity?: string
         }
         Update: {
@@ -76,6 +99,7 @@ export type Database = {
           is_vulnerable?: boolean
           line_no?: number | null
           occam_fix?: string
+          risk_weight?: number | null
           severity?: string
         }
         Relationships: []

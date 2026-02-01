@@ -1,80 +1,60 @@
 import { useMemo } from "react";
 import { SecurityNode } from "@/types/securityNode";
+import { FileRelationship } from "@/types/fileRelationship";
 
 interface ThreatConstellationLinesProps {
   nodes: SecurityNode[];
   nodePositions: { id: string; x: number; y: number }[];
+  relationships: FileRelationship[];
 }
 
-export const ThreatConstellationLines = ({ nodes, nodePositions }: ThreatConstellationLinesProps) => {
-  // Build a map of node index to whether it's "infected" (affected by upstream vulnerability)
-  // Propagation: if any node before this one in the chain is vulnerable, this path is at risk
-  const getInfectionState = useMemo(() => {
-    const infectedMap = new Map<string, { infected: boolean; maxSeverity: 'Critical' | 'High' | 'Medium' | null }>();
-    
-    let hasUpstreamVuln = false;
-    let maxUpstreamSeverity: 'Critical' | 'High' | 'Medium' | null = null;
-    
-    // Walk through nodes sequentially - vulnerabilities propagate downstream
-    for (const pos of nodePositions) {
-      const node = nodes.find(n => n.id === pos.id);
-      
-      if (node?.is_vulnerable) {
-        hasUpstreamVuln = true;
-        // Track the highest severity seen so far
-        if (node.severity === 'Critical') {
-          maxUpstreamSeverity = 'Critical';
-        } else if (node.severity === 'High' && maxUpstreamSeverity !== 'Critical') {
-          maxUpstreamSeverity = 'High';
-        } else if (node.severity === 'Medium' && !maxUpstreamSeverity) {
-          maxUpstreamSeverity = 'Medium';
-        }
+export const ThreatConstellationLines = ({ 
+  nodes, 
+  nodePositions, 
+  relationships 
+}: ThreatConstellationLinesProps) => {
+  
+  // Build a map of file_name to node for quick lookup
+  const fileToNode = useMemo(() => {
+    const map = new Map<string, SecurityNode>();
+    nodes.forEach(node => {
+      if (node.file_name) {
+        map.set(node.file_name, node);
       }
-      
-      infectedMap.set(pos.id, { 
-        infected: hasUpstreamVuln, 
-        maxSeverity: maxUpstreamSeverity 
-      });
-    }
-    
-    return infectedMap;
-  }, [nodes, nodePositions]);
+    });
+    return map;
+  }, [nodes]);
 
-  // Determine line color based on propagation logic
-  const getLineColor = (
-    node1Id: string, 
-    node2Id: string,
-    node1: SecurityNode | undefined, 
-    node2: SecurityNode | undefined
-  ): string => {
-    const state1 = getInfectionState.get(node1Id);
-    const state2 = getInfectionState.get(node2Id);
-    
-    // If neither node is infected (no upstream vulnerabilities affect them), green
-    if (!state1?.infected && !state2?.infected && !node1?.is_vulnerable && !node2?.is_vulnerable) {
-      return 'hsl(145, 70%, 45%)'; // Green - fully secure path
+  // Build a map of node id to position
+  const nodeIdToPosition = useMemo(() => {
+    const map = new Map<string, { x: number; y: number }>();
+    nodePositions.forEach(pos => {
+      map.set(pos.id, { x: pos.x, y: pos.y });
+    });
+    return map;
+  }, [nodePositions]);
+
+  // Get edge color based on risk_weight of the originating node
+  const getEdgeColor = (riskWeight: number | null, isVulnerable: boolean): string => {
+    if (!isVulnerable) {
+      return 'hsl(145, 70%, 45%)'; // Green - secure
     }
     
-    // Determine the highest severity in this connection
-    const severities = [
-      node1?.is_vulnerable ? node1.severity : null,
-      node2?.is_vulnerable ? node2.severity : null,
-      state1?.maxSeverity,
-      state2?.maxSeverity
-    ].filter(Boolean);
+    // Use risk_weight to determine color intensity
+    // Higher risk_weight = more severe color
+    const weight = riskWeight ?? 50; // Default to medium if null
     
-    if (severities.includes('Critical')) {
-      return 'hsl(0, 85%, 55%)'; // Red for critical
+    if (weight >= 80) {
+      return 'hsl(0, 85%, 55%)'; // Red for high risk
+    } else if (weight >= 50) {
+      return 'hsl(30, 90%, 55%)'; // Orange for medium-high
+    } else if (weight >= 25) {
+      return 'hsl(45, 90%, 55%)'; // Yellow-orange for medium
     }
-    
-    if (severities.includes('High')) {
-      return 'hsl(30, 90%, 55%)'; // Orange for high
-    }
-    
-    // Medium or infected by medium
-    return 'hsl(45, 90%, 55%)'; // Yellow-orange for medium
+    return 'hsl(60, 80%, 50%)'; // Yellow for low risk
   };
 
+  // Build lines from actual file_relationships
   const lines = useMemo(() => {
     const result: Array<{ 
       x1: number; 
@@ -82,56 +62,36 @@ export const ThreatConstellationLines = ({ nodes, nodePositions }: ThreatConstel
       x2: number; 
       y2: number; 
       color: string;
+      relation: string;
     }> = [];
     
-    // Create constellation connections (sequential - propagation flows through)
-    for (let i = 0; i < nodePositions.length - 1; i++) {
-      const current = nodePositions[i];
-      const next = nodePositions[i + 1];
+    relationships.forEach(rel => {
+      const fromNode = fileToNode.get(rel.from_file);
+      const toNode = fileToNode.get(rel.to_file);
       
-      const currentNode = nodes.find(n => n.id === current.id);
-      const nextNode = nodes.find(n => n.id === next.id);
-      
-      result.push({
-        x1: current.x,
-        y1: current.y,
-        x2: next.x,
-        y2: next.y,
-        color: getLineColor(current.id, next.id, currentNode, nextNode),
-      });
-    }
-    
-    // Cross-connections also follow propagation
-    if (nodePositions.length >= 4) {
-      const n0 = nodePositions[0];
-      const n3 = nodePositions[3];
-      const node0 = nodes.find(n => n.id === n0.id);
-      const node3 = nodes.find(n => n.id === n3.id);
-      result.push({
-        x1: n0.x,
-        y1: n0.y,
-        x2: n3.x,
-        y2: n3.y,
-        color: getLineColor(n0.id, n3.id, node0, node3),
-      });
-    }
-    
-    if (nodePositions.length >= 5) {
-      const n1 = nodePositions[1];
-      const n4 = nodePositions[4];
-      const node1 = nodes.find(n => n.id === n1.id);
-      const node4 = nodes.find(n => n.id === n4.id);
-      result.push({
-        x1: n1.x,
-        y1: n1.y,
-        x2: n4.x,
-        y2: n4.y,
-        color: getLineColor(n1.id, n4.id, node1, node4),
-      });
-    }
+      // Only draw if both nodes exist in our current nodes list
+      if (fromNode && toNode) {
+        const fromPos = nodeIdToPosition.get(fromNode.id);
+        const toPos = nodeIdToPosition.get(toNode.id);
+        
+        if (fromPos && toPos) {
+          // Use the originating node's risk_weight for edge color
+          const color = getEdgeColor(fromNode.risk_weight, fromNode.is_vulnerable);
+          
+          result.push({
+            x1: fromPos.x,
+            y1: fromPos.y,
+            x2: toPos.x,
+            y2: toPos.y,
+            color,
+            relation: rel.relation,
+          });
+        }
+      }
+    });
     
     return result;
-  }, [nodes, nodePositions, getInfectionState]);
+  }, [relationships, fileToNode, nodeIdToPosition]);
   
   return (
     <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
