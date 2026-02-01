@@ -8,5 +8,6 @@ export interface SecurityNode {
   file_name: string | null;
   file_content: string | null;
   line_no: number | null;
+  risk_weight: number | null;
   created_at: string;
 }

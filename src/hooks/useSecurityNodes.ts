@@ -1,30 +1,44 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SecurityNode } from "@/types/securityNode";
+import { FileRelationship } from "@/types/fileRelationship";
 import { toast } from "sonner";
 
 export const useSecurityNodes = () => {
   const [nodes, setNodes] = useState<SecurityNode[]>([]);
+  const [relationships, setRelationships] = useState<FileRelationship[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch initial nodes
+  // Fetch initial nodes and relationships
   useEffect(() => {
-    const fetchNodes = async () => {
-      const { data, error } = await supabase
-        .from('security_nodes')
-        .select('*')
-        .order('created_at', { ascending: true });
+    const fetchData = async () => {
+      const [nodesResult, relationshipsResult] = await Promise.all([
+        supabase
+          .from('security_nodes')
+          .select('*')
+          .order('created_at', { ascending: true }),
+        supabase
+          .from('file_relationships')
+          .select('*')
+      ]);
 
-      if (error) {
-        console.error('Error fetching security nodes:', error);
+      if (nodesResult.error) {
+        console.error('Error fetching security nodes:', nodesResult.error);
         toast.error('Failed to load threat data');
       } else {
-        setNodes(data as SecurityNode[]);
+        setNodes(nodesResult.data as SecurityNode[]);
       }
+
+      if (relationshipsResult.error) {
+        console.error('Error fetching file relationships:', relationshipsResult.error);
+      } else {
+        setRelationships(relationshipsResult.data as FileRelationship[]);
+      }
+
       setLoading(false);
     };
 
-    fetchNodes();
+    fetchData();
   }, []);
 
   // Set up real-time subscription
@@ -129,6 +143,7 @@ export const useSecurityNodes = () => {
 
   return {
     nodes,
+    relationships,
     loading,
     deployPatch,
     hasOpenFinding,

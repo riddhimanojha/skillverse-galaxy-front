@@ -1,9 +1,11 @@
 import { SecurityNode } from "@/types/securityNode";
+import { FileRelationship } from "@/types/fileRelationship";
 import { ThreatStar } from "./ThreatStar";
 import { ThreatConstellationLines } from "./ThreatConstellationLines";
 
 interface ThreatGalaxyProps {
   nodes: SecurityNode[];
+  relationships: FileRelationship[];
   onNodeClick: (node: SecurityNode) => void;
 }
 
@@ -20,7 +22,7 @@ const getNodePositions = (nodeCount: number) => {
   return positions.slice(0, nodeCount);
 };
 
-export const ThreatGalaxy = ({ nodes, onNodeClick }: ThreatGalaxyProps) => {
+export const ThreatGalaxy = ({ nodes, relationships, onNodeClick }: ThreatGalaxyProps) => {
   const positions = getNodePositions(nodes.length);
   
   const nodePositions = nodes.map((node, index) => ({
@@ -31,8 +33,12 @@ export const ThreatGalaxy = ({ nodes, onNodeClick }: ThreatGalaxyProps) => {
 
   return (
     <div className="relative w-full h-full">
-      {/* Constellation lines */}
-      <ThreatConstellationLines nodes={nodes} nodePositions={nodePositions} />
+      {/* Constellation lines from file_relationships */}
+      <ThreatConstellationLines 
+        nodes={nodes} 
+        nodePositions={nodePositions} 
+        relationships={relationships}
+      />
       
       {/* Stars */}
       {nodes.map((node, index) => (
